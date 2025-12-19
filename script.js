@@ -27,11 +27,6 @@ const series = [
     id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY",
     portada: "img/Loki.jpg"
   }
-    {
-    titulo: "Loki Temporada 1 - Episodio 2",
-    id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY",
-    portada: "img/Loki.jpg"
-}
 ];
 
 function cargar(lista, contenedor) {
