@@ -2,12 +2,12 @@ const peliculas = [
   {
     titulo: "Bambi",
     id: "1OKlsC4GLkGUYF6Cnsh0eeP39PrKTMyjV",
-    portada: "imagenes/bambi.jpg"
+    portada: "img/bambi.jpg"
   },
   {
     titulo: "Caramelo",
     id: "1dn-DmNz7NZTmz0EvFIHuMMNeTSdmZHS3",
-    portada: "imagenes/Caramelo.jpg"
+    portada: "img/Caramelo.jpg"
   }
 ];
 
@@ -15,12 +15,12 @@ const series = [
   {
     titulo: "IT Temporada 1 - Episodio 1",
     id: "109rkG4sPdh38wXWjAca6YAldG7AK2amo",
-    portada: "imagenes/It.jpg"
+    portada: "img/It.jpg"
   },
   {
     titulo: "Loki Temporada 1 - Episodio 1",
     id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY",
-    portada: "imagenes/Loki.jpg"
+    portada: "img/Loki.jpg"
   }
 ];
 
