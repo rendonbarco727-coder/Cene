@@ -19,7 +19,7 @@ const series = [
   },
   {
     titulo: "IT Temporada 1 - Episodio 2",
-    id: "1UM9Pl6JP00ruYSsglltJ6yx3FvGCLKn",
+    id: "1UM9Pl6JP00ruYSsglltJ6yx3FvGCLKn-",
     portada: "img/It.jpg"
   },
   {
