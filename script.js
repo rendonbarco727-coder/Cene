@@ -15,7 +15,13 @@ const peliculas = [
     portada: "img/Caramelo.jpg"
   }
 ];
-
+const novela = [
+  {
+    titulo: "Domenica Montero",
+    id: "1HKZBxjcB8VfNWIWQoINQ1__kGQH3KzLY",
+    portada: "img/domenica.jpg"
+  }
+];
 const series = [
   {
     titulo: "IT Temporada 1 - Episodio 1",
@@ -69,3 +75,4 @@ function cerrar() {
 
 cargar(peliculas, "peliculas");
 cargar(series, "series");
+cargar(novela, "novela");
