@@ -17,7 +17,7 @@ const peliculas = [
 ];
 const novela = [
   {
-    titulo: "Domenica Montero",
+    titulo: "Domenica Montero cap 01",
     id: "1HKZBxjcB8VfNWIWQoINQ1__kGQH3KzLY",
     portada: "img/domenica.jpg"
   }
