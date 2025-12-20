@@ -5,6 +5,11 @@ const peliculas = [
     portada: "img/bambi.jpg"
   },
   {
+    titulo: "Cosas imposibles",
+    id: "1S-O5BiPPZYUl9nVUicPAYywXhIKqM1VP",
+    portada: "img/cosas.jpg"
+  },
+  {
     titulo: "Caramelo",
     id: "1dn-DmNz7NZTmz0EvFIHuMMNeTSdmZHS3",
     portada: "img/Caramelo.jpg"
