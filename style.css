@@ -167,3 +167,60 @@ h2 {
     font-size: 13px;
   }
 }
+
+/* ====== EFECTO NIEVE ====== */
+
+/* Capa de nieve global */
+.snow {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  overflow: hidden;
+}
+
+/* Copos */
+.snow span {
+  position: absolute;
+  top: -10px;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: snowFall linear infinite;
+}
+
+/* Animación caída */
+@keyframes snowFall {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  90% {
+    transform: translateY(90vh) translateX(10px);
+  }
+  100% {
+    transform: translateY(100vh) translateX(-10px);
+  }
+}
+
+/* ====== REBOTE VISUAL SOBRE TARJETAS ====== */
+.card::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,0.6) 20%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
