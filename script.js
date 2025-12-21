@@ -20,7 +20,7 @@ const novela = [
     titulo: "Domenica Montero cap 01",
     id: "1HKZBxjcB8VfNWIWQoINQ1__kGQH3KzLY",
     portada: "img/domenica.jpg"
-  }
+  },
   {
     titulo: "Domenica Montero cap 02",
     id: "1H9PtFDGUj2KIZQBZ-4T4A_RbPjjTXN7o",
