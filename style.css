@@ -139,3 +139,24 @@ h2 {
     font-size: 13px;
   }
 }
+/* ====== SERIES HORIZONTALES ====== */
+.fila-horizontal {
+  display: flex;
+  gap: 15px;
+  padding: 0 20px 20px;
+  overflow-x: auto;
+}
+
+.fila-horizontal::-webkit-scrollbar {
+  height: 6px;
+}
+
+.fila-horizontal::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 10px;
+}
+
+.titulo-serie {
+  margin: 20px;
+  font-size: 18px;
+}
