@@ -1,3 +1,4 @@
+/* ====== BASE ====== */
 body {
   margin: 0;
   background: #111;
@@ -15,6 +16,7 @@ h2 {
   margin: 20px;
 }
 
+/* ====== GRID / FILAS ====== */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -22,31 +24,62 @@ h2 {
   padding: 20px;
 }
 
+/* ====== CARD ====== */
 .card {
   background: #222;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .card:hover {
-  transform: scale(1.05);
-  background: #333;
+  transform: scale(1.08);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
 }
 
+/* Imagen */
 .card img {
   width: 100%;
   height: 200px;
   object-fit: cover;
+  display: block;
 }
 
+/* Título sobre imagen */
 .card p {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
   padding: 10px;
-  text-align: center;
   font-size: 14px;
+  text-align: center;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  color: #fff;
 }
 
+/* Icono Play */
+.card::after {
+  content: "▶";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 42px;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
+/* ====== PLAYER ====== */
 .player {
   position: fixed;
   top: 0;
@@ -55,6 +88,7 @@ h2 {
   height: 100%;
   background: #000;
   z-index: 999;
+  animation: fadeIn 0.3s ease;
 }
 
 .player iframe {
@@ -63,19 +97,45 @@ h2 {
   border: none;
 }
 
+/* Animación */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Botón cerrar */
 .close {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 15px;
+  right: 15px;
   z-index: 1000;
-  font-size: 20px;
-  background: #000;
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.75);
   color: #fff;
   border: none;
-  padding: 10px;
+  padding: 12px 16px;
+  border-radius: 50%;
   cursor: pointer;
 }
 
+/* ====== UTIL ====== */
 .hidden {
   display: none;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 600px) {
+  .card img {
+    height: 180px;
+  }
+
+  .card p {
+    font-size: 13px;
+  }
 }
