@@ -43,7 +43,12 @@ const series = {
       titulo: "Temporada 1 - Episodio 2",
       id: "1UM9Pl6JP00ruYSsglltJ6yx3FvGCLKn-",
       portada: "img/It.jpg"
-    }
+    },
+    {
+      titulo: "Temporada 1 - Episodio 3",
+      id: "1dOztKuSgXOqfe9o4j2NE633XfAWpDu-1",
+      portada: "img/It.jpg"
+}
   ],
   "Loki": [
     {
