@@ -126,3 +126,10 @@ document.addEventListener("DOMContentLoaded", () => {
   cargar(novela, "novela");
   cargarSeriesPorFila(series);
 });
+
+// Simular acumulación progresiva de nieve
+setInterval(() => {
+  document.querySelectorAll(".card").forEach(card => {
+    card.classList.add("snowed");
+  });
+}, 5000);
