@@ -5,6 +5,11 @@ const peliculas = [
     id: "1OKlsC4GLkGUYF6Cnsh0eeP39PrKTMyjV",
     portada: "img/bambi.jpg"
   },
+    {
+    titulo: "Yo antes de Ti",
+    id: "1FLY2acLYfN2u_ffPfWyDZm0g1iqg_MH6",
+    portada: "img/yo.jpg"
+  },
   {
     titulo: "Five Nights at Freddy's 2",
     id: "16831kM6d-15tNBOqQIq_tCk25rBDTwce",
