@@ -6,6 +6,11 @@ const peliculas = [
     portada: "img/bambi.jpg"
   },
   {
+    titulo: "Five Nights at Freddy's 2",
+    id: "16831kM6d-15tNBOqQIq_tCk25rBDTwce",
+    portada: "img/freddy.jpg"
+  },
+  {
     titulo: "Cosas imposibles",
     id: "1S-O5BiPPZYUl9nVUicPAYywXhIKqM1VP",
     portada: "img/cosas.jpg"
