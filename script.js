@@ -53,6 +53,18 @@ const series = {
       titulo: "Temporada 1 - Episodio 4",
       id: "1MIqeU9ZwdpKuF2FGltndNpDF4d4ZNNE9",
       portada: "img/It.jpg"
+},
+    
+    {
+      titulo: "Temporada 1 - Episodio 5",
+      id: "1SV1gig2L8Gj3uti-7-8EAyq5riPd1GcO",
+      portada: "img/It.jpg"
+},
+    
+    {
+      titulo: "Temporada 1 - Episodio 6",
+      id: "1wyeG-X3cz2R2GTiLQQHEFxcCqtHCzMO7",
+      portada: "img/It.jpg"
 }
   ],
   
