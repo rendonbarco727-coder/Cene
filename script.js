@@ -6,6 +6,11 @@ const peliculas = [
     portada: "img/bambi.jpg"
   },
   {
+    titulo: "Doctor Sueño",
+    id: "173OExhru7h7P9zq8fQWp879fYXKd3SyI",
+    portada: "img/doc.jpg"
+  },
+  {
     titulo: "Trust",
     id: "1zF7nJapnl2dJUSLL2jrZbTzWz9S9o85x",
     portada: "img/trust.jpg"
