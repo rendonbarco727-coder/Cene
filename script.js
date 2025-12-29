@@ -15,7 +15,7 @@ const peliculas = [
     id: "1zF7nJapnl2dJUSLL2jrZbTzWz9S9o85x",
     portada: "img/trust.jpg"
   },
-    {
+  {
     titulo: "Yo antes de Ti",
     id: "1FLY2acLYfN2u_ffPfWyDZm0g1iqg_MH6",
     portada: "img/yo.jpg"
@@ -63,31 +63,8 @@ const series = {
       titulo: "Temporada 1 - Episodio 2",
       id: "1UM9Pl6JP00ruYSsglltJ6yx3FvGCLKn-",
       portada: "img/It.jpg"
-    },
-    {
-      titulo: "Temporada 1 - Episodio 3",
-      id: "1dOztKuSgXOqfe9o4j2NE633XfAWpDu-1",
-      portada: "img/It.jpg"
-},
-    {
-      titulo: "Temporada 1 - Episodio 4",
-      id: "1MIqeU9ZwdpKuF2FGltndNpDF4d4ZNNE9",
-      portada: "img/It.jpg"
-},
-    
-    {
-      titulo: "Temporada 1 - Episodio 5",
-      id: "1SV1gig2L8Gj3uti-7-8EAyq5riPd1GcO",
-      portada: "img/It.jpg"
-},
-    
-    {
-      titulo: "Temporada 1 - Episodio 6",
-      id: "1wyeG-X3cz2R2GTiLQQHEFxcCqtHCzMO7",
-      portada: "img/It.jpg"
-}
+    }
   ],
-  
   "Loki": [
     {
       titulo: "Temporada 1 - Episodio 1",
@@ -106,6 +83,8 @@ const series = {
 function cargar(lista, contenedor) {
   const div = document.getElementById(contenedor);
   if (!div) return;
+
+  div.innerHTML = "";
 
   lista.forEach(v => {
     const card = document.createElement("div");
@@ -150,29 +129,22 @@ function cargarSeriesPorFila(seriesObj) {
 }
 
 function reproducir(id) {
-  const player = document.getElementById("player");
   const frame = document.getElementById("videoFrame");
+  const player = document.getElementById("player");
   frame.src = `https://drive.google.com/file/d/${id}/preview`;
   player.classList.remove("hidden");
 }
 
 function cerrar() {
-  const player = document.getElementById("player");
   const frame = document.getElementById("videoFrame");
+  const player = document.getElementById("player");
   frame.src = "";
   player.classList.add("hidden");
 }
 
 /* ====== CARGA INICIAL ====== */
 document.addEventListener("DOMContentLoaded", () => {
-  cargar(peliculas, "peliculas");
-  cargar(novela, "novela");
-  cargarSeriesPorFila(series);
+  cargar(peliculas, "peliculas"); // fila horizontal
+  cargar(novela, "novela");       // fila horizontal
+  cargarSeriesPorFila(series);    // series agrupadas
 });
-
-// Simular acumulación progresiva de nieve
-setInterval(() => {
-  document.querySelectorAll(".card").forEach(card => {
-    card.classList.add("snowed");
-  });
-}, 5000);
