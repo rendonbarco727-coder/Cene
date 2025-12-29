@@ -203,7 +203,7 @@ function cerrar() {
 /* ====== CARGA INICIAL ====== */
 document.addEventListener("DOMContentLoaded", () => {
   cargarPorFila(peliculas, "peliculas");
-  cargar(novelas, "novela");
+  cargarPorFila(novelas, "novela");
   cargarSeriesPorFila(series);
 });
 
