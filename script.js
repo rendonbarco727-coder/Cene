@@ -53,11 +53,22 @@ const novelas = [
     titulo: "Domenica Montero Capítulo 02",
     id: "1H9PtFDGUj2KIZQBZ-4T4A_RbPjjTXN7o",
     portada: "img/domenica.jpg"
+  },
+  
+  {
+    titulo: "Domenica Montero Capítulo 03",
+    id: "",
+    portada: "img/domenica.jpg"
+  },
+  {
+    titulo: "Domenica Montero Capítulo 04",
+    id: "",
+    portada: "img/domenica.jpg"
   }
 ];
 
 /* ====== SERIES (AGRUPADAS) ====== */
-const series = {
+const series ={
   "IT": [
     {
       titulo: "Temporada 1 - Episodio 1",
