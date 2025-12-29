@@ -249,3 +249,24 @@ h2 {
 .card.snowed::before {
   height: 14px;
 }
+/* ===== SLIDER ENCABEZADO ===== */
+.slider {
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  position: relative;
+  background: #000;
+}
+
+.slides {
+  display: flex;
+  height: 100%;
+  transition: transform 1s ease;
+}
+
+.slides img {
+  min-width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
