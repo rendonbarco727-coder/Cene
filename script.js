@@ -22,7 +22,7 @@ const peliculas = [
   },
   {
     titulo: "Yo antes de Ti",
-    id: "1FLY2acLYfN2u_ffPfWyDZm0g1iqg_MH6",
+    id: "1L1CO0MHu2mwsSJx-LvAziteUObL2Kk7-",
     portada: "img/yo.jpg"
   },
   {
