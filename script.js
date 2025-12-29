@@ -166,9 +166,9 @@ player.classList.add("hidden");
 
 /* ====== CARGA INICIAL ====== */
 document.addEventListener("DOMContentLoaded", () => {
-cargar(peliculas, "peliculas");
+cargarPeliculasPorFila(peliculas);
 cargar(novela, "novela");
-cargarSeriesPorFila(series, películas);
+cargarSeriesPorFila(series);
 });
 
 // Simular acumulación progresiva de nieve
