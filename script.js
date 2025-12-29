@@ -57,12 +57,12 @@ const novelas = [
   
   {
     titulo: "Domenica Montero Capítulo 03",
-    id: "",
+    id: "1WbFeQ4cHKwNH4bZg8ir7rOItmqJnzsJ9",
     portada: "img/domenica.jpg"
   },
   {
     titulo: "Domenica Montero Capítulo 04",
-    id: "",
+    id: "1NQ8kdWVQ51oo9o6yya-s0pICxgT6X8fu",
     portada: "img/domenica.jpg"
   }
 ];
