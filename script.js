@@ -1,6 +1,11 @@
 /* ====== PELÍCULAS ====== */
 const peliculas = [
   {
+    titulo: "The Room",
+    id: "1HhUWsZt3nq7t3i3aj9uIjp9WFMSu_Htj",
+    portada: "img/room.jpg"
+  },
+    {
     titulo: "El Abismo Secreto",
     id: "1PtdXB3D3LJOHCc_lS7vc88q4i-x1dlFG",
     portada: "img/abi.jpg"
