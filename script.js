@@ -70,8 +70,7 @@ const novelas = [
     titulo: "Domenica Montero Capítulo 05",
     id: "1Oj86ov9uRsrOYMPJmzG7Yl561U7aE3v7",
     portada: "img/domenica.jpg"
-}
-  
+},
   {
     titulo: "Domenica Montero Capítulo 06",
     id: "1KUVqvtU4JHaYTlMHtE7f2kprOGjVCmWN",
