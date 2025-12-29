@@ -5,7 +5,7 @@ const peliculas = [
     id: "1PtdXB3D3LJOHCc_lS7vc88q4i-x1dlFG",
     portada: "img/abi.jpg"
   },
-    {
+  {
     titulo: "Bambi",
     id: "1OKlsC4GLkGUYF6Cnsh0eeP39PrKTMyjV",
     portada: "img/bambi.jpg"
@@ -54,7 +54,6 @@ const novelas = [
     id: "1H9PtFDGUj2KIZQBZ-4T4A_RbPjjTXN7o",
     portada: "img/domenica.jpg"
   },
-  
   {
     titulo: "Domenica Montero Capítulo 03",
     id: "1WbFeQ4cHKwNH4bZg8ir7rOItmqJnzsJ9",
@@ -65,21 +64,20 @@ const novelas = [
     id: "1NQ8kdWVQ51oo9o6yya-s0pICxgT6X8fu",
     portada: "img/domenica.jpg"
   },
-  
   {
     titulo: "Domenica Montero Capítulo 05",
     id: "1Oj86ov9uRsrOYMPJmzG7Yl561U7aE3v7",
     portada: "img/domenica.jpg"
-},
+  },
   {
     titulo: "Domenica Montero Capítulo 06",
     id: "1KUVqvtU4JHaYTlMHtE7f2kprOGjVCmWN",
     portada: "img/domenica.jpg"
-}
+  }
 ];
 
-/* ====== SERIES (AGRUPADAS) ====== */
-const series ={
+/* ====== SERIES ====== */
+const series = {
   "IT": [
     {
       titulo: "Temporada 1 - Episodio 1",
@@ -127,25 +125,30 @@ const series ={
   ]
 };
 
-/* ====== FUNCIONES ====== */
-function cargar(lista, contenedor) {
-  const div = document.getElementById(contenedor);
-  if (!div) return;
+/* ====== SLIDER ENCABEZADO ====== */
+let slideIndex = 0;
 
-  div.innerHTML = "";
+function cargarSlider() {
+  const slider = document.getElementById("slider");
+  if (!slider) return;
 
-  lista.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <img src="${item.portada}">
-      <p>${item.titulo}</p>
-    `;
-    card.onclick = () => reproducir(item.id);
-    div.appendChild(card);
+  slider.innerHTML = "";
+
+  peliculas.forEach(peli => {
+    const img = document.createElement("img");
+    img.src = peli.portada;
+    img.alt = peli.titulo;
+    img.onclick = () => reproducir(peli.id);
+    slider.appendChild(img);
   });
+
+  setInterval(() => {
+    slideIndex = (slideIndex + 1) % peliculas.length;
+    slider.style.transform = `translateX(-${slideIndex * 100}%)`;
+  }, 4000);
 }
 
+/* ====== FUNCIONES DE CARGA ====== */
 function cargarPorFila(lista, contenedor) {
   const div = document.getElementById(contenedor);
   if (!div) return;
@@ -195,6 +198,7 @@ function cargarSeriesPorFila(seriesObj) {
   });
 }
 
+/* ====== REPRODUCTOR ====== */
 function reproducir(id) {
   const player = document.getElementById("player");
   const frame = document.getElementById("videoFrame");
@@ -213,12 +217,13 @@ function cerrar() {
 
 /* ====== CARGA INICIAL ====== */
 document.addEventListener("DOMContentLoaded", () => {
+  cargarSlider();
   cargarPorFila(peliculas, "peliculas");
   cargarPorFila(novelas, "novela");
   cargarSeriesPorFila(series);
 });
 
-/* ====== EFECTO NIEVE SIMULADA ====== */
+/* ====== EFECTO NIEVE ====== */
 setInterval(() => {
   document.querySelectorAll(".card").forEach(card => {
     card.classList.add("snowed");
