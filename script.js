@@ -64,7 +64,19 @@ const novelas = [
     titulo: "Domenica Montero Capítulo 04",
     id: "1NQ8kdWVQ51oo9o6yya-s0pICxgT6X8fu",
     portada: "img/domenica.jpg"
-  }
+  },
+  
+  {
+    titulo: "Domenica Montero Capítulo 05",
+    id: "1Oj86ov9uRsrOYMPJmzG7Yl561U7aE3v7",
+    portada: "img/domenica.jpg"
+}
+  
+  {
+    titulo: "Domenica Montero Capítulo 06",
+    id: "1KUVqvtU4JHaYTlMHtE7f2kprOGjVCmWN",
+    portada: "img/domenica.jpg"
+}
 ];
 
 /* ====== SERIES (AGRUPADAS) ====== */
