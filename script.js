@@ -30,6 +30,11 @@ const peliculas = [
     id: "16831kM6d-15tNBOqQIq_tCk25rBDTwce",
     portada: "img/freddy.jpg"
   },
+    {
+    titulo: "Five Nights at Freddy's",
+    id: "1xs9uVvlE4nVKfuuikDLCHYmY_2DgD8PL",
+    portada: "img/five.jpg"
+  },
   {
     titulo: "Cosas imposibles",
     id: "1S-O5BiPPZYUl9nVUicPAYywXhIKqM1VP",
