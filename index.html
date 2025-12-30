@@ -2,65 +2,57 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>StreamGlass | Tu Catálogo Premium</title>
+  <title>Cinema Glass</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="snow">
-  <span style="left:10%; animation-duration:10s;"></span>
-  <span style="left:30%; animation-duration:12s;"></span>
-  <span style="left:50%; animation-duration:9s;"></span>
-  <span style="left:70%; animation-duration:14s;"></span>
-  <span style="left:90%; animation-duration:11s;"></span>
-</div>
-
-<nav class="glass-nav">
-  <div class="logo" onclick="mostrarSeccion('peliculas')">STREAM<span>GLASS</span></div>
-  <div class="menu">
-    <a href="javascript:void(0)" onclick="mostrarSeccion('peliculas')">Películas</a>
-    <a href="javascript:void(0)" onclick="mostrarSeccion('series')">Series</a>
-    <a href="javascript:void(0)" onclick="mostrarSeccion('novelas')">Novelas</a>
-  </div>
-  <div class="search-box">
-    <input type="text" id="buscador" placeholder="Buscar título..." onkeyup="filtrarContenido()">
+<nav class="navbar">
+  <div class="nav-content">
+    <div class="logo">CINEMA<span>GLASS</span></div>
+    <div class="nav-links">
+      <button onclick="mostrarSeccion('peliculas')">Películas</button>
+      <button onclick="mostrarSeccion('series')">Series</button>
+      <button onclick="mostrarSeccion('novelas')">Novelas</button>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="buscador" placeholder="Buscar..." onkeyup="filtrarContenido()">
+    </div>
   </div>
 </nav>
 
-<header id="header-slider" class="slider-container">
-  <div id="slider" class="slides"></div>
+<header id="header-slider" class="hero-slider">
+  <div id="slider" class="slider-wrapper"></div>
 </header>
 
-<main id="main-content">
+<main class="container">
   <section id="sec-peliculas" class="content-section">
-    <h2 class="section-title">Películas Disponibles</h2>
-    <div id="grid-peliculas" class="grid"></div>
+    <h2 class="category-title">Películas</h2>
+    <div id="grid-peliculas" class="movie-grid"></div>
   </section>
 
   <section id="sec-series" class="content-section hidden">
-    <h2 class="section-title">Series</h2>
-    <div id="grid-series" class="grid"></div>
+    <h2 class="category-title">Series</h2>
+    <div id="grid-series" class="movie-grid"></div>
   </section>
 
   <section id="sec-novelas" class="content-section hidden">
-    <h2 class="section-title">Novelas</h2>
-    <div id="grid-novelas" class="grid"></div>
+    <h2 class="category-title">Novelas</h2>
+    <div id="grid-novelas" class="movie-grid"></div>
   </section>
 
   <section id="vista-detalles" class="content-section hidden">
-    <div class="detail-header">
-      <button class="btn-back" onclick="volver()">⬅ Volver</button>
-      <h2 id="detalle-titulo" class="section-title">Capítulos</h2>
-    </div>
-    <div id="grid-detalles" class="grid"></div>
+    <button class="btn-back" onclick="volver()">← Regresar</button>
+    <h2 id="detalle-titulo" class="category-title"></h2>
+    <div id="grid-detalles" class="movie-grid"></div>
   </section>
 </main>
 
-<div id="player" class="player hidden">
-  <div class="player-content">
-    <button class="close" onclick="cerrar()">✖ Cerrar Reproductor</button>
-    <iframe id="videoFrame" allow="autoplay; fullscreen" src=""></iframe>
+<div id="player" class="video-overlay hidden">
+  <div class="video-container">
+    <button class="btn-close" onclick="cerrar()">✕</button>
+    <iframe id="videoFrame" src="" allowfullscreen></iframe>
   </div>
 </div>
 
