@@ -2,11 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Home</title>
+  <title>StreamGlass - Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
 <div class="snow">
   <span style="left:5%; animation-duration:10s;"></span>
   <span style="left:15%; animation-duration:12s;"></span>
@@ -19,28 +20,33 @@
   <span style="left:85%; animation-duration:12s;"></span>
   <span style="left:95%; animation-duration:9s;"></span>
 </div>
-<header class="slider">
+
+<header class="slider-container">
   <div id="slider" class="slides"></div>
 </header>
 
-<section>
-  <h2>Películas</h2>
-  <div id="peliculas" class="grid"></div>
-</section>
+<main>
+  <section>
+    <h2 class="section-title">Películas Estreno</h2>
+    <div id="peliculas" class="grid"></div>
+  </section>
 
-<section>
-  <h2>Series</h2>
-  <div id="series"></div>
-</section>
+  <section>
+    <h2 class="section-title">Series Destacadas</h2>
+    <div id="series"></div>
+  </section>
 
-<section>
-  <h2>Novelas</h2>
-  <div id="novela" class="grid"></div>
-</section>
+  <section>
+    <h2 class="section-title">Novelas</h2>
+    <div id="novela" class="grid"></div>
+  </section>
+</main>
 
 <div id="player" class="player hidden">
-  <button class="close" onclick="cerrar()">✖</button>
-  <iframe id="videoFrame" allow="autoplay; fullscreen"></iframe>
+  <div class="player-content">
+    <button class="close" onclick="cerrar()">✖ Cerrar</button>
+    <iframe id="videoFrame" allow="autoplay; fullscreen"></iframe>
+  </div>
 </div>
 
 <script src="script.js"></script>
