@@ -6,7 +6,7 @@ const peliculas = [
     portada: "img/room.jpg"
   },
   {
-  titulo: "Tron Ares",
+    titulo: "Tron Ares",
     id: "1fbWC5HmXXLj7_FG1eu5m3JYYHg8X8xyw",
     portada: "img/tron.jpg"
   },
@@ -20,7 +20,7 @@ const peliculas = [
     id: "1iyauAE-pxdlZRjoYmz1ZkIFDRYqRfghF",
     portada: "img/tel2.jpg"
   },
-    {
+  {
     titulo: "El Abismo Secreto",
     id: "1PtdXB3D3LJOHCc_lS7vc88q4i-x1dlFG",
     portada: "img/abi.jpg"
@@ -50,7 +50,7 @@ const peliculas = [
     id: "16831kM6d-15tNBOqQIq_tCk25rBDTwce",
     portada: "img/freddy.jpg"
   },
-    {
+  {
     titulo: "Five Nights at Freddy's",
     id: "1xs9uVvlE4nVKfuuikDLCHYmY_2DgD8PL",
     portada: "img/five.jpg"
@@ -69,151 +69,76 @@ const peliculas = [
 
 /* ====== NOVELAS ====== */
 const novelas = [
-  {
-    titulo: "Domenica Montero Capítulo 01",
-    id: "1HKZBxjcB8VfNWIWQoINQ1__kGQH3KzLY",
-    portada: "img/domenica.jpg"
-  },
-  {
-    titulo: "Domenica Montero Capítulo 02",
-    id: "1H9PtFDGUj2KIZQBZ-4T4A_RbPjjTXN7o",
-    portada: "img/domenica.jpg"
-  },
-  {
-    titulo: "Domenica Montero Capítulo 03",
-    id: "1WbFeQ4cHKwNH4bZg8ir7rOItmqJnzsJ9",
-    portada: "img/domenica.jpg"
-  },
-  {
-    titulo: "Domenica Montero Capítulo 04",
-    id: "1NQ8kdWVQ51oo9o6yya-s0pICxgT6X8fu",
-    portada: "img/domenica.jpg"
-  },
-  {
-    titulo: "Domenica Montero Capítulo 05",
-    id: "1Oj86ov9uRsrOYMPJmzG7Yl561U7aE3v7",
-    portada: "img/domenica.jpg"
-  },
-  {
-    titulo: "Domenica Montero Capítulo 06",
-    id: "1KUVqvtU4JHaYTlMHtE7f2kprOGjVCmWN",
-    portada: "img/domenica.jpg"
-  }
+  { titulo: "Domenica Montero Cap 01", id: "1HKZBxjcB8VfNWIWQoINQ1__kGQH3KzLY", portada: "img/domenica.jpg" },
+  { titulo: "Domenica Montero Cap 02", id: "1H9PtFDGUj2KIZQBZ-4T4A_RbPjjTXN7o", portada: "img/domenica.jpg" },
+  { titulo: "Domenica Montero Cap 03", id: "1WbFeQ4cHKwNH4bZg8ir7rOItmqJnzsJ9", portada: "img/domenica.jpg" },
+  { titulo: "Domenica Montero Cap 04", id: "1NQ8kdWVQ51oo9o6yya-s0pICxgT6X8fu", portada: "img/domenica.jpg" },
+  { titulo: "Domenica Montero Cap 05", id: "1Oj86ov9uRsrOYMPJmzG7Yl561U7aE3v7", portada: "img/domenica.jpg" },
+  { titulo: "Domenica Montero Cap 06", id: "1KUVqvtU4JHaYTlMHtE7f2kprOGjVCmWN", portada: "img/domenica.jpg" }
 ];
 
 /* ====== SERIES ====== */
 const series = {
   "IT": [
-    {
-      titulo: "Temporada 1 - Episodio 1",
-      id: "109rkG4sPdh38wXWjAca6YAldG7AK2amo",
-      portada: "img/It.jpg"
-    },
-    {
-      titulo: "Temporada 1 - Episodio 2",
-      id: "1UM9Pl6JP00ruYSsglltJ6yx3FvGCLKn-",
-      portada: "img/It.jpg"
-    },
-    {
-      titulo: "Temporada 1 - Episodio 3",
-      id: "1dOztKuSgXOqfe9o4j2NE633XfAWpDu-1",
-      portada: "img/It.jpg"
-    },
-    {
-      titulo: "Temporada 1 - Episodio 4",
-      id: "1MIqeU9ZwdpKuF2FGltndNpDF4d4ZNNE9",
-      portada: "img/It.jpg"
-    },
-    {
-      titulo: "Temporada 1 - Episodio 5",
-      id: "1SV1gig2L8Gj3uti-7-8EAyq5riPd1GcO",
-      portada: "img/It.jpg"
-    },
-    {
-      titulo: "Temporada 1 - Episodio 6",
-      id: "1wyeG-X3cz2R2GTiLQQHEFxcCqtHCzMO7",
-      portada: "img/It.jpg"
-    }
+    { titulo: "T1 - E1", id: "109rkG4sPdh38wXWjAca6YAldG7AK2amo", portada: "img/It.jpg" },
+    { titulo: "T1 - E2", id: "1UM9Pl6JP00ruYSsglltJ6yx3FvGCLKn-", portada: "img/It.jpg" },
+    { titulo: "T1 - E3", id: "1dOztKuSgXOqfe9o4j2NE633XfAWpDu-1", portada: "img/It.jpg" }
   ],
-
   "Loki": [
-    {
-      titulo: "Temporada 1 - Episodio 1",
-      id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY",
-      portada: "img/Loki.jpg"
-    },
-    {
-      titulo: "Temporada 1 - Episodio 2",
-      id: "14sKUI7KOn9XJSS4TNB4uL5GSB9BJz476",
-      portada: "img/Loki.jpg"
-    }
+    { titulo: "T1 - E1", id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY", portada: "img/Loki.jpg" },
+    { titulo: "T1 - E2", id: "14sKUI7KOn9XJSS4TNB4uL5GSB9BJz476", portada: "img/Loki.jpg" }
   ]
 };
 
-/* ====== SLIDER ENCABEZADO ====== */
+/* ====== LÓGICA DEL SLIDER ====== */
 let slideIndex = 0;
-
 function cargarSlider() {
   const slider = document.getElementById("slider");
   if (!slider) return;
 
-  slider.innerHTML = "";
-
-  peliculas.forEach(peli => {
+  peliculas.slice(0, 5).forEach(peli => {
     const img = document.createElement("img");
     img.src = peli.portada;
-    img.alt = peli.titulo;
     img.onclick = () => reproducir(peli.id);
     slider.appendChild(img);
   });
 
   setInterval(() => {
-    slideIndex = (slideIndex + 1) % peliculas.length;
+    slideIndex = (slideIndex + 1) % 5;
     slider.style.transform = `translateX(-${slideIndex * 100}%)`;
-  }, 4000);
+  }, 5000);
 }
 
-/* ====== FUNCIONES DE CARGA ====== */
-function cargarPorFila(lista, contenedor) {
-  const div = document.getElementById(contenedor);
+/* ====== CARGAR CONTENIDO ====== */
+function cargarPorFila(lista, contenedorId) {
+  const div = document.getElementById(contenedorId);
   if (!div) return;
-
-  div.innerHTML = "";
-  div.classList.add("fila-horizontal");
 
   lista.forEach(item => {
     const card = document.createElement("div");
     card.className = "card";
-    card.innerHTML = `
-      <img src="${item.portada}">
-      <p>${item.titulo}</p>
-    `;
+    card.innerHTML = `<img src="${item.portada}"><p>${item.titulo}</p>`;
     card.onclick = () => reproducir(item.id);
     div.appendChild(card);
   });
 }
 
-function cargarSeriesPorFila(seriesObj) {
+function cargarSeries() {
   const contenedor = document.getElementById("series");
   if (!contenedor) return;
 
-  contenedor.innerHTML = "";
-
-  Object.keys(seriesObj).forEach(nombreSerie => {
+  Object.keys(series).forEach(nombre => {
     const titulo = document.createElement("h3");
-    titulo.textContent = nombreSerie;
-    titulo.className = "titulo-serie";
-
+    titulo.textContent = nombre;
+    titulo.style.margin = "10px 20px";
+    
     const fila = document.createElement("div");
     fila.className = "fila-horizontal";
 
-    seriesObj[nombreSerie].forEach(ep => {
+    series[nombre].forEach(ep => {
       const card = document.createElement("div");
       card.className = "card";
-      card.innerHTML = `
-        <img src="${ep.portada}">
-        <p>${ep.titulo}</p>
-      `;
+      card.innerHTML = `<img src="${ep.portada}"><p>${ep.titulo}</p>`;
       card.onclick = () => reproducir(ep.id);
       fila.appendChild(card);
     });
@@ -227,30 +152,30 @@ function cargarSeriesPorFila(seriesObj) {
 function reproducir(id) {
   const player = document.getElementById("player");
   const frame = document.getElementById("videoFrame");
-
   frame.src = `https://drive.google.com/file/d/${id}/preview`;
   player.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
 }
 
 function cerrar() {
   const player = document.getElementById("player");
   const frame = document.getElementById("videoFrame");
-
   frame.src = "";
   player.classList.add("hidden");
+  document.body.style.overflow = "auto";
 }
 
-/* ====== CARGA INICIAL ====== */
+/* ====== INICIO ====== */
 document.addEventListener("DOMContentLoaded", () => {
   cargarSlider();
   cargarPorFila(peliculas, "peliculas");
   cargarPorFila(novelas, "novela");
-  cargarSeriesPorFila(series);
+  cargarSeries();
+  
+  // Efecto nieve aleatorio en tarjetas
+  setInterval(() => {
+    const cards = document.querySelectorAll(".card");
+    const rand = Math.floor(Math.random() * cards.length);
+    cards[rand]?.classList.toggle("snowed");
+  }, 3000);
 });
-
-/* ====== EFECTO NIEVE ====== */
-setInterval(() => {
-  document.querySelectorAll(".card").forEach(card => {
-    card.classList.add("snowed");
-  });
-}, 5000);
