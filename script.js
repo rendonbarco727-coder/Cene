@@ -4,6 +4,7 @@ const peliculas = [
   { titulo: "Tron Ares", id: "1fbWC5HmXXLj7_FG1eu5m3JYYHg8X8xyw", portada: "img/tron.jpg" },
   { titulo: "Teléfono Negro 1", id: "13GMvzhbQ3BwcQmvW7nhq3FSjTqL4dJap", portada: "img/tel1.jpg" },
   { titulo: "Five Nights at Freddy's", id: "1xs9uVvlE4nVKfuuikDLCHYmY_2DgD8PL", portada: "img/five.jpg" }
+  {titulo:"Teléfono Negro 2", id:"1iyauAE-pxdlZRjoYmz1ZkIFDRYqRfghF", portada:"img/tel2.jpg"},
 ];
 
 const series = {
