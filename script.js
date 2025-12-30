@@ -5,6 +5,7 @@ const peliculas = [
     id: "1HhUWsZt3nq7t3i3aj9uIjp9WFMSu_Htj",
     portada: "img/room.jpg"
   },
+  {
   titulo: "Tron Ares",
     id: "1fbWC5HmXXLj7_FG1eu5m3JYYHg8X8xyw",
     portada: "img/tron.jpg"
