@@ -1,4 +1,4 @@
-/* ====== DATOS (Simplificados para el ejemplo) ====== */
+/* ====== DATOS ====== */
 const peliculas = [
   { titulo: "The Room", id: "1HhUWsZt3nq7t3i3aj9uIjp9WFMSu_Htj", portada: "img/room.jpg" },
   { titulo: "Tron Ares", id: "1fbWC5HmXXLj7_FG1eu5m3JYYHg8X8xyw", portada: "img/tron.jpg" },
@@ -21,7 +21,7 @@ function mostrarSeccion(id) {
   document.getElementById(`sec-${id}`).classList.remove('hidden');
   
   const hero = document.getElementById('header-slider');
-  id === 'peliculas' ? hero.style.display = 'block' : hero.style.display = 'none';
+  id === 'peliculas' ? hero.classList.remove('hidden') : hero.classList.add('hidden');
 }
 
 function verDetalle(titulo, lista) {
@@ -44,7 +44,10 @@ function crearCard(titulo, portada, accion) {
   const div = document.createElement('div');
   div.className = 'card';
   div.innerHTML = `<img src="${portada}"><p>${titulo}</p>`;
-  div.onclick = accion;
+  div.onclick = (e) => {
+      e.stopPropagation(); // Evita errores de click
+      accion();
+  };
   return div;
 }
 
@@ -61,7 +64,8 @@ function cargarTodo() {
 
 function reproducir(id) {
   const p = document.getElementById('player');
-  document.getElementById('videoFrame').src = `https://drive.google.com/file/d/${id}/preview`;
+  const frame = document.getElementById('videoFrame');
+  frame.src = `https://drive.google.com/file/d/${id}/preview`;
   p.classList.remove('hidden');
 }
 
@@ -77,7 +81,7 @@ function filtrarContenido() {
   });
 }
 
-// Slider
+/* ====== SLIDER ====== */
 let current = 0;
 function initSlider() {
   const wrapper = document.getElementById('slider');
