@@ -1,181 +1,108 @@
-/* ====== PELÍCULAS ====== */
-const peliculas = [
-  {
-    titulo: "The Room",
-    id: "1HhUWsZt3nq7t3i3aj9uIjp9WFMSu_Htj",
-    portada: "img/room.jpg"
-  },
-  {
-    titulo: "Tron Ares",
-    id: "1fbWC5HmXXLj7_FG1eu5m3JYYHg8X8xyw",
-    portada: "img/tron.jpg"
-  },
-  {
-    titulo: "Teléfono Negro 1",
-    id: "13GMvzhbQ3BwcQmvW7nhq3FSjTqL4dJap",
-    portada: "img/tel1.jpg"
-  },
-  {
-    titulo: "Teléfono Negro 2",
-    id: "1iyauAE-pxdlZRjoYmz1ZkIFDRYqRfghF",
-    portada: "img/tel2.jpg"
-  },
-  {
-    titulo: "El Abismo Secreto",
-    id: "1PtdXB3D3LJOHCc_lS7vc88q4i-x1dlFG",
-    portada: "img/abi.jpg"
-  },
-  {
-    titulo: "Bambi",
-    id: "1OKlsC4GLkGUYF6Cnsh0eeP39PrKTMyjV",
-    portada: "img/bambi.jpg"
-  },
-  {
-    titulo: "Doctor Sueño",
-    id: "173OExhru7h7P9zq8fQWp879fYXKd3SyI",
-    portada: "img/doc.jpg"
-  },
-  {
-    titulo: "Trust",
-    id: "1zF7nJapnl2dJUSLL2jrZbTzWz9S9o85x",
-    portada: "img/trust.jpg"
-  },
-  {
-    titulo: "Yo antes de Ti",
-    id: "1L1CO0MHu2mwsSJx-LvAziteUObL2Kk7-",
-    portada: "img/yo.jpg"
-  },
-  {
-    titulo: "Five Nights at Freddy's 2",
-    id: "16831kM6d-15tNBOqQIq_tCk25rBDTwce",
-    portada: "img/freddy.jpg"
-  },
-  {
-    titulo: "Five Nights at Freddy's",
-    id: "1xs9uVvlE4nVKfuuikDLCHYmY_2DgD8PL",
-    portada: "img/five.jpg"
-  },
-  {
-    titulo: "Cosas imposibles",
-    id: "1S-O5BiPPZYUl9nVUicPAYywXhIKqM1VP",
-    portada: "img/cosas.jpg"
-  },
-  {
-    titulo: "Caramelo",
-    id: "1dn-DmNz7NZTmz0EvFIHuMMNeTSdmZHS3",
-    portada: "img/Caramelo.jpg"
+/* ====== DATOS ====== */
+// (Mantén tus arrays de peliculas, novelas y series igual que antes)
+
+/* ====== NAVEGACIÓN ====== */
+function mostrarSeccion(seccionId) {
+  // Ocultar todo
+  document.getElementById('sec-peliculas').classList.add('hidden');
+  document.getElementById('sec-series').classList.add('hidden');
+  document.getElementById('sec-novela').classList.add('hidden');
+  document.getElementById('vista-detalles').classList.add('hidden');
+  document.getElementById('header-slider').classList.remove('hidden');
+
+  // Mostrar la seleccionada
+  document.getElementById(`sec-${seccionId}`).classList.remove('hidden');
+  
+  // Si no es películas, ocultamos el slider para que no estorbe
+  if(seccionId !== 'peliculas') {
+    document.getElementById('header-slider').classList.add('hidden');
   }
-];
-
-/* ====== NOVELAS ====== */
-const novelas = [
-  { titulo: "Domenica Montero Cap 01", id: "1HKZBxjcB8VfNWIWQoINQ1__kGQH3KzLY", portada: "img/domenica.jpg" },
-  { titulo: "Domenica Montero Cap 02", id: "1H9PtFDGUj2KIZQBZ-4T4A_RbPjjTXN7o", portada: "img/domenica.jpg" },
-  { titulo: "Domenica Montero Cap 03", id: "1WbFeQ4cHKwNH4bZg8ir7rOItmqJnzsJ9", portada: "img/domenica.jpg" },
-  { titulo: "Domenica Montero Cap 04", id: "1NQ8kdWVQ51oo9o6yya-s0pICxgT6X8fu", portada: "img/domenica.jpg" },
-  { titulo: "Domenica Montero Cap 05", id: "1Oj86ov9uRsrOYMPJmzG7Yl561U7aE3v7", portada: "img/domenica.jpg" },
-  { titulo: "Domenica Montero Cap 06", id: "1KUVqvtU4JHaYTlMHtE7f2kprOGjVCmWN", portada: "img/domenica.jpg" }
-];
-
-/* ====== SERIES ====== */
-const series = {
-  "IT": [
-    { titulo: "T1 - E1", id: "109rkG4sPdh38wXWjAca6YAldG7AK2amo", portada: "img/It.jpg" },
-    { titulo: "T1 - E2", id: "1UM9Pl6JP00ruYSsglltJ6yx3FvGCLKn-", portada: "img/It.jpg" },
-    { titulo: "T1 - E3", id: "1dOztKuSgXOqfe9o4j2NE633XfAWpDu-1", portada: "img/It.jpg" }
-  ],
-  "Loki": [
-    { titulo: "T1 - E1", id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY", portada: "img/Loki.jpg" },
-    { titulo: "T1 - E2", id: "14sKUI7KOn9XJSS4TNB4uL5GSB9BJz476", portada: "img/Loki.jpg" }
-  ]
-};
-
-/* ====== LÓGICA DEL SLIDER ====== */
-let slideIndex = 0;
-function cargarSlider() {
-  const slider = document.getElementById("slider");
-  if (!slider) return;
-
-  peliculas.slice(0, 5).forEach(peli => {
-    const img = document.createElement("img");
-    img.src = peli.portada;
-    img.onclick = () => reproducir(peli.id);
-    slider.appendChild(img);
-  });
-
-  setInterval(() => {
-    slideIndex = (slideIndex + 1) % 5;
-    slider.style.transform = `translateX(-${slideIndex * 100}%)`;
-  }, 5000);
 }
 
-/* ====== CARGAR CONTENIDO ====== */
-function cargarPorFila(lista, contenedorId) {
-  const div = document.getElementById(contenedorId);
-  if (!div) return;
+/* ====== RENDERIZADO DE GRUPOS (SERIES/NOVELAS) ====== */
+function cargarCatalogos() {
+  // Cargar Películas
+  cargarGrid(peliculas, "peliculas");
 
-  lista.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `<img src="${item.portada}"><p>${item.titulo}</p>`;
-    card.onclick = () => reproducir(item.id);
-    div.appendChild(card);
-  });
-}
-
-function cargarSeries() {
-  const contenedor = document.getElementById("series");
-  if (!contenedor) return;
-
+  // Cargar Series (Agrupadas)
+  const listaSeries = document.getElementById("lista-series");
   Object.keys(series).forEach(nombre => {
-    const titulo = document.createElement("h3");
-    titulo.textContent = nombre;
-    titulo.style.margin = "10px 20px";
-    
-    const fila = document.createElement("div");
-    fila.className = "fila-horizontal";
+    const portada = series[nombre][0].portada; // Toma la portada del primer capítulo
+    const card = crearCard(nombre, portada, () => verDetalle(nombre, series[nombre]));
+    listaSeries.appendChild(card);
+  });
 
-    series[nombre].forEach(ep => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `<img src="${ep.portada}"><p>${ep.titulo}</p>`;
-      card.onclick = () => reproducir(ep.id);
-      fila.appendChild(card);
+  // Cargar Novelas (Agrupadas por nombre base)
+  // Nota: Para novelas, como están en un array plano, las agrupamos manualmente
+  const listaNovelas = document.getElementById("lista-novelas");
+  const novelaUnica = {
+    "Domenica Montero": "img/domenica.jpg"
+  };
+
+  Object.keys(novelaUnica).forEach(nombre => {
+    const card = crearCard(nombre, novelaUnica[nombre], () => {
+      const caps = novelas.filter(n => n.titulo.includes(nombre));
+      verDetalle(nombre, caps);
     });
-
-    contenedor.appendChild(titulo);
-    contenedor.appendChild(fila);
+    listaNovelas.appendChild(card);
   });
 }
 
-/* ====== REPRODUCTOR ====== */
-function reproducir(id) {
-  const player = document.getElementById("player");
-  const frame = document.getElementById("videoFrame");
-  frame.src = `https://drive.google.com/file/d/${id}/preview`;
-  player.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
+function crearCard(titulo, portada, accion) {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `<img src="${portada}"><p>${titulo}</p>`;
+  card.onclick = accion;
+  return card;
 }
 
-function cerrar() {
-  const player = document.getElementById("player");
-  const frame = document.getElementById("videoFrame");
-  frame.src = "";
-  player.classList.add("hidden");
-  document.body.style.overflow = "auto";
+function cargarGrid(lista, contenedorId) {
+  const contenedor = document.getElementById(contenedorId);
+  contenedor.innerHTML = "";
+  lista.forEach(item => {
+    const card = crearCard(item.titulo, item.portada, () => reproducir(item.id));
+    contenedor.appendChild(card);
+  });
 }
 
-/* ====== INICIO ====== */
+/* ====== VISTA DETALLE (CAPÍTULOS) ====== */
+function verDetalle(titulo, capitulos) {
+  document.getElementById('sec-series').classList.add('hidden');
+  document.getElementById('sec-novela').classList.add('hidden');
+  document.getElementById('vista-detalles').classList.remove('hidden');
+  
+  document.getElementById('detalle-titulo').textContent = titulo;
+  const grid = document.getElementById('detalle-grid');
+  grid.innerHTML = "";
+
+  capitulos.forEach(cap => {
+    const card = crearCard(cap.titulo, cap.portada, () => reproducir(cap.id));
+    grid.appendChild(card);
+  });
+}
+
+function volverAlCatalogo() {
+  document.getElementById('vista-detalles').classList.add('hidden');
+  // Detectar cual estaba activa antes o volver a series por defecto
+  document.getElementById('sec-series').classList.remove('hidden');
+}
+
+/* ====== BUSCADOR ====== */
+function filtrarContenido() {
+  const query = document.getElementById("buscador").value.toLowerCase();
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach(card => {
+    const texto = card.innerText.toLowerCase();
+    card.style.display = texto.includes(query) ? "block" : "none";
+  });
+}
+
+// ... (Mantén tus funciones de reproducir, cerrar y cargarSlider igual) ...
+
 document.addEventListener("DOMContentLoaded", () => {
   cargarSlider();
-  cargarPorFila(peliculas, "peliculas");
-  cargarPorFila(novelas, "novela");
-  cargarSeries();
-  
-  // Efecto nieve aleatorio en tarjetas
-  setInterval(() => {
-    const cards = document.querySelectorAll(".card");
-    const rand = Math.floor(Math.random() * cards.length);
-    cards[rand]?.classList.toggle("snowed");
-  }, 3000);
+  cargarCatalogos();
+  // Mostrar películas por defecto
+  mostrarSeccion('peliculas');
 });
