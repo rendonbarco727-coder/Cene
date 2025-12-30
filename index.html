@@ -2,43 +2,54 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>StreamGlass - Home</title>
+  <title>StreamGlass - Catálogo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="snow">
-  <span style="left:5%; animation-duration:10s;"></span>
-  <span style="left:15%; animation-duration:12s;"></span>
-  <span style="left:25%; animation-duration:9s;"></span>
-  <span style="left:35%; animation-duration:14s;"></span>
-  <span style="left:45%; animation-duration:11s;"></span>
-  <span style="left:55%; animation-duration:13s;"></span>
-  <span style="left:65%; animation-duration:10s;"></span>
-  <span style="left:75%; animation-duration:15s;"></span>
-  <span style="left:85%; animation-duration:12s;"></span>
-  <span style="left:95%; animation-duration:9s;"></span>
+  <span style="left:10%; animation-duration:12s;"></span>
+  <span style="left:50%; animation-duration:15s;"></span>
+  <span style="left:90%; animation-duration:11s;"></span>
 </div>
 
-<header class="slider-container">
+<nav class="glass-nav">
+  <div class="logo">Stream<span>Glass</span></div>
+  <div class="menu">
+    <a href="#" onclick="mostrarSeccion('peliculas')">Películas</a>
+    <a href="#" onclick="mostrarSeccion('series')">Series</a>
+    <a href="#" onclick="mostrarSeccion('novela')">Novelas</a>
+  </div>
+  <div class="search-box">
+    <input type="text" id="buscador" placeholder="Buscar..." onkeyup="filtrarContenido()">
+  </div>
+</nav>
+
+<header id="header-slider" class="slider-container">
   <div id="slider" class="slides"></div>
 </header>
 
-<main>
-  <section>
-    <h2 class="section-title">Películas Estreno</h2>
+<main id="main-content">
+  <section id="sec-peliculas">
+    <h2 class="section-title">Películas</h2>
     <div id="peliculas" class="grid"></div>
   </section>
 
-  <section>
-    <h2 class="section-title">Series Destacadas</h2>
-    <div id="series"></div>
+  <section id="sec-series" class="hidden">
+    <h2 class="section-title">Series</h2>
+    <div id="lista-series" class="grid"></div>
   </section>
 
-  <section>
+  <section id="sec-novela" class="hidden">
     <h2 class="section-title">Novelas</h2>
-    <div id="novela" class="grid"></div>
+    <div id="lista-novelas" class="grid"></div>
+  </section>
+
+  <section id="vista-detalles" class="hidden">
+    <button class="btn-back" onclick="volverAlCatalogo()">⬅ Volver al catálogo</button>
+    <h2 id="detalle-titulo" class="section-title"></h2>
+    <div id="detalle-grid" class="grid"></div>
   </section>
 </main>
 
