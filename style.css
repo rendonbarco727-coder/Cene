@@ -1,4 +1,18 @@
-/* ====== NAV GLASS ====== */
+:root {
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --accent: #00d2ff;
+}
+
+body {
+  margin: 0;
+  background: #0a0a0c;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Navegación Liquid Glass */
 .glass-nav {
   position: sticky;
   top: 0;
@@ -7,55 +21,99 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 5%;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(10, 10, 12, 0.7);
   backdrop-filter: blur(15px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--glass-border);
 }
 
-.logo { font-size: 24px; font-weight: bold; letter-spacing: 2px; }
-.logo span { color: var(--accent-color); }
+.logo { font-size: 22px; font-weight: 800; cursor: pointer; letter-spacing: 2px; }
+.logo span { color: var(--accent); }
 
 .menu a {
-  color: #ccc;
+  color: #aaa;
   text-decoration: none;
-  margin-right: 25px;
-  font-size: 14px;
+  margin: 0 15px;
+  font-size: 13px;
   text-transform: uppercase;
   transition: 0.3s;
 }
 
-.menu a:hover { color: #fff; text-shadow: 0 0 10px #fff; }
+.menu a:hover { color: white; text-shadow: 0 0 8px white; }
 
 .search-box input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: white;
   padding: 8px 15px;
   border-radius: 20px;
-  color: #fff;
   outline: none;
 }
 
-/* Botón Volver */
-.btn-back {
-  background: var(--accent-color);
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  margin: 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
+/* Slider */
+.slider-container {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--glass-border);
 }
 
-/* Re-ajuste de Grid para coherencia */
+.slides { display: flex; height: 100%; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
+.slides img { min-width: 100%; object-fit: cover; filter: brightness(0.5); cursor: pointer; }
+
+/* Grid y Cards */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 25px;
-  padding: 20px;
+  padding: 20px 5%;
 }
 
-/* Ocultar secciones */
+.card {
+  background: var(--glass);
+  backdrop-filter: blur(5px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.4s;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-10px) scale(1.03);
+  border-color: var(--accent);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.card img { width: 100%; height: 230px; object-fit: cover; }
+.card p { padding: 10px; margin: 0; font-size: 13px; text-align: center; background: rgba(0,0,0,0.4); }
+
+/* Botón Volver */
+.btn-back {
+  background: var(--accent);
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  margin: 20px 5%;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Reproductor */
+.player {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.95);
+  z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.player-content { width: 90%; height: 85%; position: relative; }
+.player iframe { width: 100%; height: 100%; border: none; border-radius: 15px; }
+.close { position: absolute; top: -40px; right: 0; color: white; background: none; border: none; cursor: pointer; }
+
 .hidden { display: none !important; }
 
-/* ... (Mantener el resto del CSS anterior para tarjetas y reproductor) ... */
+/* Nieve */
+.snow span { position: absolute; top: -10px; width: 4px; height: 4px; background: white; border-radius: 50%; opacity: 0.3; animation: fall linear infinite; }
+@keyframes fall { to { transform: translateY(100vh); } }
