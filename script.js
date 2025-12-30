@@ -1,108 +1,123 @@
 /* ====== DATOS ====== */
-// (Mantén tus arrays de peliculas, novelas y series igual que antes)
+const peliculas = [
+    { titulo: "The Room", id: "1HhUWsZt3nq7t3i3aj9uIjp9WFMSu_Htj", portada: "img/room.jpg" },
+    { titulo: "Tron Ares", id: "1fbWC5HmXXLj7_FG1eu5m3JYYHg8X8xyw", portada: "img/tron.jpg" },
+    { titulo: "Teléfono Negro 1", id: "13GMvzhbQ3BwcQmvW7nhq3FSjTqL4dJap", portada: "img/tel1.jpg" },
+    { titulo: "Teléfono Negro 2", id: "1iyauAE-pxdlZRjoYmz1ZkIFDRYqRfghF", portada: "img/tel2.jpg" },
+    { titulo: "Doctor Sueño", id: "173OExhru7h7P9zq8fQWp879fYXKd3SyI", portada: "img/doc.jpg" },
+    { titulo: "Five Nights at Freddy's", id: "1xs9uVvlE4nVKfuuikDLCHYmY_2DgD8PL", portada: "img/five.jpg" }
+];
 
-/* ====== NAVEGACIÓN ====== */
-function mostrarSeccion(seccionId) {
-  // Ocultar todo
-  document.getElementById('sec-peliculas').classList.add('hidden');
-  document.getElementById('sec-series').classList.add('hidden');
-  document.getElementById('sec-novela').classList.add('hidden');
-  document.getElementById('vista-detalles').classList.add('hidden');
-  document.getElementById('header-slider').classList.remove('hidden');
+const series = {
+    "IT (Eso)": [
+        { titulo: "Capítulo 01", id: "109rkG4sPdh38wXWjAca6YAldG7AK2amo", portada: "img/It.jpg" },
+        { titulo: "Capítulo 02", id: "1UM9Pl6JP00ruYSsglltJ6yx3FvGCLKn-", portada: "img/It.jpg" }
+    ],
+    "Loki": [
+        { titulo: "Temporada 1 - E01", id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY", portada: "img/Loki.jpg" },
+        { titulo: "Temporada 1 - E02", id: "14sKUI7KOn9XJSS4TNB4uL5GSB9BJz476", portada: "img/Loki.jpg" }
+    ]
+};
 
-  // Mostrar la seleccionada
-  document.getElementById(`sec-${seccionId}`).classList.remove('hidden');
-  
-  // Si no es películas, ocultamos el slider para que no estorbe
-  if(seccionId !== 'peliculas') {
-    document.getElementById('header-slider').classList.add('hidden');
-  }
+const novelas = {
+    "Domenica Montero": [
+        { titulo: "Capítulo 01", id: "1HKZBxjcB8VfNWIWQoINQ1__kGQH3KzLY", portada: "img/domenica.jpg" },
+        { titulo: "Capítulo 02", id: "1H9PtFDGUj2KIZQBZ-4T4A_RbPjjTXN7o", portada: "img/domenica.jpg" },
+        { titulo: "Capítulo 03", id: "1WbFeQ4cHKwNH4bZg8ir7rOItmqJnzsJ9", portada: "img/domenica.jpg" }
+    ]
+};
+
+/* ====== NAVEGACIÓN Y VISTAS ====== */
+function mostrarSeccion(id) {
+    document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+    document.getElementById(`sec-${id}`).classList.remove('hidden');
+    
+    // Slider solo en películas
+    const slider = document.getElementById('header-slider');
+    id === 'peliculas' ? slider.classList.remove('hidden') : slider.classList.add('hidden');
 }
 
-/* ====== RENDERIZADO DE GRUPOS (SERIES/NOVELAS) ====== */
-function cargarCatalogos() {
-  // Cargar Películas
-  cargarGrid(peliculas, "peliculas");
+function verDetalle(titulo, listaCapitulos) {
+    document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+    const vista = document.getElementById('vista-detalles');
+    vista.classList.remove('hidden');
+    
+    document.getElementById('detalle-titulo').innerText = titulo;
+    const grid = document.getElementById('grid-detalles');
+    grid.innerHTML = "";
 
-  // Cargar Series (Agrupadas)
-  const listaSeries = document.getElementById("lista-series");
-  Object.keys(series).forEach(nombre => {
-    const portada = series[nombre][0].portada; // Toma la portada del primer capítulo
-    const card = crearCard(nombre, portada, () => verDetalle(nombre, series[nombre]));
-    listaSeries.appendChild(card);
-  });
-
-  // Cargar Novelas (Agrupadas por nombre base)
-  // Nota: Para novelas, como están en un array plano, las agrupamos manualmente
-  const listaNovelas = document.getElementById("lista-novelas");
-  const novelaUnica = {
-    "Domenica Montero": "img/domenica.jpg"
-  };
-
-  Object.keys(novelaUnica).forEach(nombre => {
-    const card = crearCard(nombre, novelaUnica[nombre], () => {
-      const caps = novelas.filter(n => n.titulo.includes(nombre));
-      verDetalle(nombre, caps);
+    listaCapitulos.forEach(cap => {
+        grid.appendChild(crearCard(cap.titulo, cap.portada, () => reproducir(cap.id)));
     });
-    listaNovelas.appendChild(card);
-  });
 }
 
+function volver() {
+    mostrarSeccion('series'); // Por defecto vuelve a series
+}
+
+/* ====== RENDERIZADO ====== */
 function crearCard(titulo, portada, accion) {
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `<img src="${portada}"><p>${titulo}</p>`;
-  card.onclick = accion;
-  return card;
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `<img src="${portada}" alt="${titulo}"><p>${titulo}</p>`;
+    div.onclick = accion;
+    return div;
 }
 
-function cargarGrid(lista, contenedorId) {
-  const contenedor = document.getElementById(contenedorId);
-  contenedor.innerHTML = "";
-  lista.forEach(item => {
-    const card = crearCard(item.titulo, item.portada, () => reproducir(item.id));
-    contenedor.appendChild(card);
-  });
+function cargarContenido() {
+    // Cargar Películas
+    const gridPeli = document.getElementById('grid-peliculas');
+    peliculas.forEach(p => gridPeli.appendChild(crearCard(p.titulo, p.portada, () => reproducir(p.id))));
+
+    // Cargar Series (Agrupadas)
+    const gridSeries = document.getElementById('grid-series');
+    Object.keys(series).forEach(nombre => {
+        gridSeries.appendChild(crearCard(nombre, series[nombre][0].portada, () => verDetalle(nombre, series[nombre])));
+    });
+
+    // Cargar Novelas (Agrupadas)
+    const gridNovelas = document.getElementById('grid-novelas');
+    Object.keys(novelas).forEach(nombre => {
+        gridNovelas.appendChild(crearCard(nombre, novelas[nombre][0].portada, () => verDetalle(nombre, novelas[nombre])));
+    });
 }
 
-/* ====== VISTA DETALLE (CAPÍTULOS) ====== */
-function verDetalle(titulo, capitulos) {
-  document.getElementById('sec-series').classList.add('hidden');
-  document.getElementById('sec-novela').classList.add('hidden');
-  document.getElementById('vista-detalles').classList.remove('hidden');
-  
-  document.getElementById('detalle-titulo').textContent = titulo;
-  const grid = document.getElementById('detalle-grid');
-  grid.innerHTML = "";
-
-  capitulos.forEach(cap => {
-    const card = crearCard(cap.titulo, cap.portada, () => reproducir(cap.id));
-    grid.appendChild(card);
-  });
+/* ====== REPRODUCTOR Y OTROS ====== */
+function reproducir(id) {
+    const player = document.getElementById('player');
+    document.getElementById('videoFrame').src = `https://drive.google.com/file/d/${id}/preview`;
+    player.classList.remove('hidden');
 }
 
-function volverAlCatalogo() {
-  document.getElementById('vista-detalles').classList.add('hidden');
-  // Detectar cual estaba activa antes o volver a series por defecto
-  document.getElementById('sec-series').classList.remove('hidden');
+function cerrar() {
+    document.getElementById('player').classList.add('hidden');
+    document.getElementById('videoFrame').src = "";
 }
 
-/* ====== BUSCADOR ====== */
 function filtrarContenido() {
-  const query = document.getElementById("buscador").value.toLowerCase();
-  const cards = document.querySelectorAll(".card");
-
-  cards.forEach(card => {
-    const texto = card.innerText.toLowerCase();
-    card.style.display = texto.includes(query) ? "block" : "none";
-  });
+    const query = document.getElementById('buscador').value.toLowerCase();
+    document.querySelectorAll('.card').forEach(card => {
+        card.style.display = card.innerText.toLowerCase().includes(query) ? "block" : "none";
+    });
 }
 
-// ... (Mantén tus funciones de reproducir, cerrar y cargarSlider igual) ...
+// Slider Automático
+let index = 0;
+function initSlider() {
+    const slider = document.getElementById('slider');
+    peliculas.slice(0, 5).forEach(p => {
+        const img = document.createElement('img');
+        img.src = p.portada;
+        img.onclick = () => reproducir(p.id);
+        slider.appendChild(img);
+    });
+    setInterval(() => {
+        index = (index + 1) % 5;
+        slider.style.transform = `translateX(-${index * 100}%)`;
+    }, 4000);
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-  cargarSlider();
-  cargarCatalogos();
-  // Mostrar películas por defecto
-  mostrarSeccion('peliculas');
+    initSlider();
+    cargarContenido();
 });
