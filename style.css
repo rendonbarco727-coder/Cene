@@ -1,119 +1,116 @@
 :root {
-  --glass: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --accent: #00d2ff;
+  --bg-color: #050505;
+  --card-bg: #121212;
+  --accent: #e50914; /* Rojo tipo Netflix para contraste */
+  --text-main: #ffffff;
+  --text-dim: #a3a3a3;
 }
 
 body {
   margin: 0;
-  background: #0a0a0c;
-  color: white;
-  font-family: 'Segoe UI', sans-serif;
-  overflow-x: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'Inter', -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Navegación Liquid Glass */
-.glass-nav {
-  position: sticky;
-  top: 0;
+/* Navbar Minimalista */
+.navbar {
+  position: fixed;
+  top: 0; width: 100%;
+  height: 70px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
   z-index: 1000;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 5%;
-  background: rgba(10, 10, 12, 0.7);
-  backdrop-filter: blur(15px);
-  border-bottom: 1px solid var(--glass-border);
+  display: flex; align-items: center;
 }
 
-.logo { font-size: 22px; font-weight: 800; cursor: pointer; letter-spacing: 2px; }
+.nav-content {
+  width: 90%; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; }
 .logo span { color: var(--accent); }
 
-.menu a {
-  color: #aaa;
-  text-decoration: none;
-  margin: 0 15px;
-  font-size: 13px;
-  text-transform: uppercase;
+.nav-links button {
+  background: none; border: none; color: var(--text-dim);
+  margin: 0 15px; cursor: pointer; font-size: 0.9rem;
   transition: 0.3s;
 }
 
-.menu a:hover { color: white; text-shadow: 0 0 8px white; }
+.nav-links button:hover { color: white; }
 
-.search-box input {
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
-  color: white;
-  padding: 8px 15px;
-  border-radius: 20px;
-  outline: none;
+.search-bar input {
+  background: rgba(255,255,255,0.1);
+  border: none; padding: 8px 15px; border-radius: 4px;
+  color: white; width: 200px;
 }
 
-/* Slider */
-.slider-container {
-  width: 100%;
-  height: 300px;
-  overflow: hidden;
-  border-bottom: 1px solid var(--glass-border);
+/* Slider Elegante */
+.hero-slider {
+  width: 100%; height: 60vh;
+  overflow: hidden; position: relative;
 }
 
-.slides { display: flex; height: 100%; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
-.slides img { min-width: 100%; object-fit: cover; filter: brightness(0.5); cursor: pointer; }
+.slider-wrapper { display: flex; height: 100%; transition: transform 0.6s ease-in-out; }
+.slider-wrapper img {
+  min-width: 100%; height: 100%; object-fit: cover;
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
 
-/* Grid y Cards */
-.grid {
+/* Grid de Contenido */
+.container { padding: 40px 5%; margin-top: -100px; position: relative; z-index: 10; }
+
+.category-title {
+  font-size: 1.4rem; margin-bottom: 20px;
+  font-weight: 600; color: var(--text-main);
+}
+
+.movie-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 25px;
-  padding: 20px 5%;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
 }
 
+/* Tarjetas Estilo Moderno */
 .card {
-  background: var(--glass);
-  backdrop-filter: blur(5px);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: 0.4s;
   position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
 }
 
 .card:hover {
-  transform: translateY(-10px) scale(1.03);
-  border-color: var(--accent);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transform: scale(1.05);
+  z-index: 20;
 }
 
-.card img { width: 100%; height: 230px; object-fit: cover; }
-.card p { padding: 10px; margin: 0; font-size: 13px; text-align: center; background: rgba(0,0,0,0.4); }
+.card img {
+  width: 100%; height: 270px; object-fit: cover;
+  border-radius: 8px;
+}
 
-/* Botón Volver */
-.btn-back {
-  background: var(--accent);
-  border: none;
-  color: white;
-  padding: 8px 18px;
-  margin: 20px 5%;
-  border-radius: 5px;
-  cursor: pointer;
+.card p {
+  position: absolute; bottom: 0; width: 100%;
+  padding: 20px 10px 10px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.9));
+  margin: 0; font-size: 0.85rem; text-align: center;
 }
 
 /* Reproductor */
-.player {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.95);
-  z-index: 2000;
+.video-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.95); z-index: 2000;
   display: flex; align-items: center; justify-content: center;
 }
 
-.player-content { width: 90%; height: 85%; position: relative; }
-.player iframe { width: 100%; height: 100%; border: none; border-radius: 15px; }
-.close { position: absolute; top: -40px; right: 0; color: white; background: none; border: none; cursor: pointer; }
+.video-container { width: 80%; aspect-ratio: 16/9; position: relative; }
+.video-container iframe { width: 100%; height: 100%; border: none; border-radius: 12px; }
+
+.btn-close {
+  position: absolute; top: -40px; right: 0;
+  background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;
+}
 
 .hidden { display: none !important; }
-
-/* Nieve */
-.snow span { position: absolute; top: -10px; width: 4px; height: 4px; background: white; border-radius: 50%; opacity: 0.3; animation: fall linear infinite; }
-@keyframes fall { to { transform: translateY(100vh); } }
