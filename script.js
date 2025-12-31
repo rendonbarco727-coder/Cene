@@ -28,17 +28,20 @@ const peliculas = [
 ];
 
 const series = {
-  "IT (Eso)": [{ titulo: "Capítulo 01", id: "109rkG4sPdh38wXWjAca6YAldG7AK2amo", portada: "img/It.jpg" }],
-    "Loki": [{ titulo: "T1 - E01", id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY", portada: "img/It.jpg" }]
-    "Loki": [{ titulo: "T1 - E02", id: "1UM9Pl6JP00ruYSsglltJ6yx3FvGCLKn-", portada: "img/It.jpg" }]
-    "Loki": [{ titulo: "T1 - E03", id: "1dOztKuSgXOqfe9o4j2NE633XfAWpDu-1", portada: "img/It.jpg" }]
-    "Loki": [{ titulo: "T1 - E04", id: "1MIqeU9ZwdpKuF2FGltndNpDF4d4ZNNE9", portada: "img/It.jpg" }]
-    "Loki": [{ titulo: "T1 - E05", id: "1SV1gig2L8Gj3uti-7-8EAyq5riPd1GcO", portada: "img/It.jpg" }]
-    "Loki": [{ titulo: "T1 - E06", id: "1wyeG-X3cz2R2GTiLQQHEFxcCqtHCzMO7", portada: "img/It.jpg" }]
-    "Loki": [{ titulo: "T1 - E07", id: "1j7hZcvGGO4nF5bLHgQYPazBCArKOdX4Y", portada: "img/It.jpg" }]
-    "Loki": [{ titulo: "T1 - E08", id: "1Fmjp23Thga2jkLG6R6GHL9PfapXqZKsu", portada: "img/It.jpg" }]
-  
-};    
+  "IT (Eso)": [
+    { titulo: "Capítulo 01", id: "109rkG4sPdh38wXWjAca6YAldG7AK2amo", portada: "img/It.jpg" }],
+  "Loki": [
+    { titulo: "T1 - E01", id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY", portada: "img/It.jpg" },
+    { titulo: "T1 - E02", id: "1UM9Pl6JP00ruYSsglltJ6yx3FvGCLKn-", portada: "img/It.jpg" },
+    { titulo: "T1 - E03", id: "1dOztKuSgXOqfe9o4j2NE633XfAWpDu-1", portada: "img/It.jpg" },
+    { titulo: "T1 - E04", id: "1MIqeU9ZwdpKuF2FGltndNpDF4d4ZNNE9", portada: "img/It.jpg" },
+    { titulo: "T1 - E05", id: "1SV1gig2L8Gj3uti-7-8EAyq5riPd1GcO", portada: "img/It.jpg" },
+    { titulo: "T1 - E06", id: "1wyeG-X3cz2R2GTiLQQHEFxcCqtHCzMO7", portada: "img/It.jpg" },
+    { titulo: "T1 - E07", id: "1j7hZcvGGO4nF5bLHgQYPazBCArKOdX4Y", portada: "img/It.jpg" },
+    { titulo: "T1 - E08", id: "1Fmjp23Thga2jkLG6R6GHL9PfapXqZKsu", portada: "img/It.jpg" }
+  ] 
+};
+
   
 
 const novelas = {
