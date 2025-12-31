@@ -4,15 +4,22 @@ const peliculas = [
   { titulo: "Tron Ares", id: "1fbWC5HmXXLj7_FG1eu5m3JYYHg8X8xyw", portada: "img/tron.jpg" },
   { titulo: "Teléfono Negro 1", id: "13GMvzhbQ3BwcQmvW7nhq3FSjTqL4dJap", portada: "img/tel1.jpg" },
   { titulo: "Five Nights at Freddy's", id: "1xs9uVvlE4nVKfuuikDLCHYmY_2DgD8PL", portada: "img/five.jpg" },
-  {titulo:"Teléfono Negro 2", id:"1iyauAE-pxdlZRjoYmz1ZkIFDRYqRfghF", portada:"img/tel2.jpg"},
-  {titulo:"El Abismo Secreto",id:"1PtdXB3D3LJOHCc_IS7vc88q4i-x1dIFG",portada:"img/abi.jpg"},
-  {titulo:"Bambi",id:"1OKlsC4GLkGUYF6CnshOeeP39PrKTMyjV",portada:"img/bambi.jpg"},
-  {titulo:"Doctor Sueño",id:"173OExhru7h7P9zq8fQWp879fYXKd3SyI",portada:"img/doc.jpg"}
+  { titulo:"Teléfono Negro 2", id:"1iyauAE-pxdlZRjoYmz1ZkIFDRYqRfghF", portada: "img/tel2.jpg"},
+  { titulo:"El Abismo Secreto",id:"1PtdXB3D3LJOHCc_IS7vc88q4i-x1dIFG",portada: "img/abi.jpg"},
+  { titulo:"Bambi",id:"1OKlsC4GLkGUYF6CnshOeeP39PrKTMyjV",portada:"img/bambi.jpg"},
+  { titulo:"Doctor Sueño",id:"173OExhru7h7P9zq8fQWp879fYXKd3SyI",portada:"img/doc.jpg"},
+  { titulo:"Trust",id:"1zF7nJapnl2dJUSLL2jrZbTzWz9S9085x",portada: "img/trust.jpg"},
+  { titulo:"Yo antes de Ti",id:"1L1COOMHu2mwsSJx-LvAziteUObL2Kk7-",portada: "img/yo.jpg"},
+  { titulo:"Five Nights at Freddy's 2",id:"16831kM6d-15tNBOqQIq_tCk25rBDTwce",portada: "img/freddy.jpg"},
+  { titulo:"Five Nights at Freddy's",id:"1xs9uVvlE4nVKfuuikDLCHYmY_2DgD8PL",portada: "img/five.jpg"},
+  { titulo:"Cosas imposibles",id:"1S-O5BiPPZYUl9nVUicPAYywXhIKqM1VP",portada:"img/cosas.jpg"},
+  {titulo:"Caramelo",id:"1dn-DmNz7NZTmzOEvFIHuMMNeTSdmZHS3",portada:"img/Caramelo.jpg"}
 ];
 
 const series = {
   "IT (Eso)": [{ titulo: "Capítulo 01", id: "109rkG4sPdh38wXWjAca6YAldG7AK2amo", portada: "img/It.jpg" }],
   "Loki": [{ titulo: "T1 - E01", id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY", portada: "img/Loki.jpg" }]
+  
 };
 
 const novelas = {
