@@ -29,7 +29,7 @@ const peliculas = [
 
 const series = {
   "IT (Eso)": [
-    { titulo: "Capítulo 01", id: "109rkG4sPdh38wXWjAca6YAldG7AK2amo", portada: "img/It.jpg" },
+    { titulo: "Capítulo 01", id: "109rkG4sPdh38wXWjAca6YAldG7AK2amo", portada: "img/eso.jpg" },
     { titulo: "T1 - E02", id: "1UM9Pl6JP00ruYSsglltJ6yx3FvGCLKn-", portada: "img/It.jpg" },
     { titulo: "T1 - E03", id: "1dOztKuSgXOqfe9o4j2NE633XfAWpDu-1", portada: "img/eso.jpg" },
     { titulo: "T1 - E04", id: "1MIqeU9ZwdpKuF2FGltndNpDF4d4ZNNE9", portada: "img/It.jpg" },
