@@ -41,12 +41,13 @@ const series = {
     { titulo: "T1 - E08", id: "1Fmjp23Thga2jkLG6R6GHL9PfapXqZKsu", portada: "img/It.jpg" }
   ],
   "Loki": [
-    { titulo:"T1 - E01", id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY", portada: "img/Loki.jpg" },
-    {titulo: "T1 - E02", id: "14sKUI7KOn9XJSS4TNB4uL5GSB9BJz476", portada: "img/Loki.jpg"}
+    { titulo:"T1 - E01", id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY", portada: "img/Loki2.jpg" },
+    {titulo: "T1 - E02", id: "14sKUI7KOn9XJSS4TNB4uL5GSB9BJz476", portada: "img/Loki.jpg"},
+    {titulo: "T1 - E03", id: "1jQkqvFTYzC6T33RaljStFVdWziCFEjjT", portada: "img/Loki2.jpg"},
+    {titulo: "T1 - E04", id: "1hbwZ1AcK8kry6ELE9JNHvRq2YNcTUWvZ", portada: "img/Loki.jpg"}
   ] 
 };
 
-  
 
 const novelas = {
   "Domenica Montero": [{ titulo: "Capítulo 01", id: "1HKZBxjcB8VfNWIWQoINQ1__kGQH3KzLY", portada: "img/domenica.jpg" },
