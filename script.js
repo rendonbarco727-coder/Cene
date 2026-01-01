@@ -24,7 +24,9 @@ const peliculas = [
   
   { titulo:"Cosas imposibles",id:"1S-O5BiPPZYUl9nVUicPAYywXhIKqM1VP",portada:"img/cosas.jpg"},
   
-  {titulo:"Caramelo",id:"1dn-DmNz7NZTmz0EvFIHuMMNeTSdmZHS3",portada:"img/Caramelo.jpg"}
+  {titulo:"Caramelo",id:"1dn-DmNz7NZTmz0EvFIHuMMNeTSdmZHS3",portada:"img/Caramelo.jpg"},
+  
+  {titulo:"Pearl Harbor",id:"1pdHWRgVOVA6-PYDbtxh9T6KrJteyr9Nr",portada:"img/pear.jpg"}
 ];
 
 const series = {
@@ -78,7 +80,7 @@ portada: "img/domenica.jpg"
 ]
 };
 
-/* ====== NAVEGACIÓN ====== */
+/* ====== NAVEGACION ====== */
 function mostrarSeccion(id) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   document.getElementById(`sec-${id}`).classList.remove('hidden');
