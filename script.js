@@ -41,8 +41,8 @@ const series = {
     { titulo: "T1 - E08", id: "1Fmjp23Thga2jkLG6R6GHL9PfapXqZKsu", portada: "img/It.jpg" }
   ],
   "Loki": [
-    { titulo: "T1 - E01", id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY", portada: "img/Loki.jpg" },
-    
+    { titulo:"T1 - E01", id: "1o9uQKpwDFanF5K8Cpj75KRdn3eYguHnY", portada: "img/Loki.jpg" },
+    {titulo: "T1 - E02", id: "14sKUI7KOn9XJSS4TNB4uL5GSB9BJz476", portada: "img/Loki.jpg"}
   ] 
 };
 
