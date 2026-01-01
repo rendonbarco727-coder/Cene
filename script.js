@@ -47,7 +47,35 @@ const series = {
   
 
 const novelas = {
-  "Domenica Montero": [{ titulo: "Capítulo 01", id: "1HKZBxjcB8VfNWIWQoINQ1__kGQH3KzLY", portada: "img/domenica.jpg" }]
+  "Domenica Montero": [{ titulo: "Capítulo 01", id: "1HKZBxjcB8VfNWIWQoINQ1__kGQH3KzLY", portada: "img/domenica.jpg" },
+                       {
+titulo: "Domenica Montero Capítulo 02",
+id: "1H9PtFDGUj2KIZQBZ-4T4A_RbPjjTXN7o",
+portada: "img/domenica.jpg"
+},
+
+{
+titulo: "Domenica Montero Capítulo 03",
+id: "1WbFeQ4cHKwNH4bZg8ir7rOItmqJnzsJ9",
+portada: "img/domenica.jpg"
+},
+{
+titulo: "Domenica Montero Capítulo 04",
+id: "1NQ8kdWVQ51oo9o6yya-s0pICxgT6X8fu",
+portada: "img/domenica.jpg"
+},
+
+{
+titulo: "Domenica Montero Capítulo 05",
+id: "1Oj86ov9uRsrOYMPJmzG7Yl561U7aE3v7",
+portada: "img/domenica.jpg"
+},
+{
+titulo: "Domenica Montero Capítulo 06",
+id: "1KUVqvtU4JHaYTlMHtE7f2kprOGjVCmWN",
+portada: "img/domenica.jpg"
+}
+]
 };
 
 /* ====== NAVEGACIÓN ====== */
