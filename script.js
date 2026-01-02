@@ -52,8 +52,19 @@ const novelas = {
   ]
 };
 
-/* ====== LÓGICA DE NAVEGACIÓN ====== */
-let seccionActual = 'peliculas'; 
+/* ====== SISTEMA HISTORIAL (VISTOS) ====== */
+let vistos = JSON.parse(localStorage.getItem('cinema_vistos')) || [];
+
+function marcarVisto(id) {
+  if (!id) return;
+  if (!vistos.includes(id)) {
+    vistos.push(id);
+    localStorage.setItem('cinema_vistos', JSON.stringify(vistos));
+  }
+}
+
+/* ====== NAVEGACION ====== */
+let seccionActual = 'peliculas';
 
 function mostrarSeccion(id) {
   seccionActual = id;
@@ -63,7 +74,6 @@ function mostrarSeccion(id) {
   const hero = document.getElementById('header-slider');
   id === 'peliculas' ? hero.classList.remove('hidden') : hero.classList.add('hidden');
   
-  // Resetear buscador al cambiar
   document.getElementById('buscador').value = "";
   document.querySelectorAll('.card').forEach(c => c.style.display = "block");
 }
@@ -77,30 +87,40 @@ function verDetalle(titulo, lista) {
   const grid = document.getElementById('grid-detalles');
   grid.innerHTML = "";
   lista.forEach(item => {
-    grid.appendChild(crearCard(item.titulo, item.portada, () => reproducir(item.id)));
+    grid.appendChild(crearCard(item.titulo, item.portada, () => reproducir(item.id), item.id));
   });
   window.scrollTo(0,0);
 }
 
-function volver() { 
-  mostrarSeccion(seccionActual); 
-}
+function volver() { mostrarSeccion(seccionActual); }
 
-/* ====== RENDERIZADO ====== */
-function crearCard(titulo, portada, accion) {
+/* ====== RENDER ====== */
+function crearCard(titulo, portada, accion, id = null) {
   const div = document.createElement('div');
   div.className = 'card';
-  div.innerHTML = `<img src="${portada}"><p>${titulo}</p>`;
+  // Si ya fue visto, añadimos la clase visual
+  if (id && vistos.includes(id)) div.classList.add('visto');
+  
+  div.innerHTML = `
+    <div class="check-visto">✓</div>
+    <img src="${portada}">
+    <p>${titulo}</p>
+  `;
+  
   div.onclick = (e) => {
-      e.stopPropagation();
-      accion();
+    e.stopPropagation();
+    if (id) {
+        marcarVisto(id);
+        div.classList.add('visto'); // Actualizar visualmente al instante
+    }
+    accion();
   };
   return div;
 }
 
 function cargarTodo() {
   const gridPeli = document.getElementById('grid-peliculas');
-  peliculas.forEach(p => gridPeli.appendChild(crearCard(p.titulo, p.portada, () => reproducir(p.id))));
+  peliculas.forEach(p => gridPeli.appendChild(crearCard(p.titulo, p.portada, () => reproducir(p.id), p.id)));
 
   const gridSeries = document.getElementById('grid-series');
   Object.keys(series).forEach(s => {
@@ -113,7 +133,6 @@ function cargarTodo() {
   });
 }
 
-/* ====== REPRODUCTOR ====== */
 function reproducir(id) {
   const p = document.getElementById('player');
   const frame = document.getElementById('videoFrame');
@@ -126,16 +145,13 @@ function cerrar() {
   document.getElementById('videoFrame').src = "";
 }
 
-/* ====== BUSCADOR ====== */
 function filtrarContenido() {
   const q = document.getElementById('buscador').value.toLowerCase();
-  const seccionActiva = document.querySelector('.content-section:not(.hidden)');
-  if(!seccionActiva) return;
-
-  const cards = seccionActiva.querySelectorAll('.card');
-  cards.forEach(c => {
-    const texto = c.innerText.toLowerCase();
-    c.style.display = texto.includes(q) ? "block" : "none";
+  const activa = document.querySelector('.content-section:not(.hidden)');
+  if(!activa) return;
+  
+  activa.querySelectorAll('.card').forEach(c => {
+    c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none";
   });
 }
 
@@ -143,17 +159,17 @@ function filtrarContenido() {
 let current = 0;
 function initSlider() {
   const wrapper = document.getElementById('slider');
-  // Usamos las primeras 5 películas para el slider
-  peliculas.slice(0, 5).forEach(p => {
+  peliculas.slice(0, 6).forEach(p => {
     const img = document.createElement('img');
     img.src = p.portada;
     wrapper.appendChild(img);
   });
-  
   setInterval(() => {
-    const total = wrapper.querySelectorAll('img').length;
-    current = (current + 1) % total;
-    wrapper.style.transform = `translateX(-${current * 100}%)`;
+    const imgs = wrapper.querySelectorAll('img');
+    if(imgs.length > 0) {
+        current = (current + 1) % imgs.length;
+        wrapper.style.transform = `translateX(-${current * 100}%)`;
+    }
   }, 5000);
 }
 
@@ -161,4 +177,3 @@ document.addEventListener("DOMContentLoaded", () => {
   initSlider();
   cargarTodo();
 });
-  
