@@ -17,7 +17,7 @@
       <button onclick="mostrarSeccion('novelas')">Novelas</button>
     </div>
     <div class="search-bar">
-      <input type="text" id="buscador" placeholder="Buscar en esta sección..." onkeyup="filtrarContenido()">
+      <input type="text" id="buscador" placeholder="Buscar..." onkeyup="filtrarContenido()">
     </div>
   </div>
 </nav>
@@ -47,6 +47,10 @@
     <h2 id="detalle-titulo" class="category-title"></h2>
     <div id="grid-detalles" class="movie-grid"></div>
   </section>
+
+  <div class="footer-actions">
+    <button class="btn-borrar" onclick="borrarHistorial()">🗑️ Limpiar videos vistos</button>
+  </div>
 </main>
 
 <div id="player" class="video-overlay hidden">
