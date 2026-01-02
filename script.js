@@ -17,7 +17,9 @@ const peliculas = [
   { titulo: "Gretel y Hansel", id: "1xHYWt6QpCDf84dUB8DOdJtsEl04T87qd", portada: "img/gretel.jpg"},
   { titulo: "Apocalypto", id: "1Zq8sNv1350sF6vmzZLerULFZ3E64hike", portada: "img/apocalipto.jpg"},
   { titulo: "Los 4 Fantasticos", id: "1m7c5HjR2OcT5KfBJrLL9o4TK8dTzjL4U", portada: "img/4fan.jpg"},
-  { titulo: "Pearl Harbor", id: "1pdHWRgVOVA6-PYDbtxh9T6KrJteyr9Nr", portada: "img/pear.jpg"}
+  { titulo: "Pearl Harbor", id: "1pdHWRgVOVA6-PYDbtxh9T6KrJteyr9Nr", portada: "img/pear.jpg"},
+  { titulo: "La Torre Oscura", id: "1Nu4ZxbNgTOIqI3Uqi6ZzEg21sAxPJgJt", portada: "img/torre.jpg"},
+  { titulo: "Crimen Perfecto", id: "1DgNt_xuwrtWETD5MqAPPeRXS97NLipwb", portada: "img/crimen.jpg"}
 ];
 
 const series = {
