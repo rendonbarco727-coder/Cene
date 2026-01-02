@@ -52,18 +52,24 @@ const novelas = {
   ]
 };
 
-/* ====== SISTEMA HISTORIAL (VISTOS) ====== */
-let vistos = JSON.parse(localStorage.getItem('cinema_vistos')) || [];
+/* ====== LÓGICA DE VISTOS ====== */
+let vistos = JSON.parse(localStorage.getItem('vistos_strange')) || [];
 
 function marcarVisto(id) {
-  if (!id) return;
-  if (!vistos.includes(id)) {
-    vistos.push(id);
-    localStorage.setItem('cinema_vistos', JSON.stringify(vistos));
+  if (!id || vistos.includes(id)) return;
+  vistos.push(id);
+  localStorage.setItem('vistos_strange', JSON.stringify(vistos));
+}
+
+function borrarHistorial() {
+  if (confirm("¿Borrar todos los videos marcados como vistos?")) {
+    vistos = [];
+    localStorage.removeItem('vistos_strange');
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('visto'));
   }
 }
 
-/* ====== NAVEGACION ====== */
+/* ====== NAVEGACIÓN ====== */
 let seccionActual = 'peliculas';
 
 function mostrarSeccion(id) {
@@ -98,11 +104,10 @@ function volver() { mostrarSeccion(seccionActual); }
 function crearCard(titulo, portada, accion, id = null) {
   const div = document.createElement('div');
   div.className = 'card';
-  // Si ya fue visto, añadimos la clase visual
   if (id && vistos.includes(id)) div.classList.add('visto');
   
   div.innerHTML = `
-    <div class="check-visto">✓</div>
+    <div class="badge-visto">✓</div>
     <img src="${portada}">
     <p>${titulo}</p>
   `;
@@ -111,7 +116,7 @@ function crearCard(titulo, portada, accion, id = null) {
     e.stopPropagation();
     if (id) {
         marcarVisto(id);
-        div.classList.add('visto'); // Actualizar visualmente al instante
+        div.classList.add('visto');
     }
     accion();
   };
@@ -119,25 +124,21 @@ function crearCard(titulo, portada, accion, id = null) {
 }
 
 function cargarTodo() {
-  const gridPeli = document.getElementById('grid-peliculas');
-  peliculas.forEach(p => gridPeli.appendChild(crearCard(p.titulo, p.portada, () => reproducir(p.id), p.id)));
+  const gp = document.getElementById('grid-peliculas');
+  peliculas.forEach(p => gp.appendChild(crearCard(p.titulo, p.portada, () => reproducir(p.id), p.id)));
 
-  const gridSeries = document.getElementById('grid-series');
-  Object.keys(series).forEach(s => {
-    gridSeries.appendChild(crearCard(s, series[s][0].portada, () => verDetalle(s, series[s])));
-  });
+  const gs = document.getElementById('grid-series');
+  Object.keys(series).forEach(s => gs.appendChild(crearCard(s, series[s][0].portada, () => verDetalle(s, series[s]))));
 
-  const gridNovelas = document.getElementById('grid-novelas');
-  Object.keys(novelas).forEach(n => {
-    gridNovelas.appendChild(crearCard(n, novelas[n][0].portada, () => verDetalle(n, novelas[n])));
-  });
+  const gn = document.getElementById('grid-novelas');
+  Object.keys(novelas).forEach(n => gn.appendChild(crearCard(n, novelas[n][0].portada, () => verDetalle(n, novelas[n]))));
 }
 
+/* ====== VIDEO ====== */
 function reproducir(id) {
-  const p = document.getElementById('player');
   const frame = document.getElementById('videoFrame');
   frame.src = `https://drive.google.com/file/d/${id}/preview`;
-  p.classList.remove('hidden');
+  document.getElementById('player').classList.remove('hidden');
 }
 
 function cerrar() {
@@ -145,31 +146,27 @@ function cerrar() {
   document.getElementById('videoFrame').src = "";
 }
 
+/* ====== BUSCADOR ====== */
 function filtrarContenido() {
   const q = document.getElementById('buscador').value.toLowerCase();
   const activa = document.querySelector('.content-section:not(.hidden)');
-  if(!activa) return;
-  
   activa.querySelectorAll('.card').forEach(c => {
     c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none";
   });
 }
 
 /* ====== SLIDER ====== */
-let current = 0;
 function initSlider() {
   const wrapper = document.getElementById('slider');
-  peliculas.slice(0, 6).forEach(p => {
+  peliculas.slice(0, 5).forEach(p => {
     const img = document.createElement('img');
     img.src = p.portada;
     wrapper.appendChild(img);
   });
+  let cur = 0;
   setInterval(() => {
-    const imgs = wrapper.querySelectorAll('img');
-    if(imgs.length > 0) {
-        current = (current + 1) % imgs.length;
-        wrapper.style.transform = `translateX(-${current * 100}%)`;
-    }
+    cur = (cur + 1) % 5;
+    wrapper.style.transform = `translateX(-${cur * 100}%)`;
   }, 5000);
 }
 
