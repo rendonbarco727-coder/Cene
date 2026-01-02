@@ -170,20 +170,38 @@ function filtrarContenido() {
   });
 }
 
-/* ====== SLIDER ====== */
+/* ====== SLIDER DINÁMICO ====== */
 function initSlider() {
   const wrapper = document.getElementById('slider');
-  peliculas.slice(0, 5).forEach(p => {
+  
+  // 1. Creamos una lista con todas las portadas de películas
+  // Usamos un Set para evitar que se repitan imágenes si una película aparece dos veces
+  let todasLasFotos = [...new Set(peliculas.map(p => p.portada))];
+
+  // 2. Si quieres incluir también las de series y novelas, descomenta las líneas de abajo:
+  // Object.keys(series).forEach(s => todasLasFotos.push(series[s][0].portada));
+  // Object.keys(novelas).forEach(n => todasLasFotos.push(novelas[n][0].portada));
+
+  // 3. Crear las imágenes en el HTML
+  todasLasFotos.forEach(ruta => {
     const img = document.createElement('img');
-    img.src = p.portada;
+    img.src = ruta;
+    img.onerror = () => img.style.display = 'none'; // Si la imagen no existe, no muestra error
     wrapper.appendChild(img);
   });
-  let cur = 0;
-  setInterval(() => {
-    cur = (cur + 1) % 5;
-    wrapper.style.transform = `translateX(-${cur * 100}%)`;
-  }, 5000);
+
+  // 4. Lógica de movimiento
+  let indiceCual = 0;
+  const totalFotos = todasLasFotos.length;
+
+  if (totalFotos > 0) {
+    setInterval(() => {
+      indiceCual = (indiceCual + 1) % totalFotos;
+      wrapper.style.transform = `translateX(-${indiceCual * 100}%)`;
+    }, 5000); // Cambia cada 5 segundos
+  }
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   initSlider();
