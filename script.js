@@ -62,12 +62,27 @@ function marcarVisto(id) {
 }
 
 function borrarHistorial() {
-  if (confirm("¿Borrar todos los videos marcados como vistos?")) {
+  // 1. Pedir confirmación al usuario
+  const confirmar = confirm("¿Seguro que quieres borrar todas las marcas de 'visto'?");
+  
+  if (confirmar) {
+    // 2. Limpiar la variable en el código
     vistos = [];
+    
+    // 3. Limpiar el almacenamiento local (LocalStorage)
     localStorage.removeItem('vistos_strange');
-    document.querySelectorAll('.card').forEach(c => c.classList.remove('visto'));
+    
+    // 4. Quitar la clase visual "visto" de todas las cards que existan en el HTML
+    const todasLasCards = document.querySelectorAll('.card');
+    todasLasCards.forEach(card => {
+      card.classList.remove('visto');
+    });
+
+    console.log("Historial de vistos eliminado correctamente.");
+    alert("Historial borrado.");
   }
 }
+
 
 /* ====== NAVEGACIÓN ====== */
 let seccionActual = 'peliculas';
