@@ -19,7 +19,10 @@ const peliculas = [
   { titulo: "Los 4 Fantasticos", id: "1m7c5HjR2OcT5KfBJrLL9o4TK8dTzjL4U", portada: "img/4fan.jpg"},
   { titulo: "Pearl Harbor", id: "1pdHWRgVOVA6-PYDbtxh9T6KrJteyr9Nr", portada: "img/pear.jpg"},
   { titulo: "La Torre Oscura", id: "1Nu4ZxbNgTOIqI3Uqi6ZzEg21sAxPJgJt", portada: "img/torre.jpg"},
-  { titulo: "Crimen Perfecto", id: "1DgNt_xuwrtWETD5MqAPPeRXS97NLipwb", portada: "img/crimen.jpg"}
+  { titulo: "Crimen Perfecto", id: "1DgNt_xuwrtWETD5MqAPPeRXS97NLipwb", portada: "img/crimen.jpg"},
+  { titulo: "El Resplandor", id: "1QZBo1F5XgvJ_bho2oe_SPWH3Joy0Qe67", portada: "img/res.jpg"},
+  { titulo: "Destino Final Lazos de Sangre", id: "1xqYaA9p07eQv9Zrjvkjf8SiRV4n_leJ2", portada: "img/destino.jpg"},
+  { titulo: "Como entrenar a tu dragón", id: "1rkK3aP7jBWEJCoeHBuPGBTdvVcsPFkD2", portada: "img/como.jpg"}
 ];
 
 const series = {
