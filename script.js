@@ -22,7 +22,9 @@ const peliculas = [
   { titulo: "Crimen Perfecto", id: "1DgNt_xuwrtWETD5MqAPPeRXS97NLipwb", portada: "img/crimen.jpg"},
   { titulo: "El Resplandor", id: "1QZBo1F5XgvJ_bho2oe_SPWH3Joy0Qe67", portada: "img/res.jpg"},
   { titulo: "Destino Final Lazos de Sangre", id: "1xqYaA9p07eQv9Zrjvkjf8SiRV4n_leJ2", portada: "img/destino.jpg"},
-  { titulo: "Como entrenar a tu dragón", id: "1rkK3aP7jBWEJCoeHBuPGBTdvVcsPFkD2", portada: "img/como.jpg"}
+  { titulo: "Como entrenar a tu dragón", id: "1rkK3aP7jBWEJCoeHBuPGBTdvVcsPFkD2", portada: "img/como.jpg"},
+  { titulo: "Verdad y Traición", id: "1GeJH9KXTWEO3TnvQfOK6MNZH9ynqyTc8", portada: "img/verdad.jpg"}
+];
 ];
 
 const series = {
