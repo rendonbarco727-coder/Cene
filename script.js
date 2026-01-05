@@ -24,7 +24,9 @@ const peliculas = [
   { titulo: "Destino Final Lazos de Sangre", id: "1xqYaA9p07eQv9Zrjvkjf8SiRV4n_leJ2", portada: "img/destino.jpg"},
   { titulo: "Como entrenar a tu dragón", id: "1rkK3aP7jBWEJCoeHBuPGBTdvVcsPFkD2", portada: "img/como.jpg"},
   { titulo: "Verdad y Traición", id: "1GeJH9KXTWEO3TnvQfOK6MNZH9ynqyTc8", portada: "img/verdad.jpg"},
-  { titulo: "Sobinor y la Grande Fuga", id: "1yYIGxEkpYq1AcO92on-9Xk2oGdpZqXZr", portada: "https://share.google/B0PyT9NobpTv60VW0"}
+  { titulo: "Sobinor y la Grande Fuga", id: "1yYIGxEkpYq1AcO92on-9Xk2oGdpZqXZr", portada: "https://share.google/B0PyT9NobpTv60VW0"},
+  { titulo: "Soy Frankela", id: "16k7VHdE0JXjloxpDcZlIUVtOg6N6cY7W", portada: " https://share.google/zXaraTFEf8Vp4W03P"}
+
   
 ];
 
