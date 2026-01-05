@@ -25,7 +25,10 @@ const peliculas = [
   { titulo: "Como entrenar a tu dragón", id: "1rkK3aP7jBWEJCoeHBuPGBTdvVcsPFkD2", portada: "img/como.jpg"},
   { titulo: "Verdad y Traición", id: "1GeJH9KXTWEO3TnvQfOK6MNZH9ynqyTc8", portada: "img/verdad.jpg"},
   { titulo: "Sobinor y la Grande Fuga", id: "1yYIGxEkpYq1AcO92on-9Xk2oGdpZqXZr", portada: "img/s.jpg"},
-  { titulo: "Soy Frankela", id: "16k7VHdE0JXjloxpDcZlIUVtOg6N6cY7W", portada: "img/frankela.jpg"}
+  { titulo: "Soy Frankela", id: "16k7VHdE0JXjloxpDcZlIUVtOg6N6cY7W", portada: "img/frankela.jpg"},
+  { titulo: "The Sand", id: "1U6Gi3ULn2ip3ESChv2YCqWeAmsDSqReQ", portada: "img/thesand.jpg"},
+  { titulo: "First Moon", id: "1R6oFCl5xLmaqUfoReRGrTNCtJYGT4mR9", portada: "img/moon.jpg"}
+
 ];
 
 const series = {
