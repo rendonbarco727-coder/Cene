@@ -27,8 +27,8 @@ const peliculas = [
   { titulo: "Sobinor y la Grande Fuga", id: "1yYIGxEkpYq1AcO92on-9Xk2oGdpZqXZr", portada: "img/s.jpg"},
   { titulo: "Soy Frankela", id: "16k7VHdE0JXjloxpDcZlIUVtOg6N6cY7W", portada: "img/frankela.jpg"},
   { titulo: "The Sand", id: "1U6Gi3ULn2ip3ESChv2YCqWeAmsDSqReQ", portada: "img/thesand.jpg"},
-  { titulo: "First Moon", id: "1R6oFCl5xLmaqUfoReRGrTNCtJYGT4mR9", portada: "img/moon.jpg"}
-
+  { titulo: "First Moon", id: "1R6oFCl5xLmaqUfoReRGrTNCtJYGT4mR9", portada: "img/moon.jpg"},
+  { titulo: "Sonido de Libertad", id: "1d5kryat5EehksoWwkw6QIpQMQBjfjQX-", portada: "img/sonido.jpg"}
 ];
 
 const series = {
