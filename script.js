@@ -126,6 +126,23 @@ function verDetalle(titulo, lista) {
 
 function volver() { mostrarSeccion(seccionActual); }
 
+/* ====== SECCIONES ====== */
+function mostrarSeccion(seccion) {
+  document.querySelectorAll('.content-section').forEach(sec => {
+    sec.classList.add('hidden');
+  });
+
+  if (seccion === 'peliculas') {
+    document.getElementById('sec-peliculas').classList.remove('hidden');
+  } else if (seccion === 'series') {
+    document.getElementById('sec-series').classList.remove('hidden');
+  } else if (seccion === 'novelas') {
+    document.getElementById('sec-novelas').classList.remove('hidden');
+  } else if (seccion === 'tv') {
+    document.getElementById('sec-tv').classList.remove('hidden');
+  }
+}
+
 /* ====== RENDER ====== */
 function crearCard(titulo, portada, accion, id = null) {
   const div = document.createElement('div');
@@ -141,8 +158,8 @@ function crearCard(titulo, portada, accion, id = null) {
   div.onclick = (e) => {
     e.stopPropagation();
     if (id) {
-        marcarVisto(id);
-        div.classList.add('visto');
+      marcarVisto(id);
+      div.classList.add('visto');
     }
     accion();
   };
@@ -151,13 +168,19 @@ function crearCard(titulo, portada, accion, id = null) {
 
 function cargarTodo() {
   const gp = document.getElementById('grid-peliculas');
-  peliculas.forEach(p => gp.appendChild(crearCard(p.titulo, p.portada, () => reproducir(p.id), p.id)));
+  peliculas.forEach(p =>
+    gp.appendChild(crearCard(p.titulo, p.portada, () => reproducir(p.id), p.id))
+  );
 
   const gs = document.getElementById('grid-series');
-  Object.keys(series).forEach(s => gs.appendChild(crearCard(s, series[s][0].portada, () => verDetalle(s, series[s]))));
+  Object.keys(series).forEach(s =>
+    gs.appendChild(crearCard(s, series[s][0].portada, () => verDetalle(s, series[s])))
+  );
 
   const gn = document.getElementById('grid-novelas');
-  Object.keys(novelas).forEach(n => gn.appendChild(crearCard(n, novelas[n][0].portada, () => verDetalle(n, novelas[n]))));
+  Object.keys(novelas).forEach(n =>
+    gn.appendChild(crearCard(n, novelas[n][0].portada, () => verDetalle(n, novelas[n])))
+  );
 }
 
 /* ====== VIDEO ====== */
@@ -176,10 +199,14 @@ function cerrar() {
 function filtrarContenido() {
   const q = document.getElementById('buscador').value.toLowerCase();
   const activa = document.querySelector('.content-section:not(.hidden)');
+  if (!activa) return;
+
   activa.querySelectorAll('.card').forEach(c => {
-    c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none";
+    c.style.display = c.innerText.toLowerCase().includes(q)
+      ? "block"
+      : "none";
   });
-}
+                                                                   }
 
 /* ====== SLIDER DINÁMICO ====== */
 function initSlider() {
