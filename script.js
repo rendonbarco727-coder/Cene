@@ -28,7 +28,8 @@ const peliculas = [
   { titulo: "Soy Frankela", id: "16k7VHdE0JXjloxpDcZlIUVtOg6N6cY7W", portada: "img/frankela.jpg"},
   { titulo: "The Sand", id: "1U6Gi3ULn2ip3ESChv2YCqWeAmsDSqReQ", portada: "img/thesand.jpg"},
   { titulo: "First Moon", id: "1R6oFCl5xLmaqUfoReRGrTNCtJYGT4mR9", portada: "img/moon.jpg"},
-  { titulo: "Sonido de Libertad", id: "1d5kryat5EehksoWwkw6QIpQMQBjfjQX-", portada: "img/sonido.jpg"}
+  { titulo: "Sonido de Libertad", id: "1d5kryat5EehksoWwkw6QIpQMQBjfjQX-", portada: "img/sonido.jpg"},
+  { titulo: "La Torre Obscura", id: "12vJG_PVQxbey2rYvLJtFgHoI8pWtj8yu", portada: "img/torre.jpg"}
 ];
 
 const series = {
