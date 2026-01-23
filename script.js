@@ -33,7 +33,11 @@ const peliculas = [
   { titulo: "Exterminio (2002)", id: "16ovGFkO9tuVOZ55IHwcwLkumc41uEcAG", portada: "img/2002.jpg"},
   { titulo: "Exterminio La Evolución 2025", id: "1WL_W_bS8jIne6LWgiVluPVx8g0t-tkj4", portada: "img/evolucion.jpg"},
   { titulo: "Pecadores 2025", id: "1YScha9Sx5tgOGIYyUP7dWSgUTxHc5xWA", portada: "img/pecadores.jpg"},
-  { titulo: "28 Semanas Después", id: "17lgAtzQHQA8cGdim2HQaAWeB_KpP53y8", portada: "img/28.jpg"}
+  { titulo: "28 Semanas Después", id: "17lgAtzQHQA8cGdim2HQaAWeB_KpP53y8", portada: "img/28.jpg"},
+  { titulo: "El Conjuro", id: "1QPeYzlvIvlTmxo1q3eJQ05Vpo0Dh8_1y ", portada: "img/conjuro.jpg"},
+  { titulo: "El Conjuro 2", id: "1p8riZIHSo5iVwisPf_BvC4xo5J3rCs9Q", portada: "img/conjuro2.jpg"},
+  { titulo: "El Conjuro 3", id: "1bznsSO86KJJKuoWVHy-aJhiCPei-zdNa ", portada: "img/conjuro3.jpg"},
+  { titulo: "El Conjuro 4 Últimos Ritos", id: "1rzdrIZ1d6j439rctvEy9LqAZsNd5Rbbq", portada: "img/conjuro4.jpg"}
 ];
 
 const series = {
