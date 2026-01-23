@@ -29,7 +29,11 @@ const peliculas = [
   { titulo: "The Sand", id: "1U6Gi3ULn2ip3ESChv2YCqWeAmsDSqReQ", portada: "img/thesand.jpg"},
   { titulo: "First Moon", id: "1R6oFCl5xLmaqUfoReRGrTNCtJYGT4mR9", portada: "img/moon.jpg"},
   { titulo: "Sonido de Libertad", id: "1d5kryat5EehksoWwkw6QIpQMQBjfjQX-", portada: "img/sonido.jpg"},
-  { titulo: "La Torre Obscura", id: "12vJG_PVQxbey2rYvLJtFgHoI8pWtj8yu", portada: "img/torre.jpg"}
+  { titulo: "La Torre Obscura", id: "12vJG_PVQxbey2rYvLJtFgHoI8pWtj8yu", portada: "img/torre.jpg"},
+  { titulo: "Exterminio (2002)", id: "16ovGFkO9tuVOZ55IHwcwLkumc41uEcAG", portada: "img/2002.jpg"},
+  { titulo: "Exterminio La Evolución 2025", id: "1WL_W_bS8jIne6LWgiVluPVx8g0t-tkj4", portada: "img/evolucion.jpg"},
+  { titulo: "Pecadores 2025", id: "1YScha9Sx5tgOGIYyUP7dWSgUTxHc5xWA", portada: "img/pecadores.jpg"},
+  { titulo: "28 Semanas Después", id: "17lgAtzQHQA8cGdim2HQaAWeB_KpP53y8", portada: "img/28.jpg"}
 ];
 
 const series = {
