@@ -1,91 +1,149 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Cinema STRANGE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cara con Sensores (FIX)</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+
+body {
+    background: #66E0D4;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.shaking {
+    background: #ff4d4d;
+}
+
+.face {
+    width: 300px;
+    transition: transform 0.05s;
+}
+
+.line {
+    fill: none;
+    stroke: #111;
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+
+.mouth-open {
+    fill: #2d9188;
+    stroke: #111;
+    stroke-width: 3;
+    opacity: 0;
+}
+
+.talking .mouth-open { opacity: 1; }
+.talking .mouth-closed { opacity: 0; }
+</style>
 </head>
-<body>
 
-<nav class="navbar">
-  <div class="nav-content">
-    <div class="logo" onclick="mostrarSeccion('peliculas')">
-      CINEMA<span>STRANGER</span>
-    </div>
+<body id="body">
 
-    <div class="nav-links">
-      <button onclick="mostrarSeccion('peliculas')">Películas</button>
-      <button onclick="mostrarSeccion('series')">Series</button>
-      <button onclick="mostrarSeccion('novelas')">Novelas</button>
-      <button onclick="mostrarSeccion('tv')">TV en Vivo</button>
-    </div>
+<svg id="face" class="face" viewBox="0 0 200 150">
+    <path class="line" d="M50 55 Q60 45 70 55"/>
+    <path class="line" d="M130 55 Q140 45 150 55"/>
+    <path class="line mouth-closed" d="M75 95 Q100 105 125 95"/>
+    <ellipse class="mouth-open" cx="100" cy="100" rx="25" ry="20"/>
+</svg>
 
-    <div class="search-bar">
-      <input type="text" id="buscador" placeholder="Buscar..." onkeyup="filtrarContenido()">
-    </div>
-  </div>
-</nav>
+<script>
+const body = document.getElementById("body");
+const face = document.getElementById("face");
 
-<header id="header-slider" class="hero-slider">
-  <div id="slider" class="slider-wrapper"></div>
-</header>
+let last = { x: 0, y: 0, z: 0 };
+let power = 0;
+let active = false;
 
-<main class="container">
+const THRESHOLD = 12;
+const DECAY = 0.9;
 
-  <!-- PELÍCULAS -->
-  <section id="sec-peliculas" class="content-section">
-    <h2 class="category-title">Películas</h2>
-    <div id="grid-peliculas" class="movie-grid"></div>
-  </section>
+/* =====================
+   ACTIVAR SENSORES
+===================== */
+async function enableMotion() {
+    if (typeof DeviceMotionEvent === "undefined") {
+        alert("Este dispositivo no soporta sensores");
+        return;
+    }
 
-  <!-- SERIES -->
-  <section id="sec-series" class="content-section hidden">
-    <h2 class="category-title">Series</h2>
-    <div id="grid-series" class="movie-grid"></div>
-  </section>
+    if (typeof DeviceMotionEvent.requestPermission === "function") {
+        const res = await DeviceMotionEvent.requestPermission();
+        if (res !== "granted") return;
+    }
 
-  <!-- NOVELAS -->
-  <section id="sec-novelas" class="content-section hidden">
-    <h2 class="category-title">Novelas</h2>
-    <div id="grid-novelas" class="movie-grid"></div>
-  </section>
+    window.addEventListener("devicemotion", onMotion, true);
+    alert("Sensores ACTIVADOS. Ahora agita el teléfono.");
+}
 
-  <!-- TV EN VIVO -->
-  <section id="sec-tv" class="content-section hidden">
-    <h2 class="category-title">📺 TV en Vivo</h2>
+body.addEventListener("click", enableMotion);
 
-    <div class="tv-player">
-      <iframe
-        src="https://www.youtube.com/embed/t8HuqJeu6LE"
-        title="TV en Vivo"
-        frameborder="0"
-        allow="autoplay; encrypted-media"
-        allowfullscreen>
-      </iframe>
-    </div>
-  </section>
+/* =====================
+   SENSOR
+===================== */
+function onMotion(e) {
+    const acc = e.acceleration || e.accelerationIncludingGravity;
+    if (!acc) return;
 
-  <!-- DETALLES -->
-  <section id="vista-detalles" class="content-section hidden">
-    <button class="btn-back" onclick="volver()">← Regresar</button>
-    <h2 id="detalle-titulo" class="category-title"></h2>
-    <div id="grid-detalles" class="movie-grid"></div>
-  </section>
+    const dx = Math.abs(acc.x - last.x);
+    const dy = Math.abs(acc.y - last.y);
+    const dz = Math.abs(acc.z - last.z);
 
-  <div class="footer-actions">
-    <button class="btn-borrar" onclick="borrarHistorial()">🗑️ Limpiar videos vistos</button>
-  </div>
-</main>
+    const delta = dx + dy + dz;
 
-<!-- PLAYER GOOGLE DRIVE -->
-<div id="player" class="video-overlay hidden">
-  <div class="video-container">
-    <button class="btn-close" onclick="cerrar()">✕</button>
-    <iframe id="videoFrame" src="" allowfullscreen></iframe>
-  </div>
-</div>
+    if (delta > THRESHOLD) {
+        power += delta * 0.5;
+        if (!active) distort();
+        if (navigator.vibrate) navigator.vibrate(30);
+    }
 
-<script src="script.js"></script>
+    last = { x: acc.x, y: acc.y, z: acc.z };
+}
+
+/* =====================
+   DISTORSIÓN
+===================== */
+function distort() {
+    active = true;
+    body.classList.add("shaking");
+
+    requestAnimationFrame(loop);
+}
+
+function loop() {
+    power *= DECAY;
+
+    const sX = 1 + power / 40;
+    const sY = 1 - power / 60;
+    const rot = (Math.random() - 0.5) * power;
+
+    face.style.transform = `scale(${sX}, ${sY}) rotate(${rot}deg)`;
+
+    if (power > 1) {
+        requestAnimationFrame(loop);
+    } else {
+        face.style.transform = "scale(1) rotate(0)";
+        body.classList.remove("shaking");
+        active = false;
+        power = 0;
+    }
+}
+
+/* =====================
+   BOCA
+===================== */
+body.addEventListener("touchstart", () => body.classList.add("talking"));
+body.addEventListener("touchend", () => body.classList.remove("talking"));
+body.addEventListener("mousedown", () => body.classList.add("talking"));
+body.addEventListener("mouseup", () => body.classList.remove("talking"));
+</script>
+
 </body>
 </html>
