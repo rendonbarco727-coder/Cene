@@ -1,199 +1,91 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cara Interactiva con Sensores</title>
-
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none;
-}
-
-body {
-    background-color: #66E0D4;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    transition: background-color 0.2s;
-}
-
-/* Fondo al agitar */
-.shaking-active {
-    background-color: #ff4d4d;
-}
-
-.face-svg {
-    width: 300px;
-    height: auto;
-    transition: transform 0.05s;
-}
-
-/* Líneas */
-.stroke-line {
-    fill: none;
-    stroke: #1a1a1a;
-    stroke-width: 4;
-    stroke-linecap: round;
-}
-
-/* Boca */
-.mouth-open {
-    fill: #2d9188;
-    stroke: #1a1a1a;
-    stroke-width: 3;
-    opacity: 0;
-    transform-origin: center;
-}
-
-.talking .mouth-open {
-    opacity: 1;
-    animation: talk 0.12s infinite alternate;
-}
-
-.talking .mouth-closed {
-    opacity: 0;
-}
-
-@keyframes talk {
-    from { transform: scaleY(0.4); }
-    to   { transform: scaleY(1.4); }
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Cinema STRANGE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
+<body>
 
-<body id="mainBody">
+<nav class="navbar">
+  <div class="nav-content">
+    <div class="logo" onclick="mostrarSeccion('peliculas')">
+      CINEMA<span>STRANGER</span>
+    </div>
 
-<svg id="faceSvg" class="face-svg" viewBox="0 0 200 150"
-     xmlns="http://www.w3.org/2000/svg">
+    <div class="nav-links">
+      <button onclick="mostrarSeccion('peliculas')">Películas</button>
+      <button onclick="mostrarSeccion('series')">Series</button>
+      <button onclick="mostrarSeccion('novelas')">Novelas</button>
+      <button onclick="mostrarSeccion('tv')">TV en Vivo</button>
+    </div>
 
-    <!-- Ojos -->
-    <path class="stroke-line" d="M50,55 Q60,45 70,55" />
-    <path class="stroke-line" d="M130,55 Q140,45 150,55" />
+    <div class="search-bar">
+      <input type="text" id="buscador" placeholder="Buscar..." onkeyup="filtrarContenido()">
+    </div>
+  </div>
+</nav>
 
-    <!-- Boca -->
-    <path class="stroke-line mouth-closed" d="M75,95 Q100,105 125,95" />
-    <ellipse class="mouth-open" cx="100" cy="100" rx="25" ry="20" />
-</svg>
+<header id="header-slider" class="hero-slider">
+  <div id="slider" class="slider-wrapper"></div>
+</header>
 
-<script>
-const body = document.getElementById("mainBody");
-const faceSvg = document.getElementById("faceSvg");
+<main class="container">
 
-/* =====================
-   VARIABLES
-===================== */
-let lastX = 0, lastY = 0, lastZ = 0;
-let shakePower = 0;
-let isDistorting = false;
+  <!-- PELÍCULAS -->
+  <section id="sec-peliculas" class="content-section">
+    <h2 class="category-title">Películas</h2>
+    <div id="grid-peliculas" class="movie-grid"></div>
+  </section>
 
-/* Ajustes finos */
-const SHAKE_THRESHOLD = 18;   // sensibilidad
-const MAX_DISTORT = 40;
-const DECAY = 0.90;
+  <!-- SERIES -->
+  <section id="sec-series" class="content-section hidden">
+    <h2 class="category-title">Series</h2>
+    <div id="grid-series" class="movie-grid"></div>
+  </section>
 
-/* =====================
-   PERMISOS SENSORES
-===================== */
-function enableSensors() {
-    if (typeof DeviceMotionEvent !== "undefined" &&
-        typeof DeviceMotionEvent.requestPermission === "function") {
+  <!-- NOVELAS -->
+  <section id="sec-novelas" class="content-section hidden">
+    <h2 class="category-title">Novelas</h2>
+    <div id="grid-novelas" class="movie-grid"></div>
+  </section>
 
-        DeviceMotionEvent.requestPermission().then(res => {
-            if (res === "granted") {
-                window.addEventListener("devicemotion", handleMotion);
-            }
-        }).catch(console.error);
+  <!-- TV EN VIVO -->
+  <section id="sec-tv" class="content-section hidden">
+    <h2 class="category-title">📺 TV en Vivo</h2>
 
-    } else {
-        window.addEventListener("devicemotion", handleMotion);
-    }
-}
+    <div class="tv-player">
+      <iframe
+        src="https://www.youtube.com/embed/t8HuqJeu6LE"
+        title="TV en Vivo"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </section>
 
-body.addEventListener("click", enableSensors);
-body.addEventListener("touchstart", enableSensors);
+  <!-- DETALLES -->
+  <section id="vista-detalles" class="content-section hidden">
+    <button class="btn-back" onclick="volver()">← Regresar</button>
+    <h2 id="detalle-titulo" class="category-title"></h2>
+    <div id="grid-detalles" class="movie-grid"></div>
+  </section>
 
-/* =====================
-   MOVIMIENTO
-===================== */
-function handleMotion(event) {
-    const acc = event.accelerationIncludingGravity;
-    if (!acc) return;
+  <div class="footer-actions">
+    <button class="btn-borrar" onclick="borrarHistorial()">🗑️ Limpiar videos vistos</button>
+  </div>
+</main>
 
-    const dx = Math.abs(acc.x - lastX);
-    const dy = Math.abs(acc.y - lastY);
-    const dz = Math.abs(acc.z - lastZ);
+<!-- PLAYER GOOGLE DRIVE -->
+<div id="player" class="video-overlay hidden">
+  <div class="video-container">
+    <button class="btn-close" onclick="cerrar()">✕</button>
+    <iframe id="videoFrame" src="" allowfullscreen></iframe>
+  </div>
+</div>
 
-    const delta = dx + dy + dz;
-
-    if (delta > SHAKE_THRESHOLD) {
-        shakePower += delta * 0.6;
-
-        if (!isDistorting) startDistortion();
-
-        if (navigator.vibrate) navigator.vibrate(50);
-    }
-
-    lastX = acc.x;
-    lastY = acc.y;
-    lastZ = acc.z;
-}
-
-/* =====================
-   DISTORSIÓN
-===================== */
-function startDistortion() {
-    isDistorting = true;
-    body.classList.add("shaking-active");
-    requestAnimationFrame(distortLoop);
-}
-
-function distortLoop() {
-    shakePower *= DECAY;
-
-    const intensity = Math.min(shakePower, MAX_DISTORT);
-
-    const scaleX = 1 + intensity / 50;
-    const scaleY = 1 - intensity / 70;
-    const rotate = (Math.random() - 0.5) * intensity;
-
-    faceSvg.style.transform =
-        `scale(${scaleX}, ${scaleY}) rotate(${rotate}deg)`;
-
-    if (shakePower > 1) {
-        requestAnimationFrame(distortLoop);
-    } else {
-        resetFace();
-    }
-}
-
-function resetFace() {
-    isDistorting = false;
-    shakePower = 0;
-    body.classList.remove("shaking-active");
-    faceSvg.style.transform = "scale(1,1) rotate(0deg)";
-}
-
-/* =====================
-   BOCA HABLANDO
-===================== */
-body.addEventListener("mousedown", () => body.classList.add("talking"));
-body.addEventListener("mouseup", () => body.classList.remove("talking"));
-
-body.addEventListener("touchstart", e => {
-    e.preventDefault();
-    body.classList.add("talking");
-});
-
-body.addEventListener("touchend", () =>
-    body.classList.remove("talking")
-);
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
