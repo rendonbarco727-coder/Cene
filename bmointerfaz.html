@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cara Interactiva con Sensores</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    background-color: #66E0D4;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transition: background-color 0.2s;
+}
+
+/* Fondo al agitar */
+.shaking-active {
+    background-color: #ff4d4d;
+}
+
+.face-svg {
+    width: 300px;
+    height: auto;
+    transition: transform 0.05s;
+}
+
+/* Líneas */
+.stroke-line {
+    fill: none;
+    stroke: #1a1a1a;
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+
+/* Boca */
+.mouth-open {
+    fill: #2d9188;
+    stroke: #1a1a1a;
+    stroke-width: 3;
+    opacity: 0;
+    transform-origin: center;
+}
+
+.talking .mouth-open {
+    opacity: 1;
+    animation: talk 0.12s infinite alternate;
+}
+
+.talking .mouth-closed {
+    opacity: 0;
+}
+
+@keyframes talk {
+    from { transform: scaleY(0.4); }
+    to   { transform: scaleY(1.4); }
+}
+</style>
+</head>
+
+<body id="mainBody">
+
+<svg id="faceSvg" class="face-svg" viewBox="0 0 200 150"
+     xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Ojos -->
+    <path class="stroke-line" d="M50,55 Q60,45 70,55" />
+    <path class="stroke-line" d="M130,55 Q140,45 150,55" />
+
+    <!-- Boca -->
+    <path class="stroke-line mouth-closed" d="M75,95 Q100,105 125,95" />
+    <ellipse class="mouth-open" cx="100" cy="100" rx="25" ry="20" />
+</svg>
+
+<script>
+const body = document.getElementById("mainBody");
+const faceSvg = document.getElementById("faceSvg");
+
+/* =====================
+   VARIABLES
+===================== */
+let lastX = 0, lastY = 0, lastZ = 0;
+let shakePower = 0;
+let isDistorting = false;
+
+/* Ajustes finos */
+const SHAKE_THRESHOLD = 18;   // sensibilidad
+const MAX_DISTORT = 40;
+const DECAY = 0.90;
+
+/* =====================
+   PERMISOS SENSORES
+===================== */
+function enableSensors() {
+    if (typeof DeviceMotionEvent !== "undefined" &&
+        typeof DeviceMotionEvent.requestPermission === "function") {
+
+        DeviceMotionEvent.requestPermission().then(res => {
+            if (res === "granted") {
+                window.addEventListener("devicemotion", handleMotion);
+            }
+        }).catch(console.error);
+
+    } else {
+        window.addEventListener("devicemotion", handleMotion);
+    }
+}
+
+body.addEventListener("click", enableSensors);
+body.addEventListener("touchstart", enableSensors);
+
+/* =====================
+   MOVIMIENTO
+===================== */
+function handleMotion(event) {
+    const acc = event.accelerationIncludingGravity;
+    if (!acc) return;
+
+    const dx = Math.abs(acc.x - lastX);
+    const dy = Math.abs(acc.y - lastY);
+    const dz = Math.abs(acc.z - lastZ);
+
+    const delta = dx + dy + dz;
+
+    if (delta > SHAKE_THRESHOLD) {
+        shakePower += delta * 0.6;
+
+        if (!isDistorting) startDistortion();
+
+        if (navigator.vibrate) navigator.vibrate(50);
+    }
+
+    lastX = acc.x;
+    lastY = acc.y;
+    lastZ = acc.z;
+}
+
+/* =====================
+   DISTORSIÓN
+===================== */
+function startDistortion() {
+    isDistorting = true;
+    body.classList.add("shaking-active");
+    requestAnimationFrame(distortLoop);
+}
+
+function distortLoop() {
+    shakePower *= DECAY;
+
+    const intensity = Math.min(shakePower, MAX_DISTORT);
+
+    const scaleX = 1 + intensity / 50;
+    const scaleY = 1 - intensity / 70;
+    const rotate = (Math.random() - 0.5) * intensity;
+
+    faceSvg.style.transform =
+        `scale(${scaleX}, ${scaleY}) rotate(${rotate}deg)`;
+
+    if (shakePower > 1) {
+        requestAnimationFrame(distortLoop);
+    } else {
+        resetFace();
+    }
+}
+
+function resetFace() {
+    isDistorting = false;
+    shakePower = 0;
+    body.classList.remove("shaking-active");
+    faceSvg.style.transform = "scale(1,1) rotate(0deg)";
+}
+
+/* =====================
+   BOCA HABLANDO
+===================== */
+body.addEventListener("mousedown", () => body.classList.add("talking"));
+body.addEventListener("mouseup", () => body.classList.remove("talking"));
+
+body.addEventListener("touchstart", e => {
+    e.preventDefault();
+    body.classList.add("talking");
+});
+
+body.addEventListener("touchend", () =>
+    body.classList.remove("talking")
+);
+</script>
+
+</body>
+</html>
