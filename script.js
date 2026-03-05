@@ -38,6 +38,8 @@ const peliculas = [
   { titulo: "El Conjuro 2", id: "1p8riZIHSo5iVwisPf_BvC4xo5J3rCs9Q", portada: "img/conjuro2.jpg"},
   { titulo: "El Conjuro 3", id: "1bznsSO86KJJKuoWVHy-aJhiCPei-zdNa", portada: "img/conjuro3.jpg"},
   { titulo: "La Novia de Chucky", id: "1gtAAeT6zYJpE94DShiJI_UznSeF60u97", portada: "img/noviachucky.jpg"},
+  { titulo: "El hijo de Chucky", id: "1-_fQ5V7ro0qKIuGYxTlPGSRqiU5Mm-qL", portada: "img/hijo.jpg"},
+  
   { titulo: "El Conjuro 4 Últimos Ritos", id: "1rzdrIZ1d6j439rctvEy9LqAZsNd5Rbbq", portada: "img/conjuro4.jpg"},
   { titulo: "La Hermanastra Fea", id: "1j7j4IGpw-Bw8FMd08o3pSZGtHmueSa_F", portada: "img/fea.jpg"}
 ];
