@@ -284,6 +284,11 @@
       "titulo": "Harry Potter y la piedra filosofal",
       "id": "1CcrlkdUdAIPpeo62VMNI5cNOBTzNu7zW",
       "portada": "img/harry_potter_y_la_piedra_filosofal.jpeg"
+    },
+    {
+      "titulo": "Harry Potter y la camara secreta",
+      "id": "1NGjnf-cYNIhueoaGJPEAs6_CNnfXvViS",
+      "portada": "img/harry_potter_y_la_camara_secreta.jpeg"
     }
   ],
   "series": {
