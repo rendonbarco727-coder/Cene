@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Cinema STRANGE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -33,25 +37,21 @@
 
 <main class="container">
 
-  <!-- PELÍCULAS -->
   <section id="sec-peliculas" class="content-section">
     <h2 class="category-title">Películas</h2>
     <div id="grid-peliculas" class="movie-grid"></div>
   </section>
 
-  <!-- SERIES -->
   <section id="sec-series" class="content-section hidden">
     <h2 class="category-title">Series</h2>
     <div id="grid-series" class="movie-grid"></div>
   </section>
 
-  <!-- NOVELAS -->
   <section id="sec-novelas" class="content-section hidden">
     <h2 class="category-title">Novelas</h2>
     <div id="grid-novelas" class="movie-grid"></div>
   </section>
 
-  <!-- TV EN VIVO -->
   <section id="sec-tv" class="content-section hidden">
     <h2 class="category-title">📺 TV en Vivo</h2>
 
@@ -60,13 +60,14 @@
         src="https://www.youtube.com/embed/t8HuqJeu6LE"
         title="TV en Vivo"
         frameborder="0"
-        allow="autoplay; encrypted-media"
-        allowfullscreen>
+        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+        allowfullscreen="true"
+        webkitallowfullscreen="true"
+        mozallowfullscreen="true">
       </iframe>
     </div>
   </section>
 
-  <!-- DETALLES -->
   <section id="vista-detalles" class="content-section hidden">
     <button class="btn-back" onclick="volver()">← Regresar</button>
     <h2 id="detalle-titulo" class="category-title"></h2>
@@ -78,11 +79,17 @@
   </div>
 </main>
 
-<!-- PLAYER GOOGLE DRIVE -->
 <div id="player" class="video-overlay hidden">
   <div class="video-container">
     <button class="btn-close" onclick="cerrar()">✕</button>
-    <iframe id="videoFrame" src="" allowfullscreen></iframe>
+    <iframe 
+      id="videoFrame" 
+      src="" 
+      allow="autoplay; fullscreen; picture-in-picture" 
+      allowfullscreen="true" 
+      webkitallowfullscreen="true" 
+      mozallowfullscreen="true">
+    </iframe>
   </div>
 </div>
 
