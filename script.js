@@ -78,6 +78,19 @@ function crearCard(titulo, portada, accion, id = null) {
     <p>${titulo}</p>
   `;
 
+  // Precargar iframe al hacer hover
+  if (id) {
+    div.addEventListener('mouseenter', () => {
+      if (!div._precargado) {
+        const pre = document.createElement('iframe');
+        pre.src = `https://drive.google.com/file/d/${id}/preview`;
+        pre.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;';
+        document.body.appendChild(pre);
+        div._precargado = true;
+      }
+    }, { once: true });
+  }
+
   div.onclick = (e) => {
     e.stopPropagation();
     if (id) { marcarVisto(id); div.classList.add('visto'); }
