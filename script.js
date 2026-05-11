@@ -1,8 +1,16 @@
-/* ====== DATOS — carga desde catalogo.json ====== */
+/* ====== DATOS ====== */
 let peliculas = [];
 let series    = {};
 let novelas   = {};
+let loading   = true;
 
+/* ====== SPINNER ====== */
+function ocultarLoader() {
+  const loader = document.getElementById('loader');
+  if (loader) loader.style.display = 'none';
+}
+
+/* ====== CARGA DEL CATÁLOGO ====== */
 async function cargarCatalogo() {
   try {
     const res  = await fetch(`catalogo.json?v=${Date.now()}`);
@@ -12,10 +20,13 @@ async function cargarCatalogo() {
     novelas    = data.novelas  || {};
   } catch (e) {
     console.error('Error cargando catalogo.json:', e);
+  } finally {
+    loading = false;
+    ocultarLoader();
   }
 }
 
-/* ====== LÓGICA DE VISTOS ====== */
+/* ====== VISTOS ====== */
 let vistos = JSON.parse(localStorage.getItem('vistos_strange')) || [];
 
 function marcarVisto(id) {
@@ -25,31 +36,35 @@ function marcarVisto(id) {
 }
 
 function borrarHistorial() {
-  const confirmar = confirm("¿Seguro que quieres borrar todas las marcas de 'visto'?");
-  if (confirmar) {
+  if (confirm("¿Seguro que quieres borrar todas las marcas de 'visto'?")) {
     vistos = [];
     localStorage.removeItem('vistos_strange');
     document.querySelectorAll('.card').forEach(card => card.classList.remove('visto'));
-    console.log("Historial de vistos eliminado correctamente.");
     alert("Historial borrado.");
   }
 }
 
-/* ====== NAVEGACIÓN ====== */
+/* ====== NAVEGACIÓN Y VISTAS ====== */
 let seccionActual = 'peliculas';
 
 function mostrarSeccion(seccion) {
   seccionActual = seccion;
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
-  document.getElementById(`sec-${seccion}`).classList.remove('hidden');
+  const target = document.getElementById(`sec-${seccion}`);
+  if (target) target.classList.remove('hidden');
 
   const hero = document.getElementById('header-slider');
-  seccion === 'peliculas' ? hero.classList.remove('hidden') : hero.classList.add('hidden');
+  hero.style.display = seccion === 'peliculas' ? 'block' : 'none';
 
   document.getElementById('buscador').value = "";
   document.querySelectorAll('.card').forEach(c => c.style.display = "block");
 }
 
+function volver() {
+  mostrarSeccion(seccionActual);
+}
+
+// Vista detalle para serie/novela (episodios)
 function verDetalle(titulo, lista) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const vista = document.getElementById('vista-detalles');
@@ -64,21 +79,64 @@ function verDetalle(titulo, lista) {
   window.scrollTo(0, 0);
 }
 
-function volver() { mostrarSeccion(seccionActual); }
+/* ====== NUEVO: DETALLE DE PELÍCULA CON IDIOMAS ====== */
+function mostrarDetallePelicula(peli) {
+  // Ocultar todas las secciones
+  document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+  const detailSection = document.getElementById('sec-movie-detail');
+  detailSection.classList.remove('hidden');
 
-/* ====== RENDER ====== */
-function crearCard(titulo, portada, accion, id = null) {
+  const container = document.getElementById('movie-detail-container');
+  container.innerHTML = `
+    <div class="movie-detail-poster">
+      <img src="${peli.portada}" alt="${peli.titulo}">
+    </div>
+    <div class="movie-detail-info">
+      <h3>${peli.titulo}</h3>
+      ${peli.sinopsis ? `<div class="sinopsis">📖 ${peli.sinopsis}</div>` : ''}
+      ${peli.director ? `<div><strong>Director:</strong> ${peli.director}</div>` : ''}
+      ${peli.actores ? `<div><strong>Actores:</strong> ${peli.actores}</div>` : ''}
+      <div class="idiomas-buttons">
+        ${ (peli.idiomas && peli.idiomas.length) 
+          ? peli.idiomas.map(idi => `<button class="btn-idioma" data-id="${idi.id}" data-lang="${idi.lang}">🎧 ${idi.lang}</button>`).join('')
+          : `<button class="btn-idioma" data-id="${peli.id}" data-lang="Original">🎬 Reproducir</button>`
+        }
+      </div>
+    </div>
+  `;
+
+  // Asignar eventos a los botones de idioma
+  container.querySelectorAll('.btn-idioma').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const videoId = btn.getAttribute('data-id');
+      if (videoId) {
+        marcarVisto(videoId);
+        reproducir(videoId);
+      }
+    });
+  });
+}
+
+/* ====== RENDER DE CARDS ====== */
+function crearCard(titulo, portada, accion, id = null, idiomas = null) {
   const div = document.createElement('div');
   div.className = 'card';
   if (id && vistos.includes(id)) div.classList.add('visto');
 
+  let badgeIdiomas = '';
+  if (idiomas && idiomas.length > 1) {
+    badgeIdiomas = `<span style="position:absolute; bottom:5px; left:5px; background:#e50914; padding:2px 6px; border-radius:12px; font-size:10px;">🎧 ${idiomas.length}</span>`;
+  }
+
   div.innerHTML = `
     <div class="badge-visto">✓</div>
-    <img src="${portada}">
+    <img src="${portada}" loading="lazy">
     <p>${titulo}</p>
+    ${badgeIdiomas}
   `;
 
-  // Precargar iframe al hacer hover
+  // Precarga ligera del iframe (opcional)
   if (id) {
     div.addEventListener('mouseenter', () => {
       if (!div._precargado) {
@@ -91,32 +149,55 @@ function crearCard(titulo, portada, accion, id = null) {
     }, { once: true });
   }
 
+  // Acción al hacer clic
   div.onclick = (e) => {
     e.stopPropagation();
-    if (id) { marcarVisto(id); div.classList.add('visto'); }
-    accion();
+    if (typeof accion === 'function') {
+      accion();
+    }
   };
   return div;
 }
 
 function cargarTodo() {
+  // Películas
   const gp = document.getElementById('grid-peliculas');
-  peliculas.forEach(p =>
-    gp.appendChild(crearCard(p.titulo, p.portada, () => reproducir(p.id), p.id))
-  );
+  gp.innerHTML = '';
+  peliculas.forEach(peli => {
+    const tieneIdiomas = peli.idiomas && peli.idiomas.length;
+    let accion;
+    if (tieneIdiomas) {
+      accion = () => mostrarDetallePelicula(peli);
+    } else {
+      accion = () => {
+        marcarVisto(peli.id);
+        reproducir(peli.id);
+      };
+    }
+    const card = crearCard(peli.titulo, peli.portada, accion, peli.id, peli.idiomas);
+    gp.appendChild(card);
+  });
 
+  // Series
   const gs = document.getElementById('grid-series');
-  Object.keys(series).forEach(s =>
-    gs.appendChild(crearCard(s, series[s][0].portada, () => verDetalle(s, series[s])))
-  );
+  gs.innerHTML = '';
+  Object.keys(series).forEach(s => {
+    const primeraPortada = series[s][0].portada;
+    const card = crearCard(s, primeraPortada, () => verDetalle(s, series[s]));
+    gs.appendChild(card);
+  });
 
+  // Novelas
   const gn = document.getElementById('grid-novelas');
-  Object.keys(novelas).forEach(n =>
-    gn.appendChild(crearCard(n, novelas[n][0].portada, () => verDetalle(n, novelas[n])))
-  );
+  gn.innerHTML = '';
+  Object.keys(novelas).forEach(n => {
+    const primeraPortada = novelas[n][0].portada;
+    const card = crearCard(n, primeraPortada, () => verDetalle(n, novelas[n]));
+    gn.appendChild(card);
+  });
 }
 
-/* ====== VIDEO ====== */
+/* ====== REPRODUCTOR ====== */
 function reproducir(id) {
   const frame = document.getElementById('videoFrame');
   frame.src   = `https://drive.google.com/file/d/${id}/preview`;
@@ -130,7 +211,7 @@ function cerrar() {
 
 /* ====== BUSCADOR ====== */
 function filtrarContenido() {
-  const q      = document.getElementById('buscador').value.toLowerCase();
+  const q = document.getElementById('buscador').value.toLowerCase();
   const activa = document.querySelector('.content-section:not(.hidden)');
   if (!activa) return;
   activa.querySelectorAll('.card').forEach(c => {
@@ -138,28 +219,22 @@ function filtrarContenido() {
   });
 }
 
-/* ====== SLIDER DINÁMICO ====== */
+/* ====== CARRUSEL MINI (horizontal) ====== */
 function initSlider() {
-  const wrapper     = document.getElementById('slider');
-  let todasLasFotos = [...new Set(peliculas.map(p => p.portada))];
-
-  todasLasFotos.forEach(ruta => {
-    const img   = document.createElement('img');
-    img.src     = ruta;
+  const wrapper = document.getElementById('slider');
+  if (!wrapper) return;
+  wrapper.innerHTML = '';
+  // Tomamos hasta 15 portadas únicas
+  let portadasUnicas = [...new Set(peliculas.map(p => p.portada))].slice(0, 15);
+  portadasUnicas.forEach(ruta => {
+    const img = document.createElement('img');
+    img.src = ruta;
     img.onerror = () => img.style.display = 'none';
     wrapper.appendChild(img);
   });
-
-  let indiceCual = 0;
-  if (todasLasFotos.length > 0) {
-    setInterval(() => {
-      indiceCual = (indiceCual + 1) % todasLasFotos.length;
-      wrapper.style.transform = `translateX(-${indiceCual * 100}%)`;
-    }, 5000);
-  }
 }
 
-/* ====== INIT ====== */
+/* ====== INICIO ====== */
 document.addEventListener("DOMContentLoaded", async () => {
   await cargarCatalogo();
   initSlider();
