@@ -65,27 +65,63 @@ body {
   outline: none;
 }
 
-/* Slider Dinámico */
+/* ===== NUEVO: Spinner de carga ===== */
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255,255,255,0.2);
+  border-top-color: #e50914;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== CARRUSEL MINI (horizontal) ===== */
 .hero-slider {
   width: 100%;
-  height: 50vh;
-  overflow: hidden;
+  height: auto;
   margin-top: 60px;
-  position: relative;
+  background: #000;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  scroll-snap-type: x mandatory;
+  padding: 10px 0;
 }
-
 .slider-wrapper {
-  display: flex;
-  height: 100%;
-  transition: 0.8s ease-in-out;
+  display: inline-flex;
+  gap: 8px;
+  padding: 0 5%;
 }
-
 .slider-wrapper img {
-  min-width: 100%;
-  height: 100%;
-  object-fit: cover; /* Llena el espacio sin deformarse */
-  object-position: center top; /* Centra la imagen en las caras */
-  filter: brightness(0.5); /* Oscurece un poco para que resalte la web */
+  width: 130px;
+  height: 195px;
+  object-fit: cover;
+  border-radius: 8px;
+  scroll-snap-align: start;
+  transition: transform 0.2s;
+}
+.slider-wrapper img:hover {
+  transform: scale(1.02);
+}
+/* Ocultar scrollbar (opcional) */
+.hero-slider::-webkit-scrollbar {
+  display: none;
 }
 
 /* Main Grid */
@@ -140,7 +176,7 @@ body {
   text-align: center;
 }
 
-/* Vistos (Badge y Efecto) */
+/* Vistos */
 .badge-visto {
   position: absolute;
   top: 10px;
@@ -172,6 +208,93 @@ body {
 
 .card.visto:hover img {
   filter: brightness(0.6) grayscale(0.5);
+}
+
+/* ===== VISTA DETALLE DE PELÍCULA (idiomas) ===== */
+.movie-detail-layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  background: #0a0a0a;
+  border-radius: 20px;
+  padding: 20px;
+  margin-top: 20px;
+}
+.movie-detail-poster {
+  flex: 0 0 200px;
+}
+.movie-detail-poster img {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+.movie-detail-info {
+  flex: 2;
+  min-width: 200px;
+}
+.movie-detail-info h3 {
+  font-size: 1.8rem;
+  margin: 0 0 10px;
+}
+.sinopsis {
+  color: #ccc;
+  line-height: 1.4;
+  margin: 15px 0;
+}
+.idiomas-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+}
+.btn-idioma {
+  background: #e50914;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 40px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+.btn-idioma:hover {
+  background: #b20710;
+}
+
+/* Botones */
+.btn-back {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.footer-actions {
+  text-align: center;
+  padding: 50px;
+}
+
+.btn-borrar {
+  background: transparent;
+  color: #555;
+  border: 1px solid #333;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-borrar:hover {
+  color: white;
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.hidden {
+  display: none !important;
 }
 
 /* Player */
@@ -213,65 +336,11 @@ body {
   cursor: pointer;
 }
 
-/* Botones y Acciones */
-.btn-back {
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-bottom: 20px;
-}
-
-.footer-actions {
-  text-align: center;
-  padding: 50px;
-}
-
-.btn-borrar {
-  background: transparent;
-  color: #555;
-  border: 1px solid #333;
-  padding: 10px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.btn-borrar:hover {
-  color: white;
-  border-color: var(--accent);
-  background: var(--accent);
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* Responsivo */
-@media (max-width: 600px) {
-  .nav-content {
-    flex-direction: column;
-    gap: 10px;
-  }
-  .hero-slider {
-    height: 35vh;
-    margin-top: 110px;
-  }
-  .movie-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-  .search-bar input {
-    width: 90%;
-  }
-}
-/* ===== TV EN VIVO ===== */
+/* TV en Vivo */
 .tv-player {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 */
+  padding-top: 56.25%;
   margin-top: 15px;
 }
 
@@ -282,4 +351,22 @@ body {
   width: 100%;
   height: 100%;
   border-radius: 14px;
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .nav-content {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .hero-slider {
+    margin-top: 110px;
+  }
+  .movie-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .search-bar input {
+    width: 90%;
+  }
 }
