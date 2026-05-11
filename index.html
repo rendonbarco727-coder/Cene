@@ -4,32 +4,26 @@
   <meta charset="UTF-8">
   <title>Cinema STRANGE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- SPINNER DE CARGA (se oculta automáticamente) -->
+<!-- SPINNER DE CARGA -->
 <div id="loader" class="loader-overlay">
   <div class="spinner"></div>
 </div>
 
 <nav class="navbar">
   <div class="nav-content">
-    <div class="logo" onclick="mostrarSeccion('peliculas')">
-      CINEMA<span>STRANGER</span>
-    </div>
-
+    <div class="logo" onclick="mostrarSeccion('peliculas')">CINEMA<span>STRANGER</span></div>
     <div class="nav-links">
       <button onclick="mostrarSeccion('peliculas')">Películas</button>
       <button onclick="mostrarSeccion('series')">Series</button>
       <button onclick="mostrarSeccion('novelas')">Novelas</button>
       <button onclick="mostrarSeccion('tv')">TV en Vivo</button>
     </div>
-
     <div class="search-bar">
       <input type="text" id="buscador" placeholder="Buscar..." onkeyup="filtrarContenido()">
     </div>
@@ -41,45 +35,40 @@
 </header>
 
 <main class="container">
-
+  <!-- Sección Películas -->
   <section id="sec-peliculas" class="content-section">
     <h2 class="category-title">Películas</h2>
     <div id="grid-peliculas" class="movie-grid"></div>
   </section>
 
+  <!-- Sección Series -->
   <section id="sec-series" class="content-section hidden">
     <h2 class="category-title">Series</h2>
     <div id="grid-series" class="movie-grid"></div>
   </section>
 
+  <!-- Sección Novelas -->
   <section id="sec-novelas" class="content-section hidden">
     <h2 class="category-title">Novelas</h2>
     <div id="grid-novelas" class="movie-grid"></div>
   </section>
 
+  <!-- Sección TV en Vivo -->
   <section id="sec-tv" class="content-section hidden">
     <h2 class="category-title">📺 TV en Vivo</h2>
-
     <div class="tv-player">
-      <iframe
-        src="https://www.youtube.com/embed/t8HuqJeu6LE"
-        title="TV en Vivo"
-        frameborder="0"
-        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-        allowfullscreen="true"
-        webkitallowfullscreen="true"
-        mozallowfullscreen="true">
-      </iframe>
+      <iframe src="https://www.youtube.com/embed/t8HuqJeu6LE" title="TV en Vivo" frameborder="0" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen="true"></iframe>
     </div>
   </section>
 
+  <!-- Vista de detalles para episodios (series/novelas) -->
   <section id="vista-detalles" class="content-section hidden">
     <button class="btn-back" onclick="volver()">← Regresar</button>
     <h2 id="detalle-titulo" class="category-title"></h2>
     <div id="grid-detalles" class="movie-grid"></div>
   </section>
 
-  <!-- NUEVA SECCIÓN: Detalle de película (para elegir idioma) -->
+  <!-- NUEVA VISTA: Detalle de película (con información y botones de reproducción) -->
   <section id="sec-movie-detail" class="content-section hidden">
     <button class="btn-back" onclick="volver()">← Regresar</button>
     <div id="movie-detail-container" class="movie-detail-layout"></div>
@@ -90,17 +79,11 @@
   </div>
 </main>
 
+<!-- REPRODUCTOR FLOTANTE (overlay) -->
 <div id="player" class="video-overlay hidden">
   <div class="video-container">
-    <button class="btn-close" onclick="cerrar()">✕</button>
-    <iframe 
-      id="videoFrame" 
-      src="" 
-      allow="autoplay; fullscreen; picture-in-picture" 
-      allowfullscreen="true" 
-      webkitallowfullscreen="true" 
-      mozallowfullscreen="true">
-    </iframe>
+    <button class="btn-close" onclick="cerrarPlayer()">✕</button>
+    <iframe id="videoFrame" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="true"></iframe>
   </div>
 </div>
 
