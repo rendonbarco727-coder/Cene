@@ -12,6 +12,11 @@
 </head>
 <body>
 
+<!-- SPINNER DE CARGA (se oculta automáticamente) -->
+<div id="loader" class="loader-overlay">
+  <div class="spinner"></div>
+</div>
+
 <nav class="navbar">
   <div class="nav-content">
     <div class="logo" onclick="mostrarSeccion('peliculas')">
@@ -72,6 +77,12 @@
     <button class="btn-back" onclick="volver()">← Regresar</button>
     <h2 id="detalle-titulo" class="category-title"></h2>
     <div id="grid-detalles" class="movie-grid"></div>
+  </section>
+
+  <!-- NUEVA SECCIÓN: Detalle de película (para elegir idioma) -->
+  <section id="sec-movie-detail" class="content-section hidden">
+    <button class="btn-back" onclick="volver()">← Regresar</button>
+    <div id="movie-detail-container" class="movie-detail-layout"></div>
   </section>
 
   <div class="footer-actions">
