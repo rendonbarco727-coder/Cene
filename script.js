@@ -55,7 +55,6 @@ function mostrarSeccion(seccion) {
   document.getElementById('buscador').value = "";
   document.querySelectorAll('.card').forEach(c => c.style.display = "block");
   
-  // Ocultar/mostrar barra de géneros según sección
   const generosBar = document.getElementById('generos-container');
   if (generosBar) {
     generosBar.style.display = seccion === 'peliculas' ? 'flex' : 'none';
@@ -69,7 +68,6 @@ function volver() {
 /* ====== CLASIFICACIÓN POR GÉNEROS ====== */
 function asignarGenero(pelicula) {
   const titulo = pelicula.titulo.toLowerCase();
-  // Terror / Horror
   if (titulo.includes('teléfono negro') || titulo.includes('el abismo secreto') || titulo.includes('doctor sueño') ||
       titulo.includes('five nights') || titulo.includes('el resplandor') || titulo.includes('destino final') ||
       titulo.includes('the sand') || titulo.includes('exterminio') || titulo.includes('el conjuro') ||
@@ -80,14 +78,12 @@ function asignarGenero(pelicula) {
       titulo.includes('the jester') || titulo.includes('pecadores')) {
     return 'Terror';
   }
-  // Drama / Romance
   if (titulo.includes('yo antes de ti') || titulo.includes('cosas imposibles') || titulo.includes('caramelo') ||
       titulo.includes('verdad y traición') || titulo.includes('soy frankela') || titulo.includes('sonido de libertad') ||
       titulo.includes('babel') || titulo.includes('dejar el mundo atrás') || titulo.includes('trust') ||
       titulo.includes('asi en la tierra') || titulo.includes('el día que todo cambió') || titulo.includes('together')) {
     return 'Drama';
   }
-  // Acción / Aventura
   if (titulo.includes('tron ares') || titulo.includes('apocalypto') || titulo.includes('4 fantasticos') ||
       titulo.includes('pearl harbor') || titulo.includes('la torre oscura') || titulo.includes('crimen perfecto') ||
       titulo.includes('pantera negra') || titulo.includes('eyes of wakanda') || titulo.includes('estado eléctrico') ||
@@ -95,13 +91,11 @@ function asignarGenero(pelicula) {
       titulo.includes('michael jackson')) {
     return 'Acción';
   }
-  // Animación / Familiar
   if (titulo.includes('bambi') || titulo.includes('como entrenar a tu dragón') || titulo.includes('sobinor') ||
       titulo.includes('onward') || titulo.includes('mufasa') || titulo.includes('robot salvaje') ||
       titulo.includes('harry potter')) {
     return 'Animación';
   }
-  // Ciencia ficción
   if (titulo.includes('first moon') || titulo.includes('exterminio la evolución') || titulo.includes('28 semanas') ||
       titulo.includes('estado eléctrico')) {
     return 'Ciencia Ficción';
@@ -128,7 +122,6 @@ function renderizarGeneros() {
     generosContainer = document.createElement('div');
     generosContainer.id = 'generos-container';
     generosContainer.className = 'generos-bar';
-    // Insertar justo después del navbar o antes del slider
     const navbar = document.querySelector('.navbar');
     navbar.parentNode.insertBefore(generosContainer, navbar.nextSibling);
   }
@@ -141,7 +134,6 @@ function renderizarGeneros() {
     generosContainer.appendChild(btn);
   });
   
-  // Eventos de filtro
   document.querySelectorAll('.genero-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       document.querySelectorAll('.genero-btn').forEach(b => b.classList.remove('active'));
@@ -152,7 +144,6 @@ function renderizarGeneros() {
   });
   
   window.generosMap = generosMap;
-  // Mostrar solo si estamos en películas
   generosContainer.style.display = (seccionActual === 'peliculas') ? 'flex' : 'none';
 }
 
@@ -161,14 +152,138 @@ function filtrarPeliculasPorGenero(genero) {
   grid.innerHTML = '';
   let pelisAMostrar = [];
   if (genero === 'todos') {
-    pelisAMostrar = peliculas;
+    pelisAMostrar = [...peliculas].sort((a,b) => a.titulo.localeCompare(b.titulo)); // orden A-Z
   } else {
-    pelisAMostrar = window.generosMap[genero] || [];
+    pelisAMostrar = (window.generosMap[genero] || []).sort((a,b) => a.titulo.localeCompare(b.titulo));
   }
   pelisAMostrar.forEach(peli => {
     const card = crearCard(peli.titulo, peli.portada, () => mostrarDetallePelicula(peli), peli.id, peli.idiomas);
     grid.appendChild(card);
   });
+}
+
+/* ====== NUEVA VISTA DETALLE CON REPRODUCTOR Y SIMILARES ====== */
+function mostrarDetallePelicula(peli) {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+  const detailSection = document.getElementById('sec-movie-detail');
+  detailSection.classList.remove('hidden');
+
+  const container = document.getElementById('movie-detail-container');
+  
+  // Construir opciones de calidad (si existen en JSON)
+  let qualityOptions = '';
+  if (peli.calidades && peli.calidades.length) {
+    qualityOptions = `<select id="qualitySelect">${peli.calidades.map(q => `<option value="${q.url}">${q.label}</option>`).join('')}</select>`;
+  } else {
+    // Default: usar el ID del video para generar URL de descarga directa (mejor para control de velocidad)
+    const videoUrl = `https://drive.google.com/uc?export=download&id=${peli.id}`;
+    qualityOptions = `<select id="qualitySelect"><option value="${videoUrl}">Original</option></select>`;
+  }
+  
+  // Opciones de idioma (si existen)
+  let langOptions = '';
+  if (peli.idiomas && peli.idiomas.length) {
+    langOptions = `<select id="langSelect">${peli.idiomas.map(l => `<option value="${l.id}">${l.lang}</option>`).join('')}</select>`;
+  } else {
+    langOptions = `<select id="langSelect"><option value="${peli.id}">Idioma original</option></select>`;
+  }
+  
+  // Velocidad de reproducción
+  const speedOptions = `
+    <select id="speedSelect">
+      <option value="0.5">0.5x</option>
+      <option value="0.75">0.75x</option>
+      <option value="1" selected>1x</option>
+      <option value="1.25">1.25x</option>
+      <option value="1.5">1.5x</option>
+      <option value="2">2x</option>
+    </select>
+  `;
+  
+  // Obtener películas similares (mismo género)
+  const generoActual = asignarGenero(peli);
+  const similares = peliculas.filter(p => asignarGenero(p) === generoActual && p.titulo !== peli.titulo).slice(0, 6);
+  
+  let similaresHTML = '';
+  if (similares.length) {
+    similaresHTML = `<h4>🎬 Películas similares</h4><div class="similares-grid" id="similaresGrid"></div>`;
+  }
+  
+  const html = `
+    <div class="movie-detail-layout">
+      <div class="movie-detail-poster">
+        <img src="${peli.portada}" alt="${peli.titulo}">
+        <div class="movie-controls">
+          <label>🎞️ Calidad</label> ${qualityOptions}
+          <label>🌐 Idioma</label> ${langOptions}
+          <label>⚡ Velocidad</label> ${speedOptions}
+          <button id="applySettingsBtn">Aplicar y reproducir</button>
+        </div>
+      </div>
+      <div class="movie-detail-video">
+        <video id="detalleVideo" controls width="100%" poster="${peli.portada}">
+          <source src="" type="video/mp4">
+          Tu navegador no soporta video HTML5.
+        </video>
+        <div class="sinopsis">${peli.sinopsis ? `📖 ${peli.sinopsis}` : ''}</div>
+        ${peli.director ? `<div><strong>Director:</strong> ${peli.director}</div>` : ''}
+        ${peli.actores ? `<div><strong>Actores:</strong> ${peli.actores}</div>` : ''}
+      </div>
+    </div>
+    ${similaresHTML}
+  `;
+  container.innerHTML = html;
+  
+  // Cargar video inicial con el primer source (calidad e idioma por defecto)
+  const video = document.getElementById('detalleVideo');
+  const qualitySelect = document.getElementById('qualitySelect');
+  const langSelect = document.getElementById('langSelect');
+  const speedSelect = document.getElementById('speedSelect');
+  const applyBtn = document.getElementById('applySettingsBtn');
+  
+  function actualizarFuente() {
+    const calidadUrl = qualitySelect.value;
+    const idiomaId = langSelect.value;
+    // Si el idioma seleccionado es diferente al original, se podría cambiar el ID. Pero normalmente calidad e idioma son independientes.
+    // Para simplificar, usamos la URL de calidad y si hay idiomas, se espera que cada idioma tenga su propio video (con su ID).
+    // En este ejemplo, si se cambia idioma, reconstruimos la URL con el ID del idioma.
+    let finalUrl;
+    if (idiomaId && idiomaId !== peli.id) {
+      finalUrl = `https://drive.google.com/uc?export=download&id=${idiomaId}`;
+    } else {
+      finalUrl = calidadUrl;
+    }
+    video.src = finalUrl;
+    video.load();
+    video.play();
+  }
+  
+  applyBtn.addEventListener('click', () => {
+    actualizarFuente();
+    // Marcar como visto el ID correspondiente (el del idioma seleccionado o el original)
+    const idiomaId = langSelect.value;
+    marcarVisto(idiomaId !== peli.id ? idiomaId : peli.id);
+  });
+  
+  // Control de velocidad
+  speedSelect.addEventListener('change', () => {
+    video.playbackRate = parseFloat(speedSelect.value);
+  });
+  
+  // Inicializar
+  actualizarFuente();
+  
+  // Renderizar similares
+  const similaresGrid = document.getElementById('similaresGrid');
+  if (similaresGrid) {
+    similares.forEach(sim => {
+      const card = document.createElement('div');
+      card.className = 'similares-card';
+      card.innerHTML = `<img src="${sim.portada}" loading="lazy"><p>${sim.titulo}</p>`;
+      card.onclick = () => mostrarDetallePelicula(sim);
+      similaresGrid.appendChild(card);
+    });
+  }
 }
 
 /* ====== VISTA DETALLE PARA SERIES/NOVELAS ====== */
@@ -185,47 +300,7 @@ function verDetalle(titulo, lista) {
   window.scrollTo(0, 0);
 }
 
-/* ====== VISTA DETALLE PARA PELÍCULAS ====== */
-function mostrarDetallePelicula(peli) {
-  document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
-  const detailSection = document.getElementById('sec-movie-detail');
-  detailSection.classList.remove('hidden');
-
-  const container = document.getElementById('movie-detail-container');
-  let html = `
-    <div class="movie-detail-poster">
-      <img src="${peli.portada}" alt="${peli.titulo}">
-    </div>
-    <div class="movie-detail-info">
-      <h3>${peli.titulo}</h3>
-      ${peli.sinopsis ? `<div class="sinopsis">📖 ${peli.sinopsis}</div>` : ''}
-      ${peli.director ? `<div class="director"><strong>Director:</strong> ${peli.director}</div>` : ''}
-      ${peli.actores ? `<div class="actores"><strong>Actores:</strong> ${peli.actores}</div>` : ''}
-      <div class="idiomas-buttons">
-  `;
-  if (peli.idiomas && peli.idiomas.length > 0) {
-    peli.idiomas.forEach(idi => {
-      html += `<button class="btn-idioma" data-id="${idi.id}" data-lang="${idi.lang}">🎧 ${idi.lang}</button>`;
-    });
-  } else {
-    html += `<button class="btn-reproducir" data-id="${peli.id}">🎬 Reproducir</button>`;
-  }
-  html += `</div></div>`;
-  container.innerHTML = html;
-
-  container.querySelectorAll('.btn-idioma, .btn-reproducir').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const videoId = btn.getAttribute('data-id');
-      if (videoId) {
-        marcarVisto(videoId);
-        abrirReproductor(videoId);
-      }
-    });
-  });
-}
-
-/* ====== REPRODUCTOR ====== */
+/* ====== REPRODUCTOR LEGACY (para series/novelas, usa iframe) ====== */
 function abrirReproductor(id) {
   const frame = document.getElementById('videoFrame');
   frame.src = `https://drive.google.com/file/d/${id}/preview`;
@@ -255,18 +330,6 @@ function crearCard(titulo, portada, accion, id = null, idiomas = null) {
     ${badgeIdiomas}
   `;
 
-  if (id) {
-    div.addEventListener('mouseenter', () => {
-      if (!div._precargado) {
-        const pre = document.createElement('iframe');
-        pre.src = `https://drive.google.com/file/d/${id}/preview`;
-        pre.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;';
-        document.body.appendChild(pre);
-        div._precargado = true;
-      }
-    }, { once: true });
-  }
-
   div.onclick = (e) => {
     e.stopPropagation();
     if (typeof accion === 'function') accion();
@@ -276,11 +339,9 @@ function crearCard(titulo, portada, accion, id = null, idiomas = null) {
 
 /* ====== RENDER PRINCIPAL ====== */
 function cargarTodo() {
-  // Películas: se mostrarán mediante el filtro de géneros
-  renderizarGeneros();   // crea barra y guarda datos
-  filtrarPeliculasPorGenero('todos'); // muestra todas
+  renderizarGeneros();
+  filtrarPeliculasPorGenero('todos'); // ordena A-Z automáticamente
 
-  // Series
   const gs = document.getElementById('grid-series');
   gs.innerHTML = '';
   Object.keys(series).forEach(s => {
@@ -289,7 +350,6 @@ function cargarTodo() {
     gs.appendChild(card);
   });
 
-  // Novelas
   const gn = document.getElementById('grid-novelas');
   gn.innerHTML = '';
   Object.keys(novelas).forEach(n => {
