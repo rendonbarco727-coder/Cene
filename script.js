@@ -9,14 +9,26 @@ function ocultarLoader() {
   if (loader) loader.style.display = 'none';
 }
 
+/* ====== ELIMINAR DUPLICADOS (por título) ====== */
+function eliminarDuplicados(lista) {
+  const vistosTitulos = new Set();
+  return lista.filter(peli => {
+    if (vistosTitulos.has(peli.titulo)) return false;
+    vistosTitulos.add(peli.titulo);
+    return true;
+  });
+}
+
 /* ====== CARGA DEL CATÁLOGO ====== */
 async function cargarCatalogo() {
   try {
     const res = await fetch(`catalogo.json?v=${Date.now()}`);
     const data = await res.json();
-    peliculas = data.peliculas || [];
+    // Eliminar duplicados en películas
+    peliculas = eliminarDuplicados(data.peliculas || []);
     series    = data.series   || {};
     novelas   = data.novelas  || {};
+    console.log(`Cargadas ${peliculas.length} películas únicas.`);
   } catch (e) {
     console.error('Error cargando catalogo.json:', e);
   } finally {
@@ -173,7 +185,7 @@ function descargarVideo(id, nombreArchivo = 'video.mp4') {
   document.body.removeChild(link);
 }
 
-/* ====== VISTA DETALLE CON IFRAME Y BOTÓN DE DESCARGA ====== */
+/* ====== VISTA DETALLE CON REPRODUCTOR GRANDE Y MANEJO DE ERRORES ====== */
 function mostrarDetallePelicula(peli) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const detailSection = document.getElementById('sec-movie-detail');
@@ -181,7 +193,7 @@ function mostrarDetallePelicula(peli) {
 
   const container = document.getElementById('movie-detail-container');
   
-  // Construir opciones de calidad (si existen en JSON)
+  // Construir opciones de calidad/idioma
   let qualityOptions = '';
   if (peli.calidades && peli.calidades.length) {
     qualityOptions = `<select id="qualitySelect">${peli.calidades.map(q => `<option value="${q.id}">${q.label}</option>`).join('')}</select>`;
@@ -189,7 +201,6 @@ function mostrarDetallePelicula(peli) {
     qualityOptions = `<select id="qualitySelect"><option value="${peli.id}">Original</option></select>`;
   }
   
-  // Opciones de idioma (si existen)
   let langOptions = '';
   if (peli.idiomas && peli.idiomas.length) {
     langOptions = `<select id="langSelect">${peli.idiomas.map(l => `<option value="${l.id}">${l.lang}</option>`).join('')}</select>`;
@@ -197,9 +208,11 @@ function mostrarDetallePelicula(peli) {
     langOptions = `<select id="langSelect" style="display:none;"></select>`;
   }
   
-  // Obtener películas similares (mismo género)
+  // Obtener películas similares (sin duplicados)
   const generoActual = asignarGenero(peli);
-  const similares = peliculas.filter(p => asignarGenero(p) === generoActual && p.titulo !== peli.titulo).slice(0, 6);
+  const similares = peliculas
+    .filter(p => asignarGenero(p) === generoActual && p.titulo !== peli.titulo)
+    .slice(0, 6);
   
   let similaresHTML = '';
   if (similares.length) {
@@ -218,7 +231,11 @@ function mostrarDetallePelicula(peli) {
         </div>
       </div>
       <div class="movie-detail-video">
-        <iframe id="detalleIframe" src="about:blank" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        <iframe id="detalleIframe" src="about:blank" frameborder="0" 
+          allow="autoplay; fullscreen; picture-in-picture" 
+          allowfullscreen 
+          style="width:100%; aspect-ratio:16/9; border-radius:12px; background:#000;"></iframe>
+        <div id="videoErrorMsg" style="color:#ff6b6b; margin-top:8px; display:none;">⚠️ No se pudo cargar el video. Verifica que el archivo sea público o intenta con otro idioma/calidad.</div>
         <div class="sinopsis">${peli.sinopsis ? `📖 ${peli.sinopsis}` : ''}</div>
         ${peli.director ? `<div><strong>Director:</strong> ${peli.director}</div>` : ''}
         ${peli.actores ? `<div><strong>Actores:</strong> ${peli.actores}</div>` : ''}
@@ -229,6 +246,7 @@ function mostrarDetallePelicula(peli) {
   container.innerHTML = html;
   
   const iframe = document.getElementById('detalleIframe');
+  const errorMsg = document.getElementById('videoErrorMsg');
   const qualitySelect = document.getElementById('qualitySelect');
   const langSelect = document.getElementById('langSelect');
   const applyBtn = document.getElementById('applySettingsBtn');
@@ -244,19 +262,38 @@ function mostrarDetallePelicula(peli) {
   
   function actualizarReproductor() {
     const selectedId = obtenerIdActual();
+    if (!selectedId) {
+      errorMsg.style.display = 'block';
+      errorMsg.innerText = '⚠️ No hay ID de video válido.';
+      return;
+    }
     const videoUrl = `https://drive.google.com/file/d/${selectedId}/preview`;
     iframe.src = videoUrl;
     marcarVisto(selectedId);
-  }
-  
-  function descargarActual() {
-    const selectedId = obtenerIdActual();
-    const nombre = `${peli.titulo.replace(/[^a-z0-9]/gi, '_')}.mp4`;
-    descargarVideo(selectedId, nombre);
+    
+    // Ocultar mensaje de error previo y mostrar carga
+    errorMsg.style.display = 'none';
+    // Opcional: detectar error de carga del iframe
+    iframe.onerror = () => {
+      errorMsg.style.display = 'block';
+      errorMsg.innerText = '⚠️ No se pudo cargar el video. Asegúrate de que el archivo esté compartido públicamente.';
+    };
+    // Timeout para considerar que si no carga en 5 segundos, mostrar error
+    clearTimeout(window.videoTimeout);
+    window.videoTimeout = setTimeout(() => {
+      // No podemos saber realmente si cargó, pero si el iframe sigue en about:blank, mostramos error
+      if (iframe.src === 'about:blank' || iframe.src.includes('about:blank')) {
+        errorMsg.style.display = 'block';
+      }
+    }, 5000);
   }
   
   applyBtn.addEventListener('click', actualizarReproductor);
-  downloadBtn.addEventListener('click', descargarActual);
+  downloadBtn.addEventListener('click', () => {
+    const selectedId = obtenerIdActual();
+    const nombre = `${peli.titulo.replace(/[^a-z0-9]/gi, '_')}.mp4`;
+    descargarVideo(selectedId, nombre);
+  });
   
   // Inicializar
   actualizarReproductor();
