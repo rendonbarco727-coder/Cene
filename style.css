@@ -440,9 +440,39 @@ body {
   width: 100%;
   aspect-ratio: 2/3;
   object-fit: cover;
+}/* ===== REPRODUCTOR EN DETALLE ===== */
+.movie-detail-video {
+  flex: 2;
+  min-width: 300px;
+}
+.movie-detail-video iframe {
+  width: 100%;
+  height: 400px;          /* altura fija para escritorio */
+  border-radius: 12px;
+  background: black;
+  border: none;
+}
+
+/* Para móviles, que sea un poco más pequeño pero proporcionado */
+@media (max-width: 768px) {
+  .movie-detail-video iframe {
+    height: 250px;
+  }
+}
+
+/* También asegura que el contenedor de la vista detalle no limite */
+.movie-detail-layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  background: #0a0a0a;
+  border-radius: 20px;
+  padding: 25px;
+  margin-top: 20px;
 }
 .similares-card p {
   text-align: center;
   padding: 5px;
   font-size: 0.8rem;
 }
+
