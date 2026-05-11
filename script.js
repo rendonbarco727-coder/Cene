@@ -54,13 +54,124 @@ function mostrarSeccion(seccion) {
   hero.style.display = seccion === 'peliculas' ? 'block' : 'none';
   document.getElementById('buscador').value = "";
   document.querySelectorAll('.card').forEach(c => c.style.display = "block");
+  
+  // Ocultar/mostrar barra de géneros según sección
+  const generosBar = document.getElementById('generos-container');
+  if (generosBar) {
+    generosBar.style.display = seccion === 'peliculas' ? 'flex' : 'none';
+  }
 }
 
 function volver() {
   mostrarSeccion(seccionActual);
 }
 
-/* ====== VISTA DETALLE PARA SERIES/NOVELAS (episodios) ====== */
+/* ====== CLASIFICACIÓN POR GÉNEROS ====== */
+function asignarGenero(pelicula) {
+  const titulo = pelicula.titulo.toLowerCase();
+  // Terror / Horror
+  if (titulo.includes('teléfono negro') || titulo.includes('el abismo secreto') || titulo.includes('doctor sueño') ||
+      titulo.includes('five nights') || titulo.includes('el resplandor') || titulo.includes('destino final') ||
+      titulo.includes('the sand') || titulo.includes('exterminio') || titulo.includes('el conjuro') ||
+      titulo.includes('chucky') || titulo.includes('terrifier') || titulo.includes('silent hill') ||
+      titulo.includes('muñeco diabólico') || titulo.includes('tarot') || titulo.includes('the room') ||
+      titulo.includes('gretel') || titulo.includes('la novia de chucky') || titulo.includes('el hijo de chucky') ||
+      titulo.includes('la hermanastra fea') || titulo.includes('scream') || titulo.includes('return to silent hill') ||
+      titulo.includes('the jester') || titulo.includes('pecadores')) {
+    return 'Terror';
+  }
+  // Drama / Romance
+  if (titulo.includes('yo antes de ti') || titulo.includes('cosas imposibles') || titulo.includes('caramelo') ||
+      titulo.includes('verdad y traición') || titulo.includes('soy frankela') || titulo.includes('sonido de libertad') ||
+      titulo.includes('babel') || titulo.includes('dejar el mundo atrás') || titulo.includes('trust') ||
+      titulo.includes('asi en la tierra') || titulo.includes('el día que todo cambió') || titulo.includes('together')) {
+    return 'Drama';
+  }
+  // Acción / Aventura
+  if (titulo.includes('tron ares') || titulo.includes('apocalypto') || titulo.includes('4 fantasticos') ||
+      titulo.includes('pearl harbor') || titulo.includes('la torre oscura') || titulo.includes('crimen perfecto') ||
+      titulo.includes('pantera negra') || titulo.includes('eyes of wakanda') || titulo.includes('estado eléctrico') ||
+      titulo.includes('mario galaxy') || titulo.includes('the dinosaur proyect') || titulo.includes('la torre obscura') ||
+      titulo.includes('michael jackson')) {
+    return 'Acción';
+  }
+  // Animación / Familiar
+  if (titulo.includes('bambi') || titulo.includes('como entrenar a tu dragón') || titulo.includes('sobinor') ||
+      titulo.includes('onward') || titulo.includes('mufasa') || titulo.includes('robot salvaje') ||
+      titulo.includes('harry potter')) {
+    return 'Animación';
+  }
+  // Ciencia ficción
+  if (titulo.includes('first moon') || titulo.includes('exterminio la evolución') || titulo.includes('28 semanas') ||
+      titulo.includes('estado eléctrico')) {
+    return 'Ciencia Ficción';
+  }
+  return 'Otros';
+}
+
+function obtenerPeliculasPorGenero() {
+  const generos = {};
+  peliculas.forEach(peli => {
+    const gen = asignarGenero(peli);
+    if (!generos[gen]) generos[gen] = [];
+    generos[gen].push(peli);
+  });
+  return generos;
+}
+
+function renderizarGeneros() {
+  const generosMap = obtenerPeliculasPorGenero();
+  const generosList = Object.keys(generosMap).sort();
+  
+  let generosContainer = document.getElementById('generos-container');
+  if (!generosContainer) {
+    generosContainer = document.createElement('div');
+    generosContainer.id = 'generos-container';
+    generosContainer.className = 'generos-bar';
+    // Insertar justo después del navbar o antes del slider
+    const navbar = document.querySelector('.navbar');
+    navbar.parentNode.insertBefore(generosContainer, navbar.nextSibling);
+  }
+  generosContainer.innerHTML = '<button class="genero-btn active" data-genero="todos">🎬 Todos</button>';
+  generosList.forEach(gen => {
+    const btn = document.createElement('button');
+    btn.className = 'genero-btn';
+    btn.textContent = gen;
+    btn.setAttribute('data-genero', gen);
+    generosContainer.appendChild(btn);
+  });
+  
+  // Eventos de filtro
+  document.querySelectorAll('.genero-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.genero-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const generoSeleccionado = btn.getAttribute('data-genero');
+      filtrarPeliculasPorGenero(generoSeleccionado);
+    });
+  });
+  
+  window.generosMap = generosMap;
+  // Mostrar solo si estamos en películas
+  generosContainer.style.display = (seccionActual === 'peliculas') ? 'flex' : 'none';
+}
+
+function filtrarPeliculasPorGenero(genero) {
+  const grid = document.getElementById('grid-peliculas');
+  grid.innerHTML = '';
+  let pelisAMostrar = [];
+  if (genero === 'todos') {
+    pelisAMostrar = peliculas;
+  } else {
+    pelisAMostrar = window.generosMap[genero] || [];
+  }
+  pelisAMostrar.forEach(peli => {
+    const card = crearCard(peli.titulo, peli.portada, () => mostrarDetallePelicula(peli), peli.id, peli.idiomas);
+    grid.appendChild(card);
+  });
+}
+
+/* ====== VISTA DETALLE PARA SERIES/NOVELAS ====== */
 function verDetalle(titulo, lista) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const vista = document.getElementById('vista-detalles');
@@ -74,14 +185,13 @@ function verDetalle(titulo, lista) {
   window.scrollTo(0, 0);
 }
 
-/* ====== VISTA DETALLE PARA PELÍCULAS (con información y botones) ====== */
+/* ====== VISTA DETALLE PARA PELÍCULAS ====== */
 function mostrarDetallePelicula(peli) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const detailSection = document.getElementById('sec-movie-detail');
   detailSection.classList.remove('hidden');
 
   const container = document.getElementById('movie-detail-container');
-  // Construir HTML con datos disponibles
   let html = `
     <div class="movie-detail-poster">
       <img src="${peli.portada}" alt="${peli.titulo}">
@@ -103,7 +213,6 @@ function mostrarDetallePelicula(peli) {
   html += `</div></div>`;
   container.innerHTML = html;
 
-  // Asignar eventos a los botones
   container.querySelectorAll('.btn-idioma, .btn-reproducir').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -116,7 +225,7 @@ function mostrarDetallePelicula(peli) {
   });
 }
 
-/* ====== ABRIR REPRODUCTOR ====== */
+/* ====== REPRODUCTOR ====== */
 function abrirReproductor(id) {
   const frame = document.getElementById('videoFrame');
   frame.src = `https://drive.google.com/file/d/${id}/preview`;
@@ -128,7 +237,7 @@ function cerrarPlayer() {
   document.getElementById('videoFrame').src = "";
 }
 
-/* ====== CREAR TARJETA (card) ====== */
+/* ====== CREAR TARJETA ====== */
 function crearCard(titulo, portada, accion, id = null, idiomas = null) {
   const div = document.createElement('div');
   div.className = 'card';
@@ -146,7 +255,6 @@ function crearCard(titulo, portada, accion, id = null, idiomas = null) {
     ${badgeIdiomas}
   `;
 
-  // Precarga ligera (opcional)
   if (id) {
     div.addEventListener('mouseenter', () => {
       if (!div._precargado) {
@@ -168,13 +276,9 @@ function crearCard(titulo, portada, accion, id = null, idiomas = null) {
 
 /* ====== RENDER PRINCIPAL ====== */
 function cargarTodo() {
-  // Películas: ahora todas abren el detalle (sean con idiomas o no)
-  const gp = document.getElementById('grid-peliculas');
-  gp.innerHTML = '';
-  peliculas.forEach(peli => {
-    const card = crearCard(peli.titulo, peli.portada, () => mostrarDetallePelicula(peli), peli.id, peli.idiomas);
-    gp.appendChild(card);
-  });
+  // Películas: se mostrarán mediante el filtro de géneros
+  renderizarGeneros();   // crea barra y guarda datos
+  filtrarPeliculasPorGenero('todos'); // muestra todas
 
   // Series
   const gs = document.getElementById('grid-series');
