@@ -1,4 +1,4 @@
-      /* ====== DATOS ====== */
+/* ====== DATOS ====== */
 let peliculas = [];
 let series    = {};
 let novelas   = {};
@@ -152,7 +152,7 @@ function filtrarPeliculasPorGenero(genero) {
   grid.innerHTML = '';
   let pelisAMostrar = [];
   if (genero === 'todos') {
-    pelisAMostrar = [...peliculas].sort((a,b) => a.titulo.localeCompare(b.titulo)); // orden A-Z
+    pelisAMostrar = [...peliculas].sort((a,b) => a.titulo.localeCompare(b.titulo));
   } else {
     pelisAMostrar = (window.generosMap[genero] || []).sort((a,b) => a.titulo.localeCompare(b.titulo));
   }
@@ -162,7 +162,18 @@ function filtrarPeliculasPorGenero(genero) {
   });
 }
 
-/* ====== NUEVA VISTA DETALLE CON REPRODUCTOR Y SIMILARES ====== */
+/* ====== FUNCIÓN DE DESCARGA ====== */
+function descargarVideo(id, nombreArchivo = 'video.mp4') {
+  const url = `https://drive.google.com/uc?export=download&id=${id}`;
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = nombreArchivo;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+/* ====== VISTA DETALLE CON IFRAME Y BOTÓN DE DESCARGA ====== */
 function mostrarDetallePelicula(peli) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const detailSection = document.getElementById('sec-movie-detail');
@@ -173,11 +184,9 @@ function mostrarDetallePelicula(peli) {
   // Construir opciones de calidad (si existen en JSON)
   let qualityOptions = '';
   if (peli.calidades && peli.calidades.length) {
-    qualityOptions = `<select id="qualitySelect">${peli.calidades.map(q => `<option value="${q.url}">${q.label}</option>`).join('')}</select>`;
+    qualityOptions = `<select id="qualitySelect">${peli.calidades.map(q => `<option value="${q.id}">${q.label}</option>`).join('')}</select>`;
   } else {
-    // Default: usar el ID del video para generar URL de descarga directa (mejor para control de velocidad)
-    const videoUrl = `https://drive.google.com/uc?export=download&id=${peli.id}`;
-    qualityOptions = `<select id="qualitySelect"><option value="${videoUrl}">Original</option></select>`;
+    qualityOptions = `<select id="qualitySelect"><option value="${peli.id}">Original</option></select>`;
   }
   
   // Opciones de idioma (si existen)
@@ -185,20 +194,8 @@ function mostrarDetallePelicula(peli) {
   if (peli.idiomas && peli.idiomas.length) {
     langOptions = `<select id="langSelect">${peli.idiomas.map(l => `<option value="${l.id}">${l.lang}</option>`).join('')}</select>`;
   } else {
-    langOptions = `<select id="langSelect"><option value="${peli.id}">Idioma original</option></select>`;
+    langOptions = `<select id="langSelect" style="display:none;"></select>`;
   }
-  
-  // Velocidad de reproducción
-  const speedOptions = `
-    <select id="speedSelect">
-      <option value="0.5">0.5x</option>
-      <option value="0.75">0.75x</option>
-      <option value="1" selected>1x</option>
-      <option value="1.25">1.25x</option>
-      <option value="1.5">1.5x</option>
-      <option value="2">2x</option>
-    </select>
-  `;
   
   // Obtener películas similares (mismo género)
   const generoActual = asignarGenero(peli);
@@ -216,15 +213,12 @@ function mostrarDetallePelicula(peli) {
         <div class="movie-controls">
           <label>🎞️ Calidad</label> ${qualityOptions}
           <label>🌐 Idioma</label> ${langOptions}
-          <label>⚡ Velocidad</label> ${speedOptions}
-          <button id="applySettingsBtn">Aplicar y reproducir</button>
+          <button id="applySettingsBtn">▶ Aplicar y reproducir</button>
+          <button id="downloadBtn">⬇️ Descargar</button>
         </div>
       </div>
       <div class="movie-detail-video">
-        <video id="detalleVideo" controls width="100%" poster="${peli.portada}">
-          <source src="" type="video/mp4">
-          Tu navegador no soporta video HTML5.
-        </video>
+        <iframe id="detalleIframe" src="about:blank" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
         <div class="sinopsis">${peli.sinopsis ? `📖 ${peli.sinopsis}` : ''}</div>
         ${peli.director ? `<div><strong>Director:</strong> ${peli.director}</div>` : ''}
         ${peli.actores ? `<div><strong>Actores:</strong> ${peli.actores}</div>` : ''}
@@ -234,44 +228,38 @@ function mostrarDetallePelicula(peli) {
   `;
   container.innerHTML = html;
   
-  // Cargar video inicial con el primer source (calidad e idioma por defecto)
-  const video = document.getElementById('detalleVideo');
+  const iframe = document.getElementById('detalleIframe');
   const qualitySelect = document.getElementById('qualitySelect');
   const langSelect = document.getElementById('langSelect');
-  const speedSelect = document.getElementById('speedSelect');
   const applyBtn = document.getElementById('applySettingsBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
   
-  function actualizarFuente() {
-    const calidadUrl = qualitySelect.value;
-    const idiomaId = langSelect.value;
-    // Si el idioma seleccionado es diferente al original, se podría cambiar el ID. Pero normalmente calidad e idioma son independientes.
-    // Para simplificar, usamos la URL de calidad y si hay idiomas, se espera que cada idioma tenga su propio video (con su ID).
-    // En este ejemplo, si se cambia idioma, reconstruimos la URL con el ID del idioma.
-    let finalUrl;
-    if (idiomaId && idiomaId !== peli.id) {
-      finalUrl = `https://drive.google.com/uc?export=download&id=${idiomaId}`;
-    } else {
-      finalUrl = calidadUrl;
+  function obtenerIdActual() {
+    let selectedId = qualitySelect.value;
+    if (langSelect.style.display !== 'none' && langSelect.value) {
+      selectedId = langSelect.value;
     }
-    video.src = finalUrl;
-    video.load();
-    video.play();
+    return selectedId;
   }
   
-  applyBtn.addEventListener('click', () => {
-    actualizarFuente();
-    // Marcar como visto el ID correspondiente (el del idioma seleccionado o el original)
-    const idiomaId = langSelect.value;
-    marcarVisto(idiomaId !== peli.id ? idiomaId : peli.id);
-  });
+  function actualizarReproductor() {
+    const selectedId = obtenerIdActual();
+    const videoUrl = `https://drive.google.com/file/d/${selectedId}/preview`;
+    iframe.src = videoUrl;
+    marcarVisto(selectedId);
+  }
   
-  // Control de velocidad
-  speedSelect.addEventListener('change', () => {
-    video.playbackRate = parseFloat(speedSelect.value);
-  });
+  function descargarActual() {
+    const selectedId = obtenerIdActual();
+    const nombre = `${peli.titulo.replace(/[^a-z0-9]/gi, '_')}.mp4`;
+    descargarVideo(selectedId, nombre);
+  }
+  
+  applyBtn.addEventListener('click', actualizarReproductor);
+  downloadBtn.addEventListener('click', descargarActual);
   
   // Inicializar
-  actualizarFuente();
+  actualizarReproductor();
   
   // Renderizar similares
   const similaresGrid = document.getElementById('similaresGrid');
@@ -300,7 +288,7 @@ function verDetalle(titulo, lista) {
   window.scrollTo(0, 0);
 }
 
-/* ====== REPRODUCTOR LEGACY (para series/novelas, usa iframe) ====== */
+/* ====== REPRODUCTOR LEGACY (para series/novelas) ====== */
 function abrirReproductor(id) {
   const frame = document.getElementById('videoFrame');
   frame.src = `https://drive.google.com/file/d/${id}/preview`;
@@ -340,7 +328,7 @@ function crearCard(titulo, portada, accion, id = null, idiomas = null) {
 /* ====== RENDER PRINCIPAL ====== */
 function cargarTodo() {
   renderizarGeneros();
-  filtrarPeliculasPorGenero('todos'); // ordena A-Z automáticamente
+  filtrarPeliculasPorGenero('todos');
 
   const gs = document.getElementById('grid-series');
   gs.innerHTML = '';
