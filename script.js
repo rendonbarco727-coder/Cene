@@ -64,7 +64,6 @@ function mostrarSeccion(seccion) {
   if (target) target.classList.remove('hidden');
   
   const hero = document.getElementById('header-slider');
-  // Mostrar slider solo si estamos en películas
   hero.style.display = (seccion === 'peliculas') ? 'block' : 'none';
   
   document.getElementById('buscador').value = "";
@@ -77,7 +76,6 @@ function mostrarSeccion(seccion) {
 }
 
 function volver() {
-  // Ocultar carrusel si veníamos de detalle (se mostrará en mostrarSeccion si corresponde)
   mostrarSeccion(seccionActual);
 }
 
@@ -189,24 +187,34 @@ function descargarVideo(id, nombreArchivo = 'video.mp4') {
   document.body.removeChild(link);
 }
 
-/* ====== VISTA DETALLE DE PELÍCULA (con título grande y slider oculto) ====== */
+/* ====== REPRODUCTOR OVERLAY (el mismo que funciona) ====== */
+function abrirReproductor(id) {
+  const frame = document.getElementById('videoFrame');
+  frame.src = `https://drive.google.com/file/d/${id}/preview`;
+  document.getElementById('player').classList.remove('hidden');
+}
+
+function cerrarPlayer() {
+  document.getElementById('player').classList.add('hidden');
+  document.getElementById('videoFrame').src = "";
+}
+
+/* ====== VISTA DETALLE DE PELÍCULA (sin iframe, solo info y botón reproducción) ====== */
 function mostrarDetallePelicula(peli) {
-  // Ocultar todas las secciones y también el slider
+  // Ocultar secciones y también el carrusel
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const detailSection = document.getElementById('sec-movie-detail');
   detailSection.classList.remove('hidden');
   
-  // Ocultar el carrusel mientras estamos en detalle
+  // Ocultar slider y barra de géneros
   const hero = document.getElementById('header-slider');
   hero.style.display = 'none';
-  
-  // Ocultar también la barra de géneros
   const generosBar = document.getElementById('generos-container');
   if (generosBar) generosBar.style.display = 'none';
 
   const container = document.getElementById('movie-detail-container');
   
-  // Construir opciones de calidad/idioma
+  // Opciones de calidad
   let qualityOptions = '';
   if (peli.calidades && peli.calidades.length) {
     qualityOptions = `<select id="qualitySelect">${peli.calidades.map(q => `<option value="${q.id}">${q.label}</option>`).join('')}</select>`;
@@ -214,6 +222,7 @@ function mostrarDetallePelicula(peli) {
     qualityOptions = `<select id="qualitySelect"><option value="${peli.id}">Original</option></select>`;
   }
   
+  // Opciones de idioma
   let langOptions = '';
   if (peli.idiomas && peli.idiomas.length) {
     langOptions = `<select id="langSelect">${peli.idiomas.map(l => `<option value="${l.id}">${l.lang}</option>`).join('')}</select>`;
@@ -221,7 +230,7 @@ function mostrarDetallePelicula(peli) {
     langOptions = `<select id="langSelect" style="display:none;"></select>`;
   }
   
-  // Obtener películas similares (sin duplicados)
+  // Películas similares
   const generoActual = asignarGenero(peli);
   const similares = peliculas
     .filter(p => asignarGenero(p) === generoActual && p.titulo !== peli.titulo)
@@ -239,34 +248,24 @@ function mostrarDetallePelicula(peli) {
         <div class="movie-controls">
           <label>🎞️ Calidad</label> ${qualityOptions}
           <label>🌐 Idioma</label> ${langOptions}
-          <button id="applySettingsBtn">▶ Aplicar y reproducir</button>
+          <button id="reproducirBtn">▶ Reproducir</button>
           <button id="downloadBtn">⬇️ Descargar</button>
         </div>
       </div>
       <div class="movie-detail-info">
-        <!-- TÍTULO GRANDE DESTACADO -->
-        <h1 style="font-size: 2.5rem; margin: 0 0 15px 0; color: var(--accent);">${peli.titulo}</h1>
+        <h1 style="font-size: 2.5rem; margin: 0 0 15px 0; color: #e50914;">${peli.titulo}</h1>
         <div class="sinopsis">${peli.sinopsis ? `📖 ${peli.sinopsis}` : ''}</div>
         ${peli.director ? `<div class="director"><strong>Director:</strong> ${peli.director}</div>` : ''}
         ${peli.actores ? `<div class="actores"><strong>Actores:</strong> ${peli.actores}</div>` : ''}
-      </div>
-      <div class="movie-detail-video">
-        <iframe id="detalleIframe" src="about:blank" frameborder="0" 
-          allow="autoplay; fullscreen; picture-in-picture" 
-          allowfullscreen 
-          style="width:100%; aspect-ratio:16/9; border-radius:12px; background:#000;"></iframe>
-        <div id="videoErrorMsg" style="color:#ff6b6b; margin-top:8px; display:none;">⚠️ No se pudo cargar el video. Verifica que el archivo sea público o intenta con otro idioma/calidad.</div>
       </div>
     </div>
     ${similaresHTML}
   `;
   container.innerHTML = html;
   
-  const iframe = document.getElementById('detalleIframe');
-  const errorMsg = document.getElementById('videoErrorMsg');
   const qualitySelect = document.getElementById('qualitySelect');
   const langSelect = document.getElementById('langSelect');
-  const applyBtn = document.getElementById('applySettingsBtn');
+  const reproducirBtn = document.getElementById('reproducirBtn');
   const downloadBtn = document.getElementById('downloadBtn');
   
   function obtenerIdActual() {
@@ -277,37 +276,21 @@ function mostrarDetallePelicula(peli) {
     return selectedId;
   }
   
-  function actualizarReproductor() {
+  reproducirBtn.addEventListener('click', () => {
     const selectedId = obtenerIdActual();
-    if (!selectedId) {
-      errorMsg.style.display = 'block';
-      errorMsg.innerText = '⚠️ No hay ID de video válido.';
-      return;
+    if (selectedId) {
+      marcarVisto(selectedId);
+      abrirReproductor(selectedId);
+    } else {
+      alert('No hay un ID de video válido');
     }
-    const videoUrl = `https://drive.google.com/file/d/${selectedId}/preview`;
-    iframe.src = videoUrl;
-    marcarVisto(selectedId);
-    errorMsg.style.display = 'none';
-    iframe.onerror = () => {
-      errorMsg.style.display = 'block';
-      errorMsg.innerText = '⚠️ No se pudo cargar el video. Asegúrate de que el archivo esté compartido públicamente.';
-    };
-    clearTimeout(window.videoTimeout);
-    window.videoTimeout = setTimeout(() => {
-      if (iframe.src === 'about:blank' || iframe.src.includes('about:blank')) {
-        errorMsg.style.display = 'block';
-      }
-    }, 5000);
-  }
+  });
   
-  applyBtn.addEventListener('click', actualizarReproductor);
   downloadBtn.addEventListener('click', () => {
     const selectedId = obtenerIdActual();
     const nombre = `${peli.titulo.replace(/[^a-z0-9]/gi, '_')}.mp4`;
     descargarVideo(selectedId, nombre);
   });
-  
-  actualizarReproductor();
   
   // Renderizar similares
   const similaresGrid = document.getElementById('similaresGrid');
@@ -322,7 +305,7 @@ function mostrarDetallePelicula(peli) {
   }
 }
 
-/* ====== VISTA DETALLE PARA SERIES/NOVELAS (también oculta slider) ====== */
+/* ====== VISTA DETALLE PARA SERIES/NOVELAS ====== */
 function verDetalle(titulo, lista) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const vista = document.getElementById('vista-detalles');
@@ -341,18 +324,6 @@ function verDetalle(titulo, lista) {
     grid.appendChild(crearCard(item.titulo, item.portada, () => abrirReproductor(item.id), item.id));
   });
   window.scrollTo(0, 0);
-}
-
-/* ====== REPRODUCTOR LEGACY (para series/novelas) ====== */
-function abrirReproductor(id) {
-  const frame = document.getElementById('videoFrame');
-  frame.src = `https://drive.google.com/file/d/${id}/preview`;
-  document.getElementById('player').classList.remove('hidden');
-}
-
-function cerrarPlayer() {
-  document.getElementById('player').classList.add('hidden');
-  document.getElementById('videoFrame').src = "";
 }
 
 /* ====== CREAR TARJETA ====== */
