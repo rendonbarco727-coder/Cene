@@ -197,7 +197,7 @@ function descargarVideo(id, nombreArchivo = 'video.mp4') {
 /* ====== REPRODUCTOR OVERLAY (para series/novelas) ====== */
 function abrirReproductor(id) {
   const frame = document.getElementById('videoFrame');
-  frame.src = `https://drive.google.com/file/d/${id}/preview`;
+  frame.src = `https://drive.google.com/uc?export=embed&id=${id}`;
   document.getElementById('player').classList.remove('hidden');
 }
 
@@ -252,32 +252,32 @@ function mostrarDetallePelicula(peli) {
     similaresHTML = `<h4 style="margin-top: 30px;">🎬 Películas similares</h4><div class="similares-grid" id="similaresGrid"></div>`;
   }
   
-  // Construir HTML: portada (izquierda) + video (derecha), título encima de portada
-  const html = `
-    <div class="movie-detail-layout">
-      <div class="movie-detail-poster">
-        <p class="movie-detail-title">${peli.titulo}</p>
-        <img src="${peli.portada}" alt="${peli.titulo}">
-        <div class="movie-controls">
-          <button id="downloadBtn">⬇️ Descargar</button>
-        </div>
-      </div>
-      <div class="movie-detail-video">
-        <iframe id="detalleIframe"
-          src="https://drive.google.com/file/d/${defaultId}/preview"
-          frameborder="0"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowfullscreen>
-        </iframe>
+// Construir HTML: portada (izquierda) + video (derecha), título encima de portada
+const html = `
+  <div class="movie-detail-layout">
+    <div class="movie-detail-poster">
+      <p class="movie-detail-title">${peli.titulo}</p>
+      <img src="${peli.portada}" alt="${peli.titulo}">
+      <div class="movie-controls">
+        <button id="downloadBtn">⬇️ Descargar</button>
       </div>
     </div>
-    <div class="movie-info-adicional">
-      <div class="sinopsis">${peli.sinopsis ? `📖 ${peli.sinopsis}` : ''}</div>
-      ${peli.director ? `<div class="director"><strong>Director:</strong> ${peli.director}</div>` : ''}
-      ${peli.actores ? `<div class="actores"><strong>Actores:</strong> ${peli.actores}</div>` : ''}
+    <div class="movie-detail-video">
+      <iframe id="detalleIframe"
+        src="https://drive.google.com/uc?export=embed&id=${defaultId}"
+        frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen>
+      </iframe>
     </div>
-    ${similaresHTML}
-  `;
+  </div>
+  <div class="movie-info-adicional">
+    <div class="sinopsis">${peli.sinopsis ? `📖 ${peli.sinopsis}` : ''}</div>
+    ${peli.director ? `<div class="director"><strong>Director:</strong> ${peli.director}</div>` : ''}
+    ${peli.actores ? `<div class="actores"><strong>Actores:</strong> ${peli.actores}</div>` : ''}
+  </div>
+  ${similaresHTML}
+`;
   container.innerHTML = html;
 
   const downloadBtn = document.getElementById('downloadBtn');
