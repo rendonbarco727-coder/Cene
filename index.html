@@ -1175,8 +1175,11 @@ function mostrarDetallePelicula(peli) {
 
   const container = document.getElementById('movie-detail-container');
   
-  let defaultId = peli.id;
-  if (peli.idiomas && peli.idiomas.length) defaultId = peli.idiomas[0].id;
+ let defaultId = peli.id;
+if (peli.idiomas && peli.idiomas.length) defaultId = peli.idiomas[0].id;
+abrirReproductor(defaultId);
+marcarVisto(defaultId);
+return; // ← ya no renderiza el layout de dos columnas
   
   const generoActual = asignarGenero(peli);
   const similares = peliculas
