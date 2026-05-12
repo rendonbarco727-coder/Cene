@@ -1167,52 +1167,76 @@ function mostrarDetallePelicula(peli) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const detailSection = document.getElementById('sec-movie-detail');
   detailSection.classList.remove('hidden');
-  
+
   const hero = document.getElementById('header-slider');
   hero.style.display = 'none';
   const generosBar = document.getElementById('generos-container');
   if (generosBar) generosBar.style.display = 'none';
 
-  const container = document.getElementById('movie-detail-container');
-  
- let defaultId = peli.id;
-if (peli.idiomas && peli.idiomas.length) defaultId = peli.idiomas[0].id;
-abrirReproductor(defaultId);
-marcarVisto(defaultId);
-return; // ← ya no renderiza el layout de dos columnas
-  
+  let defaultId = peli.id;
+  if (peli.idiomas && peli.idiomas.length) defaultId = peli.idiomas[0].id;
+
   const generoActual = asignarGenero(peli);
   const similares = peliculas
     .filter(p => asignarGenero(p) === generoActual && normalizarTexto(p.titulo) !== normalizarTexto(peli.titulo))
     .slice(0, 8);
-  
-  let similaresHTML = '';
-  if (similares.length) {
-    similaresHTML = `<h4 style="margin-top: 30px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.08em;">🎬 PELÍCULAS SIMILARES</h4><div class="similares-grid" id="similaresGrid"></div>`;
-  }
-  
-  const html = `
-    <div class="movie-detail-layout">
-      <div class="movie-detail-poster">
-        <p class="movie-detail-title">${peli.titulo}</p>
-        <img src="${peli.portada}" alt="${peli.titulo}">
-      </div>
-      <div class="movie-detail-video">
-        <iframe 
+
+  const container = document.getElementById('movie-detail-container');
+  container.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:20px; width:100%;">
+
+      <!-- VIDEO ARRIBA FULL WIDTH -->
+      <div style="width:100%; background:#000; border-radius:8px; overflow:hidden;">
+        <iframe
           src="https://drive.google.com/file/d/${defaultId}/preview"
-          frameborder="0"
+          style="width:100%; aspect-ratio:16/9; min-height:200px; display:block; border:none;"
           allow="autoplay; fullscreen; picture-in-picture"
           allowfullscreen>
         </iframe>
       </div>
+
+      <!-- POSTER + INFO LADO A LADO -->
+      <div style="display:flex; gap:20px; align-items:flex-start;">
+        <img src="${peli.portada}" alt="${peli.titulo}"
+          style="width:120px; flex-shrink:0; border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,0.6);">
+        <div>
+          <h3 style="font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:0.08em;
+            border-left:3px solid var(--accent); padding-left:10px; margin-bottom:10px;">
+            ${peli.titulo}
+          </h3>
+          <p class="sinopsis">${peli.sinopsis ? '📖 ' + peli.sinopsis : '🎬 Disfruta de esta película en Cinema STRANGER'}</p>
+          ${peli.director ? `<div class="director"><strong>DIRECTOR:</strong> ${peli.director}</div>` : ''}
+          ${peli.actores  ? `<div class="actores"><strong>REPARTO:</strong> ${peli.actores}</div>`   : ''}
+        </div>
+      </div>
+
+      <!-- SIMILARES -->
+      ${similares.length ? `
+        <div>
+          <h4 style="font-family:'Bebas Neue',sans-serif; letter-spacing:0.08em; margin-bottom:12px;">
+            🎬 PELÍCULAS SIMILARES
+          </h4>
+          <div class="similares-grid" id="similaresGrid"></div>
+        </div>` : ''}
+
     </div>
-    <div class="movie-info-adicional">
-      <div class="sinopsis">${peli.sinopsis ? `📖 ${peli.sinopsis}` : '🎬 Disfruta de esta película en Cinema STRANGER'}</div>
-      ${peli.director ? `<div class="director"><strong>DIRECTOR:</strong> ${peli.director}</div>` : ''}
-      ${peli.actores ? `<div class="actores"><strong>REPARTO:</strong> ${peli.actores}</div>` : ''}
-    </div>
-    ${similaresHTML}
   `;
+
+  marcarVisto(defaultId);
+
+  const similaresGrid = document.getElementById('similaresGrid');
+  if (similaresGrid) {
+    similares.forEach(sim => {
+      const card = document.createElement('div');
+      card.className = 'similares-card';
+      card.innerHTML = `<img src="${sim.portada}" loading="lazy"><p>${sim.titulo}</p>`;
+      card.onclick = () => mostrarDetallePelicula(sim);
+      similaresGrid.appendChild(card);
+    });
+  }
+
+  window.scrollTo(0, 0);
+}
   
   container.innerHTML = html;
   marcarVisto(defaultId);
