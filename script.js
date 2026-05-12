@@ -9,7 +9,7 @@ function ocultarLoader() {
   if (loader) loader.style.display = 'none';
 }
 
-/* ====== NORMALIZAR TÍTULOS ====== */
+/* ====== NORMALIZAR TÍTULOS (minúsculas, sin acentos, sin espacios extra) ====== */
 function normalizarTexto(texto) {
   return texto.toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -34,6 +34,7 @@ async function cargarCatalogo() {
     peliculas = eliminarDuplicados(data.peliculas || []);
     series    = data.series   || {};
     novelas   = data.novelas  || {};
+    console.log(`Cargadas ${peliculas.length} películas únicas.`);
   } catch (e) {
     console.error('Error cargando catalogo.json:', e);
   } finally {
@@ -48,6 +49,7 @@ function marcarVisto(id) {
   if (!id || vistos.includes(id)) return;
   vistos.push(id);
   localStorage.setItem('vistos_strange', JSON.stringify(vistos));
+  document.querySelectorAll(`.card[data-id="${id}"]`).forEach(card => card.classList.add('visto'));
 }
 
 function borrarHistorial() {
@@ -84,7 +86,7 @@ function volver() {
   mostrarSeccion(seccionActual);
 }
 
-/* ====== GÉNEROS ====== */
+/* ====== CLASIFICACIÓN POR GÉNEROS ====== */
 function asignarGenero(pelicula) {
   const titulo = normalizarTexto(pelicula.titulo);
   if (titulo.includes('telefono negro') || titulo.includes('el abismo secreto') || titulo.includes('doctor sueño') ||
@@ -135,6 +137,7 @@ function obtenerPeliculasPorGenero() {
 function renderizarGeneros() {
   const generosMap = obtenerPeliculasPorGenero();
   const generosList = Object.keys(generosMap).sort();
+  
   let generosContainer = document.getElementById('generos-container');
   if (!generosContainer) {
     generosContainer = document.createElement('div');
@@ -151,13 +154,16 @@ function renderizarGeneros() {
     btn.setAttribute('data-genero', gen);
     generosContainer.appendChild(btn);
   });
+  
   document.querySelectorAll('.genero-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       document.querySelectorAll('.genero-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      filtrarPeliculasPorGenero(btn.getAttribute('data-genero'));
+      const generoSeleccionado = btn.getAttribute('data-genero');
+      filtrarPeliculasPorGenero(generoSeleccionado);
     });
   });
+  
   window.generosMap = generosMap;
   generosContainer.style.display = (seccionActual === 'peliculas') ? 'flex' : 'none';
 }
@@ -177,7 +183,7 @@ function filtrarPeliculasPorGenero(genero) {
   });
 }
 
-/* ====== DESCARGA ====== */
+/* ====== FUNCIÓN DE DESCARGA ====== */
 function descargarVideo(id, nombreArchivo = 'video.mp4') {
   const url = `https://drive.google.com/uc?export=download&id=${id}`;
   const link = document.createElement('a');
@@ -188,20 +194,34 @@ function descargarVideo(id, nombreArchivo = 'video.mp4') {
   document.body.removeChild(link);
 }
 
-/* ====== VISTA DETALLE CON REPRODUCTOR A LA DERECHA ====== */
+/* ====== REPRODUCTOR OVERLAY (para series/novelas) ====== */
+function abrirReproductor(id) {
+  const frame = document.getElementById('videoFrame');
+  frame.src = `https://drive.google.com/file/d/${id}/preview`;
+  document.getElementById('player').classList.remove('hidden');
+}
+
+function cerrarPlayer() {
+  document.getElementById('player').classList.add('hidden');
+  document.getElementById('videoFrame').src = "";
+}
+
+/* ====== VISTA DETALLE DE PELÍCULA (con iframe a la derecha) ====== */
 function mostrarDetallePelicula(peli) {
+  // Ocultar todas las secciones
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const detailSection = document.getElementById('sec-movie-detail');
   detailSection.classList.remove('hidden');
   
-  // Ocultar slider y géneros
-  document.getElementById('header-slider').style.display = 'none';
+  // Ocultar slider y barra de géneros
+  const hero = document.getElementById('header-slider');
+  hero.style.display = 'none';
   const generosBar = document.getElementById('generos-container');
   if (generosBar) generosBar.style.display = 'none';
 
   const container = document.getElementById('movie-detail-container');
   
-  // Preparar opciones de calidad/idioma
+  // Opciones de calidad (si existen)
   let qualityOptions = '';
   if (peli.calidades && peli.calidades.length) {
     qualityOptions = `<select id="qualitySelect">${peli.calidades.map(q => `<option value="${q.id}">${q.label}</option>`).join('')}</select>`;
@@ -209,6 +229,7 @@ function mostrarDetallePelicula(peli) {
     qualityOptions = `<select id="qualitySelect"><option value="${peli.id}">Original</option></select>`;
   }
   
+  // Opciones de idioma (si existen)
   let langOptions = '';
   if (peli.idiomas && peli.idiomas.length) {
     langOptions = `<select id="langSelect">${peli.idiomas.map(l => `<option value="${l.id}">${l.lang}</option>`).join('')}</select>`;
@@ -216,7 +237,7 @@ function mostrarDetallePelicula(peli) {
     langOptions = `<select id="langSelect" style="display:none;"></select>`;
   }
   
-  // ID por defecto (si hay idiomas, usar el primero)
+  // ID por defecto (el primer idioma si existe, sino el ID original)
   let defaultId = peli.id;
   if (peli.idiomas && peli.idiomas.length) defaultId = peli.idiomas[0].id;
   
@@ -231,8 +252,7 @@ function mostrarDetallePelicula(peli) {
     similaresHTML = `<h4 style="margin-top: 30px;">🎬 Películas similares</h4><div class="similares-grid" id="similaresGrid"></div>`;
   }
   
-  // Estructura: título arriba, luego fila con portada (izquierda) + video (derecha)
-  // Debajo de la fila, la información adicional (sinopsis, director, actores) y luego similares
+  // Construir HTML: Título arriba, luego fila con portada (izquierda) + video (derecha)
   const html = `
     <h1 style="font-size: 2.5rem; margin: 0 0 20px 0; color: #e50914;">${peli.titulo}</h1>
     <div class="movie-detail-layout">
@@ -246,9 +266,12 @@ function mostrarDetallePelicula(peli) {
         </div>
       </div>
       <div class="movie-detail-video">
-        <iframe id="detalleIframe" src="https://drive.google.com/file/d/${defaultId}/preview" 
-          frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
-          style="width:100%; aspect-ratio:16/9; border-radius:12px; background:#000;"></iframe>
+        <iframe id="detalleIframe" 
+          src="https://drive.google.com/file/d/${defaultId}/preview" 
+          frameborder="0" 
+          allow="autoplay; fullscreen; picture-in-picture" 
+          allowfullscreen>
+        </iframe>
         <div id="videoErrorMsg" style="color:#ff6b6b; margin-top:8px; display:none;">⚠️ No se pudo cargar el video. Verifica que el archivo sea público.</div>
       </div>
     </div>
@@ -294,7 +317,7 @@ function mostrarDetallePelicula(peli) {
     descargarVideo(newId, nombre);
   });
   
-  // Marcar como visto el video inicial
+  // Marcar como visto el video por defecto
   marcarVisto(defaultId);
   
   // Renderizar similares
@@ -310,14 +333,15 @@ function mostrarDetallePelicula(peli) {
   }
 }
 
-/* ====== VISTA PARA SERIES/NOVELAS ====== */
+/* ====== VISTA DETALLE PARA SERIES/NOVELAS ====== */
 function verDetalle(titulo, lista) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const vista = document.getElementById('vista-detalles');
   vista.classList.remove('hidden');
   document.getElementById('detalle-titulo').innerText = titulo;
   
-  document.getElementById('header-slider').style.display = 'none';
+  const hero = document.getElementById('header-slider');
+  hero.style.display = 'none';
   const generosBar = document.getElementById('generos-container');
   if (generosBar) generosBar.style.display = 'none';
   
@@ -329,37 +353,25 @@ function verDetalle(titulo, lista) {
   window.scrollTo(0, 0);
 }
 
-/* ====== REPRODUCTOR OVERLAY ====== */
-function abrirReproductor(id) {
-  const frame = document.getElementById('videoFrame');
-  frame.src = `https://drive.google.com/file/d/${id}/preview`;
-  document.getElementById('player').classList.remove('hidden');
-}
-
-function cerrarPlayer() {
-  document.getElementById('player').classList.add('hidden');
-  document.getElementById('videoFrame').src = "";
-}
-
 /* ====== CREAR TARJETA ====== */
 function crearCard(titulo, portada, accion, id = null, idiomas = null) {
   const div = document.createElement('div');
   div.className = 'card';
   if (id && vistos.includes(id)) div.classList.add('visto');
   if (id) div.setAttribute('data-id', id);
-  
+
   let badgeIdiomas = '';
   if (idiomas && idiomas.length > 1) {
     badgeIdiomas = `<span style="position:absolute; bottom:5px; left:5px; background:#e50914; padding:2px 6px; border-radius:12px; font-size:10px;">🎧 ${idiomas.length}</span>`;
   }
-  
+
   div.innerHTML = `
     <div class="badge-visto">✓</div>
     <img src="${portada}" loading="lazy">
     <p>${titulo}</p>
     ${badgeIdiomas}
   `;
-  
+
   div.onclick = (e) => {
     e.stopPropagation();
     if (typeof accion === 'function') accion();
@@ -371,7 +383,8 @@ function crearCard(titulo, portada, accion, id = null, idiomas = null) {
 function cargarTodo() {
   renderizarGeneros();
   filtrarPeliculasPorGenero('todos');
-  
+
+  // Series
   const gs = document.getElementById('grid-series');
   gs.innerHTML = '';
   Object.keys(series).forEach(s => {
@@ -379,7 +392,8 @@ function cargarTodo() {
     const card = crearCard(s, primeraPortada, () => verDetalle(s, series[s]));
     gs.appendChild(card);
   });
-  
+
+  // Novelas
   const gn = document.getElementById('grid-novelas');
   gn.innerHTML = '';
   Object.keys(novelas).forEach(n => {
@@ -399,7 +413,7 @@ function filtrarContenido() {
   });
 }
 
-/* ====== CARRUSEL ====== */
+/* ====== CARRUSEL MINI ====== */
 function initSlider() {
   const wrapper = document.getElementById('slider');
   if (!wrapper) return;
