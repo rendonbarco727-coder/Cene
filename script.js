@@ -9,11 +9,17 @@ function ocultarLoader() {
   if (loader) loader.style.display = 'none';
 }
 
-/* ====== ELIMINAR DUPLICADOS NORMALIZANDO TÍTULOS (minúsculas) ====== */
+/* ====== NORMALIZAR TÍTULOS (minúsculas, quitar acentos, etc.) ====== */
+function normalizarTexto(texto) {
+  return texto.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // eliminar acentos
+    .trim();
+}
+
 function eliminarDuplicados(lista) {
   const vistosTitulos = new Set();
   return lista.filter(peli => {
-    const tituloNorm = peli.titulo.toLowerCase().trim();
+    const tituloNorm = normalizarTexto(peli.titulo);
     if (vistosTitulos.has(tituloNorm)) return false;
     vistosTitulos.add(tituloNorm);
     return true;
@@ -43,6 +49,11 @@ function marcarVisto(id) {
   if (!id || vistos.includes(id)) return;
   vistos.push(id);
   localStorage.setItem('vistos_strange', JSON.stringify(vistos));
+  // Opcional: actualizar visualmente las tarjetas que se vean
+  document.querySelectorAll('.card').forEach(card => {
+    const cardId = card.getAttribute('data-id');
+    if (cardId === id) card.classList.add('visto');
+  });
 }
 
 function borrarHistorial() {
@@ -81,37 +92,37 @@ function volver() {
 
 /* ====== CLASIFICACIÓN POR GÉNEROS ====== */
 function asignarGenero(pelicula) {
-  const titulo = pelicula.titulo.toLowerCase();
-  if (titulo.includes('teléfono negro') || titulo.includes('el abismo secreto') || titulo.includes('doctor sueño') ||
+  const titulo = normalizarTexto(pelicula.titulo);
+  if (titulo.includes('telefono negro') || titulo.includes('el abismo secreto') || titulo.includes('doctor sueño') ||
       titulo.includes('five nights') || titulo.includes('el resplandor') || titulo.includes('destino final') ||
       titulo.includes('the sand') || titulo.includes('exterminio') || titulo.includes('el conjuro') ||
       titulo.includes('chucky') || titulo.includes('terrifier') || titulo.includes('silent hill') ||
-      titulo.includes('muñeco diabólico') || titulo.includes('tarot') || titulo.includes('the room') ||
+      titulo.includes('muneco diabolico') || titulo.includes('tarot') || titulo.includes('the room') ||
       titulo.includes('gretel') || titulo.includes('la novia de chucky') || titulo.includes('el hijo de chucky') ||
       titulo.includes('la hermanastra fea') || titulo.includes('scream') || titulo.includes('return to silent hill') ||
       titulo.includes('the jester') || titulo.includes('pecadores')) {
     return 'Terror';
   }
   if (titulo.includes('yo antes de ti') || titulo.includes('cosas imposibles') || titulo.includes('caramelo') ||
-      titulo.includes('verdad y traición') || titulo.includes('soy frankela') || titulo.includes('sonido de libertad') ||
-      titulo.includes('babel') || titulo.includes('dejar el mundo atrás') || titulo.includes('trust') ||
-      titulo.includes('asi en la tierra') || titulo.includes('el día que todo cambió') || titulo.includes('together')) {
+      titulo.includes('verdad y traicion') || titulo.includes('soy frankela') || titulo.includes('sonido de libertad') ||
+      titulo.includes('babel') || titulo.includes('dejar el mundo atras') || titulo.includes('trust') ||
+      titulo.includes('asi en la tierra') || titulo.includes('el dia que todo cambio') || titulo.includes('together')) {
     return 'Drama';
   }
   if (titulo.includes('tron ares') || titulo.includes('apocalypto') || titulo.includes('4 fantasticos') ||
       titulo.includes('pearl harbor') || titulo.includes('la torre oscura') || titulo.includes('crimen perfecto') ||
-      titulo.includes('pantera negra') || titulo.includes('eyes of wakanda') || titulo.includes('estado eléctrico') ||
+      titulo.includes('pantera negra') || titulo.includes('eyes of wakanda') || titulo.includes('estado electrico') ||
       titulo.includes('mario galaxy') || titulo.includes('the dinosaur proyect') || titulo.includes('la torre obscura') ||
       titulo.includes('michael jackson')) {
     return 'Acción';
   }
-  if (titulo.includes('bambi') || titulo.includes('como entrenar a tu dragón') || titulo.includes('sobinor') ||
+  if (titulo.includes('bambi') || titulo.includes('como entrenar a tu dragon') || titulo.includes('sobinor') ||
       titulo.includes('onward') || titulo.includes('mufasa') || titulo.includes('robot salvaje') ||
       titulo.includes('harry potter')) {
     return 'Animación';
   }
-  if (titulo.includes('first moon') || titulo.includes('exterminio la evolución') || titulo.includes('28 semanas') ||
-      titulo.includes('estado eléctrico')) {
+  if (titulo.includes('first moon') || titulo.includes('exterminio la evolucion') || titulo.includes('28 semanas') ||
+      titulo.includes('estado electrico')) {
     return 'Ciencia Ficción';
   }
   return 'Otros';
@@ -187,21 +198,9 @@ function descargarVideo(id, nombreArchivo = 'video.mp4') {
   document.body.removeChild(link);
 }
 
-/* ====== REPRODUCTOR OVERLAY (el mismo que funciona) ====== */
-function abrirReproductor(id) {
-  const frame = document.getElementById('videoFrame');
-  frame.src = `https://drive.google.com/file/d/${id}/preview`;
-  document.getElementById('player').classList.remove('hidden');
-}
-
-function cerrarPlayer() {
-  document.getElementById('player').classList.add('hidden');
-  document.getElementById('videoFrame').src = "";
-}
-
-/* ====== VISTA DETALLE DE PELÍCULA (sin iframe, solo info y botón reproducción) ====== */
+/* ====== VISTA DETALLE DE PELÍCULA CON IFRAME AUTOMÁTICO ====== */
 function mostrarDetallePelicula(peli) {
-  // Ocultar secciones y también el carrusel
+  // Ocultar todas las secciones
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const detailSection = document.getElementById('sec-movie-detail');
   detailSection.classList.remove('hidden');
@@ -214,7 +213,7 @@ function mostrarDetallePelicula(peli) {
 
   const container = document.getElementById('movie-detail-container');
   
-  // Opciones de calidad
+  // Opciones de calidad (si existen)
   let qualityOptions = '';
   if (peli.calidades && peli.calidades.length) {
     qualityOptions = `<select id="qualitySelect">${peli.calidades.map(q => `<option value="${q.id}">${q.label}</option>`).join('')}</select>`;
@@ -222,7 +221,7 @@ function mostrarDetallePelicula(peli) {
     qualityOptions = `<select id="qualitySelect"><option value="${peli.id}">Original</option></select>`;
   }
   
-  // Opciones de idioma
+  // Opciones de idioma (si existen)
   let langOptions = '';
   if (peli.idiomas && peli.idiomas.length) {
     langOptions = `<select id="langSelect">${peli.idiomas.map(l => `<option value="${l.id}">${l.lang}</option>`).join('')}</select>`;
@@ -230,10 +229,14 @@ function mostrarDetallePelicula(peli) {
     langOptions = `<select id="langSelect" style="display:none;"></select>`;
   }
   
+  // Obtener ID por defecto (el primer idioma si existe, sino el ID original)
+  let defaultId = peli.id;
+  if (peli.idiomas && peli.idiomas.length) defaultId = peli.idiomas[0].id;
+  
   // Películas similares
   const generoActual = asignarGenero(peli);
   const similares = peliculas
-    .filter(p => asignarGenero(p) === generoActual && p.titulo !== peli.titulo)
+    .filter(p => asignarGenero(p) === generoActual && normalizarTexto(p.titulo) !== normalizarTexto(peli.titulo))
     .slice(0, 6);
   
   let similaresHTML = '';
@@ -248,7 +251,7 @@ function mostrarDetallePelicula(peli) {
         <div class="movie-controls">
           <label>🎞️ Calidad</label> ${qualityOptions}
           <label>🌐 Idioma</label> ${langOptions}
-          <button id="reproducirBtn">▶ Reproducir</button>
+          <button id="applyBtn">▶ Aplicar cambios</button>
           <button id="downloadBtn">⬇️ Descargar</button>
         </div>
       </div>
@@ -258,14 +261,22 @@ function mostrarDetallePelicula(peli) {
         ${peli.director ? `<div class="director"><strong>Director:</strong> ${peli.director}</div>` : ''}
         ${peli.actores ? `<div class="actores"><strong>Actores:</strong> ${peli.actores}</div>` : ''}
       </div>
+      <div class="movie-detail-video">
+        <iframe id="detalleIframe" src="https://drive.google.com/file/d/${defaultId}/preview" 
+          frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
+          style="width:100%; aspect-ratio:16/9; border-radius:12px; background:#000;"></iframe>
+        <div id="videoErrorMsg" style="color:#ff6b6b; margin-top:8px; display:none;">⚠️ No se pudo cargar el video. Verifica que el archivo sea público.</div>
+      </div>
     </div>
     ${similaresHTML}
   `;
   container.innerHTML = html;
   
+  const iframe = document.getElementById('detalleIframe');
+  const errorMsg = document.getElementById('videoErrorMsg');
   const qualitySelect = document.getElementById('qualitySelect');
   const langSelect = document.getElementById('langSelect');
-  const reproducirBtn = document.getElementById('reproducirBtn');
+  const applyBtn = document.getElementById('applyBtn');
   const downloadBtn = document.getElementById('downloadBtn');
   
   function obtenerIdActual() {
@@ -276,21 +287,32 @@ function mostrarDetallePelicula(peli) {
     return selectedId;
   }
   
-  reproducirBtn.addEventListener('click', () => {
-    const selectedId = obtenerIdActual();
-    if (selectedId) {
-      marcarVisto(selectedId);
-      abrirReproductor(selectedId);
-    } else {
-      alert('No hay un ID de video válido');
+  function actualizarIframe() {
+    const newId = obtenerIdActual();
+    if (!newId) {
+      errorMsg.style.display = 'block';
+      errorMsg.innerText = '⚠️ No hay ID de video válido.';
+      return;
     }
+    iframe.src = `https://drive.google.com/file/d/${newId}/preview`;
+    marcarVisto(newId);
+    errorMsg.style.display = 'none';
+    // Opcional: manejar error de carga del iframe (no es fácil detectarlo, pero podemos poner un timeout)
+    iframe.onerror = () => {
+      errorMsg.style.display = 'block';
+      errorMsg.innerText = '⚠️ No se pudo cargar el video. Asegúrate de que el archivo esté compartido públicamente.';
+    };
+  }
+  
+  applyBtn.addEventListener('click', actualizarIframe);
+  downloadBtn.addEventListener('click', () => {
+    const newId = obtenerIdActual();
+    const nombre = `${peli.titulo.replace(/[^a-z0-9]/gi, '_')}.mp4`;
+    descargarVideo(newId, nombre);
   });
   
-  downloadBtn.addEventListener('click', () => {
-    const selectedId = obtenerIdActual();
-    const nombre = `${peli.titulo.replace(/[^a-z0-9]/gi, '_')}.mp4`;
-    descargarVideo(selectedId, nombre);
-  });
+  // Marcar como visto el video por defecto
+  marcarVisto(defaultId);
   
   // Renderizar similares
   const similaresGrid = document.getElementById('similaresGrid');
@@ -305,14 +327,13 @@ function mostrarDetallePelicula(peli) {
   }
 }
 
-/* ====== VISTA DETALLE PARA SERIES/NOVELAS ====== */
+/* ====== VISTA DETALLE PARA SERIES/NOVELAS (sin cambios) ====== */
 function verDetalle(titulo, lista) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const vista = document.getElementById('vista-detalles');
   vista.classList.remove('hidden');
   document.getElementById('detalle-titulo').innerText = titulo;
   
-  // Ocultar slider y barra de géneros
   const hero = document.getElementById('header-slider');
   hero.style.display = 'none';
   const generosBar = document.getElementById('generos-container');
@@ -326,11 +347,24 @@ function verDetalle(titulo, lista) {
   window.scrollTo(0, 0);
 }
 
+/* ====== REPRODUCTOR OVERLAY (solo para series/novelas) ====== */
+function abrirReproductor(id) {
+  const frame = document.getElementById('videoFrame');
+  frame.src = `https://drive.google.com/file/d/${id}/preview`;
+  document.getElementById('player').classList.remove('hidden');
+}
+
+function cerrarPlayer() {
+  document.getElementById('player').classList.add('hidden');
+  document.getElementById('videoFrame').src = "";
+}
+
 /* ====== CREAR TARJETA ====== */
 function crearCard(titulo, portada, accion, id = null, idiomas = null) {
   const div = document.createElement('div');
   div.className = 'card';
   if (id && vistos.includes(id)) div.classList.add('visto');
+  if (id) div.setAttribute('data-id', id);
 
   let badgeIdiomas = '';
   if (idiomas && idiomas.length > 1) {
