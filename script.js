@@ -9,12 +9,13 @@ function ocultarLoader() {
   if (loader) loader.style.display = 'none';
 }
 
-/* ====== ELIMINAR DUPLICADOS (por título) ====== */
+/* ====== ELIMINAR DUPLICADOS NORMALIZANDO TÍTULOS (minúsculas) ====== */
 function eliminarDuplicados(lista) {
   const vistosTitulos = new Set();
   return lista.filter(peli => {
-    if (vistosTitulos.has(peli.titulo)) return false;
-    vistosTitulos.add(peli.titulo);
+    const tituloNorm = peli.titulo.toLowerCase().trim();
+    if (vistosTitulos.has(tituloNorm)) return false;
+    vistosTitulos.add(tituloNorm);
     return true;
   });
 }
@@ -24,7 +25,6 @@ async function cargarCatalogo() {
   try {
     const res = await fetch(`catalogo.json?v=${Date.now()}`);
     const data = await res.json();
-    // Eliminar duplicados en películas
     peliculas = eliminarDuplicados(data.peliculas || []);
     series    = data.series   || {};
     novelas   = data.novelas  || {};
@@ -62,18 +62,22 @@ function mostrarSeccion(seccion) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const target = document.getElementById(`sec-${seccion}`);
   if (target) target.classList.remove('hidden');
+  
   const hero = document.getElementById('header-slider');
-  hero.style.display = seccion === 'peliculas' ? 'block' : 'none';
+  // Mostrar slider solo si estamos en películas
+  hero.style.display = (seccion === 'peliculas') ? 'block' : 'none';
+  
   document.getElementById('buscador').value = "";
   document.querySelectorAll('.card').forEach(c => c.style.display = "block");
   
   const generosBar = document.getElementById('generos-container');
   if (generosBar) {
-    generosBar.style.display = seccion === 'peliculas' ? 'flex' : 'none';
+    generosBar.style.display = (seccion === 'peliculas') ? 'flex' : 'none';
   }
 }
 
 function volver() {
+  // Ocultar carrusel si veníamos de detalle (se mostrará en mostrarSeccion si corresponde)
   mostrarSeccion(seccionActual);
 }
 
@@ -185,11 +189,20 @@ function descargarVideo(id, nombreArchivo = 'video.mp4') {
   document.body.removeChild(link);
 }
 
-/* ====== VISTA DETALLE CON REPRODUCTOR GRANDE Y MANEJO DE ERRORES ====== */
+/* ====== VISTA DETALLE DE PELÍCULA (con título grande y slider oculto) ====== */
 function mostrarDetallePelicula(peli) {
+  // Ocultar todas las secciones y también el slider
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const detailSection = document.getElementById('sec-movie-detail');
   detailSection.classList.remove('hidden');
+  
+  // Ocultar el carrusel mientras estamos en detalle
+  const hero = document.getElementById('header-slider');
+  hero.style.display = 'none';
+  
+  // Ocultar también la barra de géneros
+  const generosBar = document.getElementById('generos-container');
+  if (generosBar) generosBar.style.display = 'none';
 
   const container = document.getElementById('movie-detail-container');
   
@@ -230,15 +243,19 @@ function mostrarDetallePelicula(peli) {
           <button id="downloadBtn">⬇️ Descargar</button>
         </div>
       </div>
+      <div class="movie-detail-info">
+        <!-- TÍTULO GRANDE DESTACADO -->
+        <h1 style="font-size: 2.5rem; margin: 0 0 15px 0; color: var(--accent);">${peli.titulo}</h1>
+        <div class="sinopsis">${peli.sinopsis ? `📖 ${peli.sinopsis}` : ''}</div>
+        ${peli.director ? `<div class="director"><strong>Director:</strong> ${peli.director}</div>` : ''}
+        ${peli.actores ? `<div class="actores"><strong>Actores:</strong> ${peli.actores}</div>` : ''}
+      </div>
       <div class="movie-detail-video">
         <iframe id="detalleIframe" src="about:blank" frameborder="0" 
           allow="autoplay; fullscreen; picture-in-picture" 
           allowfullscreen 
           style="width:100%; aspect-ratio:16/9; border-radius:12px; background:#000;"></iframe>
         <div id="videoErrorMsg" style="color:#ff6b6b; margin-top:8px; display:none;">⚠️ No se pudo cargar el video. Verifica que el archivo sea público o intenta con otro idioma/calidad.</div>
-        <div class="sinopsis">${peli.sinopsis ? `📖 ${peli.sinopsis}` : ''}</div>
-        ${peli.director ? `<div><strong>Director:</strong> ${peli.director}</div>` : ''}
-        ${peli.actores ? `<div><strong>Actores:</strong> ${peli.actores}</div>` : ''}
       </div>
     </div>
     ${similaresHTML}
@@ -270,18 +287,13 @@ function mostrarDetallePelicula(peli) {
     const videoUrl = `https://drive.google.com/file/d/${selectedId}/preview`;
     iframe.src = videoUrl;
     marcarVisto(selectedId);
-    
-    // Ocultar mensaje de error previo y mostrar carga
     errorMsg.style.display = 'none';
-    // Opcional: detectar error de carga del iframe
     iframe.onerror = () => {
       errorMsg.style.display = 'block';
       errorMsg.innerText = '⚠️ No se pudo cargar el video. Asegúrate de que el archivo esté compartido públicamente.';
     };
-    // Timeout para considerar que si no carga en 5 segundos, mostrar error
     clearTimeout(window.videoTimeout);
     window.videoTimeout = setTimeout(() => {
-      // No podemos saber realmente si cargó, pero si el iframe sigue en about:blank, mostramos error
       if (iframe.src === 'about:blank' || iframe.src.includes('about:blank')) {
         errorMsg.style.display = 'block';
       }
@@ -295,7 +307,6 @@ function mostrarDetallePelicula(peli) {
     descargarVideo(selectedId, nombre);
   });
   
-  // Inicializar
   actualizarReproductor();
   
   // Renderizar similares
@@ -311,12 +322,19 @@ function mostrarDetallePelicula(peli) {
   }
 }
 
-/* ====== VISTA DETALLE PARA SERIES/NOVELAS ====== */
+/* ====== VISTA DETALLE PARA SERIES/NOVELAS (también oculta slider) ====== */
 function verDetalle(titulo, lista) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const vista = document.getElementById('vista-detalles');
   vista.classList.remove('hidden');
   document.getElementById('detalle-titulo').innerText = titulo;
+  
+  // Ocultar slider y barra de géneros
+  const hero = document.getElementById('header-slider');
+  hero.style.display = 'none';
+  const generosBar = document.getElementById('generos-container');
+  if (generosBar) generosBar.style.display = 'none';
+  
   const grid = document.getElementById('grid-detalles');
   grid.innerHTML = "";
   lista.forEach(item => {
