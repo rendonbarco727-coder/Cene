@@ -518,7 +518,7 @@
     /* ==========================================
        MOVIE DETAIL VIEW
        ========================================== */
-    .movie-detail-layout {
+    .movie-detail-container {
       background: var(--bg-panel);
       border: 1px solid var(--border-sub);
       border-radius: 8px;
@@ -526,82 +526,144 @@
       margin-top: 20px;
     }
 
-    .movie-detail-poster img {
+    /* Video responsivo - se reduce en móvil */
+    .movie-detail-video-wrapper {
       width: 100%;
-      border-radius: 6px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-      display: block;
-    }
-
-    .movie-detail-video {
-      width: 100%;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
       margin-bottom: 24px;
     }
 
-    .movie-detail-video iframe {
+    .movie-detail-video-wrapper iframe {
       width: 100%;
       aspect-ratio: 16 / 9;
-      border-radius: 6px;
-      background: #000;
+      display: block;
       border: none;
+    }
+
+    /* En móvil, el video se reduce manteniendo proporción */
+    @media (max-width: 768px) {
+      .movie-detail-video-wrapper iframe {
+        aspect-ratio: 16 / 9;
+      }
+    }
+
+    /* En tablets */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .movie-detail-video-wrapper iframe {
+        aspect-ratio: 16 / 9;
+      }
+    }
+
+    .movie-info-row {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .movie-poster {
+      width: 160px;
+      flex-shrink: 0;
+    }
+
+    .movie-poster img {
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
       display: block;
     }
 
-    .movie-info-adicional {
-      margin-top: 4px;
-      padding: 20px;
-      background: var(--glass);
-      border: 1px solid var(--border-sub);
-      border-radius: 6px;
+    .movie-info-text {
+      flex: 1;
+    }
+
+    .movie-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.08em;
+      border-left: 4px solid var(--accent);
+      padding-left: 14px;
+      margin-bottom: 16px;
     }
 
     .sinopsis {
       font-family: 'Crimson Pro', serif;
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-style: italic;
       color: var(--text-mid);
-      line-height: 1.7;
-      margin-bottom: 10px;
+      line-height: 1.6;
+      margin-bottom: 14px;
     }
 
     .director, .actores {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
       color: var(--text-dim);
-      margin: 4px 0;
+      margin: 6px 0;
       letter-spacing: 0.05em;
     }
 
-    .movie-detail-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.15rem;
-      letter-spacing: 0.08em;
+    /* BOTÓN DE REGRESO - SIEMPRE VISIBLE */
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text-mid);
+      border: 1px solid var(--border-sub);
+      padding: 8px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      transition: all 0.2s;
+    }
+
+    .btn-back:hover {
       color: var(--text);
-      font-weight: 400;
-      line-height: 1.25;
-      margin: 0 0 10px 0;
-      padding: 0 0 0 8px;
-      border-left: 2px solid var(--accent);
+      border-color: var(--accent);
+      background: rgba(200,16,46,0.06);
+    }
+
+    .btn-back svg {
+      width: 16px;
+      height: 16px;
     }
 
     /* SIMILARES */
+    .similares-section {
+      margin-top: 32px;
+    }
+
+    .similares-title {
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+
     .similares-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 12px;
-      margin-top: 16px;
+      gap: 14px;
     }
 
     .similares-card {
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 6px;
       overflow: hidden;
       background: var(--bg-card);
       transition: transform 0.2s, box-shadow 0.2s;
     }
 
     .similares-card:hover {
-      transform: translateY(-3px);
+      transform: translateY(-4px);
       box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     }
 
@@ -610,20 +672,20 @@
       aspect-ratio: 2/3;
       object-fit: cover;
       display: block;
-      filter: brightness(0.8);
+      filter: brightness(0.85);
       transition: filter 0.2s;
     }
     .similares-card:hover img { filter: brightness(1); }
 
     .similares-card p {
-      position: static;
       background: none;
-      padding: 6px 6px 8px;
+      position: static;
+      padding: 8px 6px;
       font-family: 'Crimson Pro', serif;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: var(--text-dim);
       text-align: center;
-      line-height: 1.2;
+      line-height: 1.3;
     }
 
     /* ==========================================
@@ -654,64 +716,6 @@
       border-radius: 8px;
       border: none;
       display: block;
-    }
-
-    /* ==========================================
-       BACK BUTTON
-       ========================================== */
-    .btn-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: transparent;
-      color: var(--text-mid);
-      border: 1px solid var(--border-sub);
-      padding: 8px 18px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 24px;
-      transition: color 0.2s, border-color 0.2s, background 0.2s;
-    }
-
-    .btn-back:hover {
-      color: var(--text);
-      border-color: var(--accent);
-      background: rgba(200,16,46,0.06);
-    }
-
-    /* ==========================================
-       FOOTER ACTIONS
-       ========================================== */
-    .footer-actions {
-      text-align: center;
-      padding: 60px 20px 40px;
-    }
-
-    .btn-borrar {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: transparent;
-      color: var(--text-dim);
-      border: 1px solid rgba(255,255,255,0.08);
-      padding: 10px 22px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      transition: all 0.25s;
-    }
-
-    .btn-borrar:hover {
-      color: var(--text);
-      border-color: var(--accent);
-      background: rgba(200,16,46,0.06);
     }
 
     /* ==========================================
@@ -773,12 +777,43 @@
     }
 
     /* ==========================================
+       FOOTER ACTIONS
+       ========================================== */
+    .footer-actions {
+      text-align: center;
+      padding: 50px 20px 30px;
+    }
+
+    .btn-borrar {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 22px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: all 0.25s;
+    }
+
+    .btn-borrar:hover {
+      color: var(--text);
+      border-color: var(--accent);
+      background: rgba(200,16,46,0.06);
+    }
+
+    /* ==========================================
        UTILITY
        ========================================== */
     .hidden { display: none !important; }
 
     /* ==========================================
-       RESPONSIVE
+       RESPONSIVE AJUSTES
        ========================================== */
     @media (max-width: 768px) {
       .nav-links   { display: none; }
@@ -793,22 +828,43 @@
       }
 
       .category-title { font-size: 1.7rem; }
+      
+      .movie-title { font-size: 1.5rem; }
+      
+      .movie-poster { width: 110px; }
+      
+      .movie-info-row { gap: 14px; }
+      
+      .movie-detail-container { padding: 16px; }
+      
+      .similares-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
     }
 
     @media (max-width: 480px) {
       .movie-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        gap: 12px;
       }
 
-      .container { padding: 24px 4% 50px; }
+      .container { padding: 20px 4% 40px; }
 
       .slider-wrapper img {
-        width: 90px;
-        height: 135px;
+        width: 85px;
+        height: 128px;
       }
-
-      .movie-info-adicional { padding: 14px; }
+      
+      .movie-poster { width: 90px; }
+      
+      .movie-title { font-size: 1.2rem; }
+      
+      .sinopsis { font-size: 0.85rem; }
+      
+      .similares-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     @keyframes cardIn {
@@ -900,14 +956,20 @@
   </section>
 
   <section id="vista-detalles" class="content-section hidden">
-    <button class="btn-back" onclick="volver()"><span>←</span> Regresar</button>
+    <button class="btn-back" onclick="volver()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Regresar
+    </button>
     <h2 id="detalle-titulo" class="category-title"></h2>
     <div id="grid-detalles" class="movie-grid"></div>
   </section>
 
   <section id="sec-movie-detail" class="content-section hidden">
-    <button class="btn-back" onclick="volver()"><span>←</span> Regresar</button>
-    <div id="movie-detail-container" class="movie-detail-layout"></div>
+    <button class="btn-back" onclick="volver()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Regresar
+    </button>
+    <div id="movie-detail-container" class="movie-detail-container"></div>
   </section>
 
   <div class="footer-actions">
@@ -998,8 +1060,12 @@ function borrarHistorial() {
 }
 
 let seccionActual = 'peliculas';
+let historialAnterior = null;
 
 function mostrarSeccion(seccion) {
+  if (seccionActual !== 'peliculas' && seccionActual !== 'series' && seccionActual !== 'novelas' && seccionActual !== 'tv') {
+    historialAnterior = seccionActual;
+  }
   seccionActual = seccion;
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const target = document.getElementById(`sec-${seccion}`);
@@ -1018,7 +1084,12 @@ function mostrarSeccion(seccion) {
 }
 
 function volver() {
-  mostrarSeccion(seccionActual);
+  if (historialAnterior && historialAnterior !== seccionActual) {
+    mostrarSeccion(historialAnterior);
+    historialAnterior = null;
+  } else {
+    mostrarSeccion('peliculas');
+  }
 }
 
 function asignarGenero(pelicula) {
@@ -1129,6 +1200,7 @@ function cerrarPlayer() {
 }
 
 function mostrarDetallePelicula(peli) {
+  historialAnterior = seccionActual;
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const detailSection = document.getElementById('sec-movie-detail');
   detailSection.classList.remove('hidden');
@@ -1151,41 +1223,34 @@ function mostrarDetallePelicula(peli) {
   let similaresHTML = '';
   if (similares.length) {
     similaresHTML = `
-      <div style="margin-top: 30px;">
-        <h4 style="font-family:'Bebas Neue',sans-serif; letter-spacing:0.08em; margin-bottom:12px; color:var(--accent);">
-          🎬 PELÍCULAS SIMILARES
-        </h4>
+      <div class="similares-section">
+        <h4 class="similares-title">🎬 PELÍCULAS SIMILARES</h4>
         <div class="similares-grid" id="similaresGrid"></div>
       </div>
     `;
   }
 
   const html = `
-    <div style="display:flex; flex-direction:column; gap:20px; width:100%;">
-      <div style="width:100%; background:#000; border-radius:8px; overflow:hidden;">
-        <iframe
-          src="https://drive.google.com/file/d/${defaultId}/preview"
-          style="width:100%; aspect-ratio:16/9; display:block; border:none;"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
-
-      <div style="display:flex; gap:20px; align-items:flex-start;">
-        <img src="${peli.portada}" alt="${peli.titulo}"
-          style="width:140px; flex-shrink:0; border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,0.6);">
-        <div>
-          <h3 style="font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.08em;
-            border-left:3px solid var(--accent); padding-left:10px; margin-bottom:10px;">
-            ${peli.titulo}
-          </h3>
-          <p class="sinopsis">${peli.sinopsis ? '📖 ' + peli.sinopsis : '🎬 Disfruta de esta película en Cinema STRANGER'}</p>
-          ${peli.director ? `<div class="director"><strong>DIRECTOR:</strong> ${peli.director}</div>` : ''}
-          ${peli.actores  ? `<div class="actores"><strong>REPARTO:</strong> ${peli.actores}</div>` : ''}
-        </div>
-      </div>
-      ${similaresHTML}
+    <div class="movie-detail-video-wrapper">
+      <iframe
+        src="https://drive.google.com/file/d/${defaultId}/preview"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen>
+      </iframe>
     </div>
+
+    <div class="movie-info-row">
+      <div class="movie-poster">
+        <img src="${peli.portada}" alt="${peli.titulo}">
+      </div>
+      <div class="movie-info-text">
+        <h3 class="movie-title">${peli.titulo}</h3>
+        <p class="sinopsis">${peli.sinopsis ? '📖 ' + peli.sinopsis : '🎬 Disfruta de esta película en Cinema STRANGER'}</p>
+        ${peli.director ? `<div class="director"><strong>DIRECTOR:</strong> ${peli.director}</div>` : ''}
+        ${peli.actores  ? `<div class="actores"><strong>REPARTO:</strong> ${peli.actores}</div>` : ''}
+      </div>
+    </div>
+    ${similaresHTML}
   `;
 
   container.innerHTML = html;
@@ -1206,6 +1271,7 @@ function mostrarDetallePelicula(peli) {
 }
 
 function verDetalle(titulo, lista) {
+  historialAnterior = seccionActual;
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   const vista = document.getElementById('vista-detalles');
   vista.classList.remove('hidden');
@@ -1232,7 +1298,7 @@ function crearCard(titulo, portada, accion, id = null, idiomas = null) {
 
   let badgeIdiomas = '';
   if (idiomas && idiomas.length > 1) {
-    badgeIdiomas = `<span style="position:absolute; bottom:5px; left:5px; background:#e50914; padding:2px 6px; border-radius:12px; font-size:10px; z-index:10;">🎧 ${idiomas.length}</span>`;
+    badgeIdiomas = `<span class="badge-idiomas">🎧 ${idiomas.length}</span>`;
   }
 
   div.innerHTML = `
