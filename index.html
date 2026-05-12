@@ -537,14 +537,20 @@
       display: block;
     }
 
-    .movie-detail-video iframe {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border-radius: 6px;
-      background: #000;
-      border: none;
-      display: block;
-    }
+  .movie-detail-video {
+  min-height: 200px;
+  width: 100%;
+}
+
+.movie-detail-video iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 200px;  /* ← esto es lo crítico */
+  border-radius: 6px;
+  background: #000;
+  border: none;
+  display: block;
+}
 
     .movie-info-adicional {
       grid-column: 1 / -1;
