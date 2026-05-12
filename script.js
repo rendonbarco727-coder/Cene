@@ -183,17 +183,6 @@ function filtrarPeliculasPorGenero(genero) {
   });
 }
 
-/* ====== FUNCIÓN DE DESCARGA ====== */
-function descargarVideo(id, nombreArchivo = 'video.mp4') {
-  const url = `https://drive.google.com/uc?export=download&id=${id}`;
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = nombreArchivo;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
 /* ====== REPRODUCTOR OVERLAY (para series/novelas) ====== */
 function abrirReproductor(id) {
   const frame = document.getElementById('videoFrame');
@@ -206,7 +195,7 @@ function cerrarPlayer() {
   document.getElementById('videoFrame').src = "";
 }
 
-/* ====== VISTA DETALLE DE PELÍCULA (con iframe a la derecha) ====== */
+/* ====== VISTA DETALLE DE PELÍCULA (SIN DESCARGA) ====== */
 function mostrarDetallePelicula(peli) {
   // Ocultar todas las secciones
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
@@ -220,22 +209,6 @@ function mostrarDetallePelicula(peli) {
   if (generosBar) generosBar.style.display = 'none';
 
   const container = document.getElementById('movie-detail-container');
-  
-  // Opciones de calidad (si existen)
-  let qualityOptions = '';
-  if (peli.calidades && peli.calidades.length) {
-    qualityOptions = `<select id="qualitySelect">${peli.calidades.map(q => `<option value="${q.id}">${q.label}</option>`).join('')}</select>`;
-  } else {
-    qualityOptions = `<select id="qualitySelect"><option value="${peli.id}">Original</option></select>`;
-  }
-  
-  // Opciones de idioma (si existen)
-  let langOptions = '';
-  if (peli.idiomas && peli.idiomas.length) {
-    langOptions = `<select id="langSelect">${peli.idiomas.map(l => `<option value="${l.id}">${l.lang}</option>`).join('')}</select>`;
-  } else {
-    langOptions = `<select id="langSelect" style="display:none;"></select>`;
-  }
   
   // ID por defecto (el primer idioma si existe, sino el ID original)
   let defaultId = peli.id;
@@ -252,41 +225,32 @@ function mostrarDetallePelicula(peli) {
     similaresHTML = `<h4 style="margin-top: 30px;">🎬 Películas similares</h4><div class="similares-grid" id="similaresGrid"></div>`;
   }
   
-// Construir HTML: portada (izquierda) + video (derecha), título encima de portada
-const html = `
-  <div class="movie-detail-layout">
-    <div class="movie-detail-poster">
-      <p class="movie-detail-title">${peli.titulo}</p>
-      <img src="${peli.portada}" alt="${peli.titulo}">
-      <div class="movie-controls">
-        <button id="downloadBtn">⬇️ Descargar</button>
+  // Construir HTML (SIN BOTÓN DE DESCARGA)
+  const html = `
+    <div class="movie-detail-layout">
+      <div class="movie-detail-poster">
+        <p class="movie-detail-title">${peli.titulo}</p>
+        <img src="${peli.portada}" alt="${peli.titulo}">
+      </div>
+      <div class="movie-detail-video">
+        <iframe id="detalleIframe"
+          src="https://drive.google.com/uc?export=embed&id=${defaultId}"
+          frameborder="0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen>
+        </iframe>
       </div>
     </div>
-    <div class="movie-detail-video">
-      <iframe id="detalleIframe"
-        src="https://drive.google.com/uc?export=embed&id=${defaultId}"
-        frameborder="0"
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowfullscreen>
-      </iframe>
+    <div class="movie-info-adicional">
+      <div class="sinopsis">${peli.sinopsis ? `📖 ${peli.sinopsis}` : ''}</div>
+      ${peli.director ? `<div class="director"><strong>Director:</strong> ${peli.director}</div>` : ''}
+      ${peli.actores ? `<div class="actores"><strong>Actores:</strong> ${peli.actores}</div>` : ''}
     </div>
-  </div>
-  <div class="movie-info-adicional">
-    <div class="sinopsis">${peli.sinopsis ? `📖 ${peli.sinopsis}` : ''}</div>
-    ${peli.director ? `<div class="director"><strong>Director:</strong> ${peli.director}</div>` : ''}
-    ${peli.actores ? `<div class="actores"><strong>Actores:</strong> ${peli.actores}</div>` : ''}
-  </div>
-  ${similaresHTML}
-`;
+    ${similaresHTML}
+  `;
   container.innerHTML = html;
-
-  const downloadBtn = document.getElementById('downloadBtn');
-  downloadBtn.addEventListener('click', () => {
-    const nombre = `${peli.titulo.replace(/[^a-z0-9]/gi, '_')}.mp4`;
-    descargarVideo(defaultId, nombre);
-  });
   
-  // Marcar como visto el video por defecto
+  // Marcar como visto
   marcarVisto(defaultId);
   
   // Renderizar similares
