@@ -6,81 +6,117 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <!-- SPINNER DE CARGA -->
 <div id="loader" class="loader-overlay">
-  <div class="spinner"></div>
+  <div class="loader-inner">
+    <div class="film-reel">
+      <div class="reel-hole"></div>
+      <div class="reel-hole"></div>
+      <div class="reel-hole"></div>
+    </div>
+    <div class="loader-text">CARGANDO</div>
+  </div>
 </div>
+
+<!-- GRAIN OVERLAY -->
+<div class="grain-overlay"></div>
 
 <nav class="navbar">
   <div class="nav-content">
-    <div class="logo" onclick="mostrarSeccion('peliculas')">CINEMA<span>STRANGER</span></div>
+    <div class="logo" onclick="mostrarSeccion('peliculas')">
+      <span class="logo-cinema">CINEMA</span>
+      <span class="logo-strange">STRANGER</span>
+    </div>
     <div class="nav-links">
-      <button onclick="mostrarSeccion('peliculas')">Películas</button>
-      <button onclick="mostrarSeccion('series')">Series</button>
-      <button onclick="mostrarSeccion('novelas')">Novelas</button>
-      <button onclick="mostrarSeccion('tv')">TV en Vivo</button>
+      <button onclick="mostrarSeccion('peliculas')" data-section="peliculas" class="nav-btn active">Películas</button>
+      <button onclick="mostrarSeccion('series')" data-section="series" class="nav-btn">Series</button>
+      <button onclick="mostrarSeccion('novelas')" data-section="novelas" class="nav-btn">Novelas</button>
+      <button onclick="mostrarSeccion('tv')" data-section="tv" class="nav-btn">TV en Vivo</button>
     </div>
     <div class="search-bar">
-      <input type="text" id="buscador" placeholder="Buscar..." onkeyup="filtrarContenido()">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="buscador" placeholder="Buscar título..." onkeyup="filtrarContenido()">
+    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <!-- Mobile menu -->
+  <div class="mobile-menu hidden" id="mobile-menu">
+    <button onclick="mostrarSeccion('peliculas'); toggleMenu()" class="mobile-nav-btn">Películas</button>
+    <button onclick="mostrarSeccion('series'); toggleMenu()" class="mobile-nav-btn">Series</button>
+    <button onclick="mostrarSeccion('novelas'); toggleMenu()" class="mobile-nav-btn">Novelas</button>
+    <button onclick="mostrarSeccion('tv'); toggleMenu()" class="mobile-nav-btn">TV en Vivo</button>
+    <div class="mobile-search">
+      <input type="text" id="buscador-mobile" placeholder="Buscar..." oninput="document.getElementById('buscador').value=this.value; filtrarContenido()">
     </div>
   </div>
 </nav>
 
 <header id="header-slider" class="hero-slider">
+  <div class="slider-fade-left"></div>
   <div id="slider" class="slider-wrapper"></div>
+  <div class="slider-fade-right"></div>
 </header>
 
 <main class="container">
   <!-- Sección Películas -->
   <section id="sec-peliculas" class="content-section">
-    <h2 class="category-title">Películas</h2>
+    <h2 class="category-title"><span class="title-number">01</span>Películas</h2>
     <div id="grid-peliculas" class="movie-grid"></div>
   </section>
 
   <!-- Sección Series -->
   <section id="sec-series" class="content-section hidden">
-    <h2 class="category-title">Series</h2>
+    <h2 class="category-title"><span class="title-number">02</span>Series</h2>
     <div id="grid-series" class="movie-grid"></div>
   </section>
 
   <!-- Sección Novelas -->
   <section id="sec-novelas" class="content-section hidden">
-    <h2 class="category-title">Novelas</h2>
+    <h2 class="category-title"><span class="title-number">03</span>Novelas</h2>
     <div id="grid-novelas" class="movie-grid"></div>
   </section>
 
   <!-- Sección TV en Vivo -->
   <section id="sec-tv" class="content-section hidden">
-    <h2 class="category-title">📺 TV en Vivo</h2>
+    <h2 class="category-title"><span class="title-number">04</span>TV en Vivo</h2>
     <div class="tv-player">
+      <div class="tv-live-badge">● EN VIVO</div>
       <iframe src="https://www.youtube.com/embed/t8HuqJeu6LE" title="TV en Vivo" frameborder="0" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen="true"></iframe>
     </div>
   </section>
 
-  <!-- Vista de detalles para episodios (series/novelas) -->
+  <!-- Vista de detalles para episodios -->
   <section id="vista-detalles" class="content-section hidden">
-    <button class="btn-back" onclick="volver()">← Regresar</button>
+    <button class="btn-back" onclick="volver()"><span>←</span> Regresar</button>
     <h2 id="detalle-titulo" class="category-title"></h2>
     <div id="grid-detalles" class="movie-grid"></div>
   </section>
 
-  <!-- NUEVA VISTA: Detalle de película (con información y botones de reproducción) -->
+  <!-- Vista: Detalle de película -->
   <section id="sec-movie-detail" class="content-section hidden">
-    <button class="btn-back" onclick="volver()">← Regresar</button>
+    <button class="btn-back" onclick="volver()"><span>←</span> Regresar</button>
     <div id="movie-detail-container" class="movie-detail-layout"></div>
   </section>
 
   <div class="footer-actions">
-    <button class="btn-borrar" onclick="borrarHistorial()">🗑️ Limpiar videos vistos</button>
+    <button class="btn-borrar" onclick="borrarHistorial()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      Limpiar videos vistos
+    </button>
   </div>
 </main>
 
-<!-- REPRODUCTOR FLOTANTE (overlay) -->
+<!-- REPRODUCTOR FLOTANTE -->
 <div id="player" class="video-overlay hidden">
+  <div class="video-backdrop" onclick="cerrarPlayer()"></div>
   <div class="video-container">
     <button class="btn-close" onclick="cerrarPlayer()">✕</button>
     <iframe id="videoFrame" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="true"></iframe>
@@ -88,5 +124,18 @@
 </div>
 
 <script src="script.js"></script>
+<script>
+function toggleMenu() {
+  const m = document.getElementById('mobile-menu');
+  m.classList.toggle('hidden');
+}
+// Highlight active nav button
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+</script>
 </body>
 </html>
