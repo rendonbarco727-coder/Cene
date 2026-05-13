@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Cinema STRANGER</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <style>
     :root {
@@ -316,7 +316,7 @@
     .card.visto .badge-visto { opacity: 1; }
     .card.visto img { filter: brightness(0.35); }
 
-    /* BOTÓN REGRESAR */
+    /* BOTÓN REGRESAR (MEJORADO PARA WEBVIEW) */
     .btn-back {
       display: inline-flex;
       align-items: center;
@@ -330,18 +330,20 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
       font-weight: bold;
-      margin-top: calc(64px + 16px);
+      margin-top: 20px;   /* Valor base, se ajusta según navegador */
       margin-bottom: 20px;
       transition: all 0.2s;
+      z-index: 2100;      /* Por encima del navbar */
     }
     .btn-back:hover {
       background: var(--accent);
       color: white;
     }
 
-    @media (max-width: 768px) {
+    /* AJUSTE PARA ESCRITORIO / MÓVIL NORMAL (NAVBAR FIJO) */
+    @media (min-width: 769px) {
       .btn-back {
-        margin-top: calc(64px + 10px);
+        margin-top: calc(64px + 16px);
       }
     }
 
@@ -358,6 +360,7 @@
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 20px;
+      touch-action: manipulation; /* Mejora táctil en WebView */
     }
     .video-wrapper iframe {
       width: 100%;
@@ -366,6 +369,7 @@
       aspect-ratio: 16 / 9;
       display: block;
       border: none;
+      pointer-events: auto;   /* Asegura eventos táctiles */
     }
 
     @media (max-width: 768px) {
@@ -526,6 +530,31 @@
       color: white;
     }
 
+    /* ===== AJUSTES ESPECÍFICOS PARA WEBVIEW (ANDROID) ===== */
+    /* Detectamos WebView y corregimos márgenes, posición del navbar */
+    @media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) {
+      /* En WebView, el navbar fixed puede tapar contenido, lo cambiamos a relative */
+      .navbar {
+        position: relative;
+        margin-bottom: 0;
+      }
+      .hero-slider, .generos-bar {
+        margin-top: 0;
+      }
+      /* Botón regresar con margen reducido */
+      .btn-back {
+        margin-top: 10px !important;
+      }
+      /* Aseguramos que el iframe tenga altura suficiente y respuesta táctil */
+      .video-wrapper iframe {
+        min-height: 240px !important;
+      }
+      /* Contenedor principal con menos padding superior */
+      .container {
+        padding-top: 10px;
+      }
+    }
+
     /* MEDIA QUERIES ORIGINALES */
     @media (max-width: 768px) {
       .nav-links, .search-bar { display: none; }
@@ -536,7 +565,6 @@
       .poster-col { width: 100px; }
       .similares-grid { grid-template-columns: repeat(3, 1fr); }
       .genero-btn { padding: 4px 12px; font-size: 0.65rem; }
-      /* Ocultar botón escritorio en móvil por defecto, pero se puede usar igual */
       .btn-desktop { display: inline-block; }
     }
 
@@ -570,7 +598,6 @@
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="buscador" placeholder="Buscar..." onkeyup="filtrarContenido()">
     </div>
-    <!-- BOTÓN MODO ESCRITORIO -->
     <button id="btnDesktopMode" class="btn-desktop" onclick="toggleDesktopMode()">💻 Escritorio</button>
     <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
   </div>
@@ -639,7 +666,6 @@ function toggleMenu() {
   document.getElementById('mobile-menu').classList.toggle('hidden');
 }
 
-// Función para alternar modo escritorio
 function toggleDesktopMode() {
   const body = document.body;
   const btn = document.getElementById('btnDesktopMode');
@@ -655,7 +681,6 @@ function toggleDesktopMode() {
   }
 }
 
-// Cargar preferencia al iniciar
 function loadDesktopPreference() {
   const saved = localStorage.getItem('desktopMode');
   if (saved === 'true') {
@@ -805,7 +830,8 @@ function filtrarPorGenero(genero) {
 }
 
 function abrirReproductor(id) {
-  document.getElementById('videoFrame').src = `https://drive.google.com/file/d/${id}/preview`;
+  const frame = document.getElementById('videoFrame');
+  frame.src = `https://drive.google.com/file/d/${id}/preview`;
   document.getElementById('player').classList.remove('hidden');
 }
 
@@ -952,7 +978,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await cargarCatalogo();
   initSlider();
   cargarTodo();
-  loadDesktopPreference();  // Cargar preferencia de modo escritorio
+  loadDesktopPreference();
 });
 </script>
 </body>
