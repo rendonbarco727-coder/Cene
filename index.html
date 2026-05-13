@@ -545,6 +545,22 @@
       .similares-grid { grid-template-columns: repeat(2, 1fr); }
       .movie-title { font-size: 1.1rem; }
     }
+    /* Detecta Android WebView (por user-agent) */
+@media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) {
+    /* Ajusta márgenes para que el contenido no quede tan abajo */
+    .btn-back {
+        margin-top: 16px;   /* reduce el margen */
+    }
+    .container {
+        padding-top: 10px;
+    }
+}
+
+/* Fuerza que el iframe tenga altura suficiente y reciba eventos táctiles */
+.video-wrapper iframe {
+    min-height: 300px !important;
+    height: auto !important;
+}
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 </head>
