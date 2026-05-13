@@ -32,7 +32,6 @@
       overflow-x: hidden;
     }
 
-    /* NAVBAR */
     .navbar {
       position: fixed;
       top: 0;
@@ -96,7 +95,6 @@
       background: rgba(200,16,46,0.08);
     }
 
-    /* SEARCH */
     .search-bar {
       position: relative;
     }
@@ -310,7 +308,6 @@
     .card.visto .badge-visto { opacity: 1; }
     .card.visto img { filter: brightness(0.35); }
 
-    /* Botón regresar – estilos base */
     .btn-back {
       display: inline-flex;
       align-items: center;
@@ -334,7 +331,6 @@
       color: white;
     }
 
-    /* Por defecto en escritorio/móvil con navbar fijo */
     @media (min-width: 769px) {
       .btn-back {
         margin-top: calc(64px + 16px);
@@ -353,26 +349,12 @@
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 20px;
-      touch-action: manipulation;
     }
-    .video-wrapper iframe, .video-wrapper video {
+    .video-wrapper iframe {
       width: 100%;
-      height: auto;
-      min-height: 250px;
       aspect-ratio: 16 / 9;
       display: block;
       border: none;
-      background: black;
-    }
-    .video-wrapper video {
-      background: black;
-      outline: none;
-    }
-
-    @media (max-width: 768px) {
-      .video-wrapper iframe, .video-wrapper video {
-        min-height: 200px;
-      }
     }
 
     .info-row {
@@ -446,45 +428,6 @@
       border-radius: 8px;
     }
 
-    .video-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 3000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .video-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.95);
-      cursor: pointer;
-    }
-    .video-container {
-      position: relative;
-      width: 90%;
-      max-width: 1000px;
-      aspect-ratio: 16/9;
-    }
-    .video-container iframe {
-      width: 100%;
-      height: 100%;
-      border-radius: 8px;
-    }
-    .btn-close {
-      position: absolute;
-      top: -40px;
-      right: 0;
-      background: rgba(200,16,46,0.8);
-      border: none;
-      color: white;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 18px;
-    }
-
     .footer-actions {
       text-align: center;
       padding: 40px 20px 20px;
@@ -500,7 +443,6 @@
 
     .hidden { display: none !important; }
 
-    /* MODO ESCRITORIO */
     body.desktop-mode {
       min-width: 1024px;
       overflow-x: auto;
@@ -520,7 +462,7 @@
       padding: 8px 18px;
     }
 
-    /* ESTILOS ESPECÍFICOS PARA WEBVIEW (DETECTADOS POR JS) */
+    /* WebView specific */
     body.in-webview .navbar {
       position: relative;
     }
@@ -533,10 +475,6 @@
     }
     body.in-webview .container {
       padding-top: 10px;
-    }
-    body.in-webview .video-wrapper iframe,
-    body.in-webview .video-wrapper video {
-      min-height: 240px !important;
     }
 
     @media (max-width: 768px) {
@@ -645,24 +583,17 @@
 </div>
 
 <script>
-// --- Detección de WebView (Android) ---
+// --- Detección WebView ---
 function isWebView() {
   const ua = navigator.userAgent;
-  return /Android.*(; wv\)|WebView)/i.test(ua) || 
-         /wv\)/i.test(ua) || 
-         (ua.includes('Android') && !ua.includes('Chrome'));
+  return /Android.*(; wv\)|WebView)/i.test(ua) || /wv\)/i.test(ua) || (ua.includes('Android') && !ua.includes('Chrome'));
 }
+if (isWebView()) document.body.classList.add('in-webview');
 
-// Aplicar clase al body si es WebView
-if (isWebView()) {
-  document.body.classList.add('in-webview');
-}
-
-// --- Funciones de UI ---
+// --- UI ---
 function toggleMenu() {
   document.getElementById('mobile-menu').classList.toggle('hidden');
 }
-
 function toggleDesktopMode() {
   const body = document.body;
   const btn = document.getElementById('btnDesktopMode');
@@ -677,7 +608,6 @@ function toggleDesktopMode() {
     localStorage.setItem('desktopMode', 'false');
   }
 }
-
 function loadDesktopPreference() {
   const saved = localStorage.getItem('desktopMode');
   if (saved === 'true') {
@@ -690,7 +620,7 @@ function loadDesktopPreference() {
   }
 }
 
-// --- Datos y lógica principal ---
+// --- Datos principales ---
 let peliculas = [], series = {}, novelas = {};
 let vistos = JSON.parse(localStorage.getItem('vistos_strange')) || [];
 let seccionActual = 'peliculas';
@@ -698,11 +628,9 @@ let seccionActual = 'peliculas';
 function ocultarLoader() {
   document.getElementById('loader').style.display = 'none';
 }
-
 function normalizarTexto(t) {
   return t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
-
 function eliminarDuplicados(lista) {
   const set = new Set();
   return lista.filter(p => {
@@ -712,7 +640,6 @@ function eliminarDuplicados(lista) {
     return true;
   });
 }
-
 async function cargarCatalogo() {
   try {
     const res = await fetch(`catalogo.json?v=${Date.now()}`);
@@ -724,19 +651,17 @@ async function cargarCatalogo() {
     console.log(`Cargadas ${peliculas.length} películas`);
   } catch(e) {
     console.error('Error cargando catálogo:', e);
-    document.body.innerHTML += '<div style="background:#c8102e; color:white; padding:20px; text-align:center; margin-top:70px;">⚠️ Error al cargar el catálogo. Asegúrate de que el archivo <strong>catalogo.json</strong> existe y es válido.</div>';
+    document.body.innerHTML += '<div style="background:#c8102e; color:white; padding:20px; text-align:center; margin-top:70px;">⚠️ Error al cargar el catálogo. Asegúrate de que el archivo <strong>catalogo.json</strong> existe.</div>';
   } finally {
     ocultarLoader();
   }
 }
-
 function marcarVisto(id) {
   if (!id || vistos.includes(id)) return;
   vistos.push(id);
   localStorage.setItem('vistos_strange', JSON.stringify(vistos));
   document.querySelectorAll(`.card[data-id="${id}"]`).forEach(c => c.classList.add('visto'));
 }
-
 function borrarHistorial() {
   if(confirm("¿Borrar historial de vistos?")) {
     vistos = [];
@@ -744,13 +669,11 @@ function borrarHistorial() {
     document.querySelectorAll('.card').forEach(c => c.classList.remove('visto'));
   }
 }
-
 function mostrarSeccion(seccion) {
   seccionActual = seccion;
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   document.getElementById(`sec-${seccion}`).classList.remove('hidden');
   document.getElementById('header-slider').style.display = seccion === 'peliculas' ? 'block' : 'none';
-  
   let genBar = document.getElementById('generos-container');
   if(seccion === 'peliculas') {
     if(!genBar) renderizarGeneros();
@@ -758,15 +681,14 @@ function mostrarSeccion(seccion) {
   } else if(genBar) {
     genBar.style.display = 'none';
   }
-  
   document.getElementById('buscador').value = "";
   document.querySelectorAll('.card').forEach(c => c.style.display = 'block');
 }
-
 function volver() {
   mostrarSeccion('peliculas');
 }
 
+// --- Géneros ---
 function asignarGenero(p) {
   const t = normalizarTexto(p.titulo);
   if(t.includes('telefono') || t.includes('abismo') || t.includes('conjuro') || t.includes('chucky') || 
@@ -780,7 +702,6 @@ function asignarGenero(p) {
      t.includes('robot salvaje')) return 'Animación';
   return 'Otros';
 }
-
 function obtenerGeneros() {
   const gen = {};
   peliculas.forEach(p => {
@@ -790,7 +711,6 @@ function obtenerGeneros() {
   });
   return gen;
 }
-
 function renderizarGeneros() {
   let cont = document.getElementById('generos-container');
   if(cont) cont.remove();
@@ -798,10 +718,8 @@ function renderizarGeneros() {
   cont.id = 'generos-container';
   cont.className = 'generos-bar';
   document.querySelector('.hero-slider').after(cont);
-  
   const mapa = obtenerGeneros();
   const lista = ['todos', ...Object.keys(mapa).sort()];
-  
   lista.forEach(g => {
     const btn = document.createElement('button');
     btn.className = 'genero-btn' + (g === 'todos' ? ' active' : '');
@@ -816,7 +734,6 @@ function renderizarGeneros() {
   });
   window.generosMap = mapa;
 }
-
 function filtrarPorGenero(genero) {
   const grid = document.getElementById('grid-peliculas');
   grid.innerHTML = '';
@@ -827,60 +744,59 @@ function filtrarPorGenero(genero) {
   });
 }
 
-function abrirReproductor(id) {
-  const frame = document.getElementById('videoFrame');
-  frame.src = `https://drive.google.com/file/d/${id}/preview`;
-  document.getElementById('player').classList.remove('hidden');
-}
-
-function cerrarPlayer() {
-  document.getElementById('player').classList.add('hidden');
-  document.getElementById('videoFrame').src = "";
-}
-
-// --- NUEVA FUNCIÓN: genera el reproductor adecuado según el tipo de archivo ---
+// --- Reproductor con iframe + botón externo (según tu petición) ---
 function generarReproductorVideo(id, titulo) {
-  // Intentar determinar la extensión desde el ID no es posible. 
-  // Lo haremos asumiendo que el archivo puede ser MKV o MP4.
-  // Por defecto usamos el iframe de Drive. Si falla (o si el usuario lo pide) podríamos cambiar.
-  // Para simplificar, aquí siempre usaremos iframe de Drive, pero añadimos un botón de "Abrir con reproductor alternativo"
-  // que intenta cargar el archivo con un elemento <video> nativo (soporta MP4 y algunos MKV dependiendo del codec).
   const driveUrl = `https://drive.google.com/file/d/${id}/preview`;
-  const directDownloadUrl = `https://drive.google.com/uc?export=download&id=${id}`;
-  
-  // Construimos un contenedor con iframe y un botón para cambiar a reproductor nativo
   return `
     <div class="video-wrapper" id="video-wrapper-${id}">
       <iframe src="${driveUrl}" allow="autoplay; fullscreen" allowfullscreen></iframe>
     </div>
-    <div style="text-align: center; margin-top: 8px;">
-      <button class="btn-switch-player" data-id="${id}" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; cursor: pointer;">🎬 Cambiar a reproductor nativo</button>
+    <div style="text-align: center; margin-top: 10px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+      <!-- Botón para cambiar a reproductor nativo (opcional) -->
+      <button class="btn-switch-player" data-id="${id}" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; cursor: pointer;">🎬 Reproductor Nativo</button>
+      <!-- NUEVO: Botón para la App (Reproductor Externo) -->
+      <button onclick="playExternal('${id}')" style="background: var(--accent); border: none; color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(200,16,46,0.3);">🚀 Abrir en Reproductor Externo (VLC/MX)</button>
     </div>
     <div id="native-player-${id}" style="display:none; margin-top: 10px;"></div>
   `;
 }
 
-// Función para cambiar a reproductor nativo (intenta cargar el video directamente)
+// Función que se comunica con la App (AndroidBridge)
+function playExternal(id) {
+  // Enlace de descarga directa (compatible con reproductores externos)
+  const directUrl = `https://drive.google.com/uc?export=download&id=${id}`;
+  // Si estamos dentro de la App y existe el puente, usamos la App
+  if (window.AndroidBridge && window.AndroidBridge.playVideo) {
+    window.AndroidBridge.playVideo(directUrl);
+  } else {
+    // Si no (por ejemplo, en navegador normal), abrimos el enlace en una nueva pestaña
+    window.open(directUrl, '_blank');
+  }
+}
+
+// Función para cambiar a reproductor nativo (si el usuario lo prefiere)
 function switchToNativePlayer(id) {
   const wrapper = document.getElementById(`video-wrapper-${id}`);
   const nativeContainer = document.getElementById(`native-player-${id}`);
   if (!wrapper || !nativeContainer) return;
-  
   const directUrl = `https://drive.google.com/uc?export=download&id=${id}`;
   nativeContainer.innerHTML = `
-    <video controls autoplay style="width:100%; aspect-ratio:16/9; background:black; border-radius:8px;">
-      <source src="${directUrl}" type="video/mp4">
-      <source src="${directUrl}" type="video/mkv">
-      Tu navegador no soporta reproducción de video.
-    </video>
-    <p style="font-size:0.7rem; margin-top:5px;">Si el video no se reproduce, es posible que el formato MKV no sea compatible. Prueba descargar el archivo.</p>
-    <a href="${directUrl}" download style="color:var(--accent); font-size:0.7rem;">⬇️ Descargar video</a>
+    <div class="video-native">
+      <video controls autoplay playsinline style="width:100%; aspect-ratio:16/9; background:black; border-radius:8px;">
+        <source src="${directUrl}" type="video/mp4">
+        <source src="${directUrl}" type="video/mkv">
+        Tu navegador no puede reproducir este video directamente.
+      </video>
+    </div>
+    <div style="text-align:center; margin-top:5px;">
+      <a href="${directUrl}" download style="color:var(--accent); font-size:0.7rem;">⬇️ Descargar video</a>
+    </div>
   `;
   wrapper.style.display = 'none';
   nativeContainer.style.display = 'block';
 }
 
-// Modificamos mostrarDetallePelicula para usar el nuevo generador
+// --- Vista detalle de película ---
 function mostrarDetallePelicula(peli) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   document.getElementById('sec-movie-detail').classList.remove('hidden');
@@ -892,7 +808,6 @@ function mostrarDetallePelicula(peli) {
   if(peli.idiomas && peli.idiomas.length) defaultId = peli.idiomas[0].id;
 
   const similares = peliculas.filter(p => asignarGenero(p) === asignarGenero(peli) && p.titulo !== peli.titulo).slice(0, 6);
-  
   let similaresHtml = '';
   if(similares.length) {
     similaresHtml = `
@@ -904,11 +819,8 @@ function mostrarDetallePelicula(peli) {
   }
 
   const container = document.getElementById('movie-detail-container');
-  // Usamos la nueva función para generar el reproductor con botón de cambio
-  const reproductorHtml = generarReproductorVideo(defaultId, peli.titulo);
-  
   container.innerHTML = `
-    ${reproductorHtml}
+    ${generarReproductorVideo(defaultId, peli.titulo)}
     <div class="info-row">
       <div class="poster-col">
         <img src="${peli.portada}" onerror="this.src='https://placehold.co/150x225?text=No+Image'">
@@ -925,12 +837,12 @@ function mostrarDetallePelicula(peli) {
 
   marcarVisto(defaultId);
 
-  // Agregar evento al botón de cambio de reproductor
+  // Asignar evento al botón "Reproductor Nativo"
   const switchBtn = container.querySelector('.btn-switch-player');
   if (switchBtn) {
     switchBtn.addEventListener('click', (e) => {
-      const id = e.currentTarget.getAttribute('data-id');
-      switchToNativePlayer(id);
+      const vid = e.currentTarget.getAttribute('data-id');
+      switchToNativePlayer(vid);
     });
   }
 
@@ -947,6 +859,16 @@ function mostrarDetallePelicula(peli) {
   window.scrollTo(0, 0);
 }
 
+// --- Series y novelas (reproductor flotante con iframe) ---
+function abrirReproductor(id) {
+  const frame = document.getElementById('videoFrame');
+  frame.src = `https://drive.google.com/file/d/${id}/preview`;
+  document.getElementById('player').classList.remove('hidden');
+}
+function cerrarPlayer() {
+  document.getElementById('player').classList.add('hidden');
+  document.getElementById('videoFrame').src = "";
+}
 function verDetalle(titulo, lista) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   document.getElementById('vista-detalles').classList.remove('hidden');
@@ -954,7 +876,6 @@ function verDetalle(titulo, lista) {
   document.getElementById('header-slider').style.display = 'none';
   let genBar = document.getElementById('generos-container');
   if(genBar) genBar.style.display = 'none';
-  
   const grid = document.getElementById('grid-detalles');
   grid.innerHTML = "";
   lista.forEach(item => {
@@ -963,6 +884,7 @@ function verDetalle(titulo, lista) {
   window.scrollTo(0, 0);
 }
 
+// --- Tarjeta común ---
 function crearCard(titulo, portada, accion, id) {
   const div = document.createElement('div');
   div.className = 'card';
@@ -980,7 +902,6 @@ function crearCard(titulo, portada, accion, id) {
 function cargarTodo() {
   renderizarGeneros();
   filtrarPorGenero('todos');
-  
   const gs = document.getElementById('grid-series');
   if(gs) {
     gs.innerHTML = '';
@@ -988,7 +909,6 @@ function cargarTodo() {
       gs.appendChild(crearCard(s, series[s][0]?.portada || '', () => verDetalle(s, series[s])));
     });
   }
-  
   const gn = document.getElementById('grid-novelas');
   if(gn) {
     gn.innerHTML = '';
@@ -1032,5 +952,47 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadDesktopPreference();
 });
 </script>
+
+<!-- Estilos adicionales para el overlay de series/novelas (ya existían) -->
+<style>
+  .video-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .video-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    cursor: pointer;
+  }
+  .video-container {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    aspect-ratio: 16/9;
+  }
+  .video-container iframe {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+  }
+  .btn-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: rgba(200,16,46,0.8);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+  }
+</style>
 </body>
 </html>
