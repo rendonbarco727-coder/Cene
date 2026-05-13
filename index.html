@@ -120,7 +120,6 @@
       color: var(--text-dim);
     }
 
-    /* BOTÓN MODO ESCRITORIO */
     .btn-desktop {
       background: transparent;
       border: 1px solid var(--border-sub);
@@ -187,7 +186,6 @@
       border-radius: 4px;
     }
 
-    /* LOADER */
     .loader-overlay {
       position: fixed;
       inset: 0;
@@ -209,7 +207,6 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* HERO SLIDER */
     .hero-slider {
       width: 100%;
       margin-top: 64px;
@@ -231,7 +228,6 @@
       cursor: pointer;
     }
 
-    /* GENRE BAR */
     .generos-bar {
       display: flex;
       flex-wrap: wrap;
@@ -258,7 +254,6 @@
       color: white;
     }
 
-    /* MAIN */
     .container {
       padding: 32px 5% 60px;
     }
@@ -269,7 +264,6 @@
       margin-bottom: 24px;
     }
 
-    /* MOVIE GRID */
     .movie-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -316,7 +310,7 @@
     .card.visto .badge-visto { opacity: 1; }
     .card.visto img { filter: brightness(0.35); }
 
-    /* BOTÓN REGRESAR (MEJORADO PARA WEBVIEW) */
+    /* Botón regresar – estilos base */
     .btn-back {
       display: inline-flex;
       align-items: center;
@@ -330,24 +324,23 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
       font-weight: bold;
-      margin-top: 20px;   /* Valor base, se ajusta según navegador */
+      margin-top: 20px;
       margin-bottom: 20px;
       transition: all 0.2s;
-      z-index: 2100;      /* Por encima del navbar */
+      z-index: 2100;
     }
     .btn-back:hover {
       background: var(--accent);
       color: white;
     }
 
-    /* AJUSTE PARA ESCRITORIO / MÓVIL NORMAL (NAVBAR FIJO) */
+    /* Por defecto en escritorio/móvil con navbar fijo */
     @media (min-width: 769px) {
       .btn-back {
         margin-top: calc(64px + 16px);
       }
     }
 
-    /* DETALLE PELÍCULA */
     .movie-detail-container {
       background: var(--bg-panel);
       border-radius: 12px;
@@ -360,20 +353,24 @@
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 20px;
-      touch-action: manipulation; /* Mejora táctil en WebView */
+      touch-action: manipulation;
     }
-    .video-wrapper iframe {
+    .video-wrapper iframe, .video-wrapper video {
       width: 100%;
       height: auto;
       min-height: 250px;
       aspect-ratio: 16 / 9;
       display: block;
       border: none;
-      pointer-events: auto;   /* Asegura eventos táctiles */
+      background: black;
+    }
+    .video-wrapper video {
+      background: black;
+      outline: none;
     }
 
     @media (max-width: 768px) {
-      .video-wrapper iframe {
+      .video-wrapper iframe, .video-wrapper video {
         min-height: 200px;
       }
     }
@@ -413,7 +410,6 @@
       margin: 5px 0;
     }
 
-    /* SIMILARES */
     .similares-section {
       margin-top: 30px;
     }
@@ -444,14 +440,12 @@
       text-align: center;
     }
 
-    /* TV EN VIVO */
     .tv-player iframe {
       width: 100%;
       aspect-ratio: 16/9;
       border-radius: 8px;
     }
 
-    /* OVERLAY PLAYER */
     .video-overlay {
       position: fixed;
       inset: 0;
@@ -506,7 +500,7 @@
 
     .hidden { display: none !important; }
 
-    /* ===== MODO ESCRITORIO ===== */
+    /* MODO ESCRITORIO */
     body.desktop-mode {
       min-width: 1024px;
       overflow-x: auto;
@@ -525,37 +519,26 @@
       font-size: 0.8rem;
       padding: 8px 18px;
     }
-    body.desktop-mode .btn-desktop.active {
-      background: var(--accent);
-      color: white;
+
+    /* ESTILOS ESPECÍFICOS PARA WEBVIEW (DETECTADOS POR JS) */
+    body.in-webview .navbar {
+      position: relative;
+    }
+    body.in-webview .hero-slider,
+    body.in-webview .generos-bar {
+      margin-top: 0;
+    }
+    body.in-webview .btn-back {
+      margin-top: 10px !important;
+    }
+    body.in-webview .container {
+      padding-top: 10px;
+    }
+    body.in-webview .video-wrapper iframe,
+    body.in-webview .video-wrapper video {
+      min-height: 240px !important;
     }
 
-    /* ===== AJUSTES ESPECÍFICOS PARA WEBVIEW (ANDROID) ===== */
-    /* Detectamos WebView y corregimos márgenes, posición del navbar */
-    @media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) {
-      /* En WebView, el navbar fixed puede tapar contenido, lo cambiamos a relative */
-      .navbar {
-        position: relative;
-        margin-bottom: 0;
-      }
-      .hero-slider, .generos-bar {
-        margin-top: 0;
-      }
-      /* Botón regresar con margen reducido */
-      .btn-back {
-        margin-top: 10px !important;
-      }
-      /* Aseguramos que el iframe tenga altura suficiente y respuesta táctil */
-      .video-wrapper iframe {
-        min-height: 240px !important;
-      }
-      /* Contenedor principal con menos padding superior */
-      .container {
-        padding-top: 10px;
-      }
-    }
-
-    /* MEDIA QUERIES ORIGINALES */
     @media (max-width: 768px) {
       .nav-links, .search-bar { display: none; }
       .hamburger { display: flex; }
@@ -662,6 +645,20 @@
 </div>
 
 <script>
+// --- Detección de WebView (Android) ---
+function isWebView() {
+  const ua = navigator.userAgent;
+  return /Android.*(; wv\)|WebView)/i.test(ua) || 
+         /wv\)/i.test(ua) || 
+         (ua.includes('Android') && !ua.includes('Chrome'));
+}
+
+// Aplicar clase al body si es WebView
+if (isWebView()) {
+  document.body.classList.add('in-webview');
+}
+
+// --- Funciones de UI ---
 function toggleMenu() {
   document.getElementById('mobile-menu').classList.toggle('hidden');
 }
@@ -693,6 +690,7 @@ function loadDesktopPreference() {
   }
 }
 
+// --- Datos y lógica principal ---
 let peliculas = [], series = {}, novelas = {};
 let vistos = JSON.parse(localStorage.getItem('vistos_strange')) || [];
 let seccionActual = 'peliculas';
@@ -840,6 +838,49 @@ function cerrarPlayer() {
   document.getElementById('videoFrame').src = "";
 }
 
+// --- NUEVA FUNCIÓN: genera el reproductor adecuado según el tipo de archivo ---
+function generarReproductorVideo(id, titulo) {
+  // Intentar determinar la extensión desde el ID no es posible. 
+  // Lo haremos asumiendo que el archivo puede ser MKV o MP4.
+  // Por defecto usamos el iframe de Drive. Si falla (o si el usuario lo pide) podríamos cambiar.
+  // Para simplificar, aquí siempre usaremos iframe de Drive, pero añadimos un botón de "Abrir con reproductor alternativo"
+  // que intenta cargar el archivo con un elemento <video> nativo (soporta MP4 y algunos MKV dependiendo del codec).
+  const driveUrl = `https://drive.google.com/file/d/${id}/preview`;
+  const directDownloadUrl = `https://drive.google.com/uc?export=download&id=${id}`;
+  
+  // Construimos un contenedor con iframe y un botón para cambiar a reproductor nativo
+  return `
+    <div class="video-wrapper" id="video-wrapper-${id}">
+      <iframe src="${driveUrl}" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+    <div style="text-align: center; margin-top: 8px;">
+      <button class="btn-switch-player" data-id="${id}" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; cursor: pointer;">🎬 Cambiar a reproductor nativo</button>
+    </div>
+    <div id="native-player-${id}" style="display:none; margin-top: 10px;"></div>
+  `;
+}
+
+// Función para cambiar a reproductor nativo (intenta cargar el video directamente)
+function switchToNativePlayer(id) {
+  const wrapper = document.getElementById(`video-wrapper-${id}`);
+  const nativeContainer = document.getElementById(`native-player-${id}`);
+  if (!wrapper || !nativeContainer) return;
+  
+  const directUrl = `https://drive.google.com/uc?export=download&id=${id}`;
+  nativeContainer.innerHTML = `
+    <video controls autoplay style="width:100%; aspect-ratio:16/9; background:black; border-radius:8px;">
+      <source src="${directUrl}" type="video/mp4">
+      <source src="${directUrl}" type="video/mkv">
+      Tu navegador no soporta reproducción de video.
+    </video>
+    <p style="font-size:0.7rem; margin-top:5px;">Si el video no se reproduce, es posible que el formato MKV no sea compatible. Prueba descargar el archivo.</p>
+    <a href="${directUrl}" download style="color:var(--accent); font-size:0.7rem;">⬇️ Descargar video</a>
+  `;
+  wrapper.style.display = 'none';
+  nativeContainer.style.display = 'block';
+}
+
+// Modificamos mostrarDetallePelicula para usar el nuevo generador
 function mostrarDetallePelicula(peli) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
   document.getElementById('sec-movie-detail').classList.remove('hidden');
@@ -863,10 +904,11 @@ function mostrarDetallePelicula(peli) {
   }
 
   const container = document.getElementById('movie-detail-container');
+  // Usamos la nueva función para generar el reproductor con botón de cambio
+  const reproductorHtml = generarReproductorVideo(defaultId, peli.titulo);
+  
   container.innerHTML = `
-    <div class="video-wrapper">
-      <iframe src="https://drive.google.com/file/d/${defaultId}/preview" allow="autoplay; fullscreen" allowfullscreen></iframe>
-    </div>
+    ${reproductorHtml}
     <div class="info-row">
       <div class="poster-col">
         <img src="${peli.portada}" onerror="this.src='https://placehold.co/150x225?text=No+Image'">
@@ -882,6 +924,15 @@ function mostrarDetallePelicula(peli) {
   `;
 
   marcarVisto(defaultId);
+
+  // Agregar evento al botón de cambio de reproductor
+  const switchBtn = container.querySelector('.btn-switch-player');
+  if (switchBtn) {
+    switchBtn.addEventListener('click', (e) => {
+      const id = e.currentTarget.getAttribute('data-id');
+      switchToNativePlayer(id);
+    });
+  }
 
   const similaresGrid = document.getElementById('similaresGrid');
   if(similaresGrid) {
