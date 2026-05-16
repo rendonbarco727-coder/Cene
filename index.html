@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cinema STRANGER · Hipercompacto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <style>
+    /* ---------- ESTILOS EXTREMADAMENTE COMPACTOS ---------- */
+    :root {
+      --bg: #080808;
+      --bg-card: #0f0f0f;
+      --bg-panel: #111111;
+      --accent: #c8102e;
+      --text: #e8e0d5;
+      --text-dim: #7a7065;
+      --text-mid: #b0a898;
+      --border-sub: rgba(255,255,255,0.07);
+      --glass: rgba(255,255,255,0.04);
+      --success: #4caf7d;
+      --card-min: 50px;
+      --grid-gap: 1px;
+      --nav-height: 26px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 8px;
+      overflow-x: hidden;
+    }
+
+    /* Navbar ultrafino */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 2000;
+      background: linear-gradient(to bottom, rgba(8,8,8,0.98), rgba(8,8,8,0.85));
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-sub);
+    }
+    .nav-content {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 1%;
+      height: var(--nav-height);
+    }
+    .logo-cinema {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.4rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+    .logo-strange {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.6rem;
+      color: var(--accent);
+      line-height: 0.7;
+    }
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 1px 2px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.35rem;
+      text-transform: uppercase;
+    }
+    .nav-btn.active {
+      color: var(--accent);
+      background: rgba(200,16,46,0.08);
+    }
+    .search-bar input {
+      background: var(--glass);
+      border: 1px solid var(--border-sub);
+      color: var(--text);
+      padding: 1px 2px 1px 12px;
+      border-radius: 1px;
+      font-size: 0.35rem;
+      width: 70px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 2px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+    }
+    .btn-desktop {
+      background: transparent;
+      border: 1px solid var(--border-sub);
+      color: var(--text-dim);
+      padding: 1px 3px;
+      border-radius: 2px;
+      font-size: 0.35rem;
+      cursor: pointer;
+    }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 1px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .hamburger span {
+      width: 10px;
+      height: 1px;
+      background: var(--text-mid);
+    }
+    .mobile-menu {
+      padding: 2px 1%;
+      border-top: 1px solid var(--border-sub);
+      background: rgba(8,8,8,0.98);
+      display: flex;
+      flex-direction: column;
+      gap: 0px;
+    }
+    .mobile-nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-mid);
+      padding: 3px 2px;
+      font-size: 0.45rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-sub);
+    }
+    /* Slider minúsculo */
+    .hero-slider {
+      margin-top: var(--nav-height);
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: 1px 0;
+    }
+    .slider-wrapper {
+      display: inline-flex;
+      gap: 1px;
+      padding: 0 1%;
+    }
+    .slider-wrapper img {
+      width: 35px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 1px;
+      cursor: pointer;
+    }
+    /* Géneros */
+    .generos-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1px;
+      padding: 1px 1%;
+      border-bottom: 1px solid var(--border-sub);
+      margin-top: var(--nav-height);
+      background: var(--bg);
+    }
+    .genero-btn {
+      background: transparent;
+      border: 1px solid var(--border-sub);
+      color: var(--text-dim);
+      padding: 1px 3px;
+      border-radius: 4px;
+      font-size: 0.35rem;
+      cursor: pointer;
+    }
+    .genero-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    /* Contenedor principal */
+    .container {
+      padding: 1px 1% 5px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .category-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.7rem;
+      margin-bottom: 1px;
+    }
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(var(--card-min), 1fr));
+      gap: var(--grid-gap);
+    }
+    .card {
+      position: relative;
+      border-radius: 1px;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--bg-card);
+    }
+    .card img {
+      width: 100%;
+      aspect-ratio: 2/3;
+      object-fit: cover;
+    }
+    .card p {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: linear-gradient(transparent, rgba(0,0,0,0.95));
+      padding: 2px 0px 0px;
+      text-align: center;
+      font-size: 0.35rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .badge-visto {
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      background: var(--success);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3px;
+      opacity: 0;
+    }
+    .card.visto .badge-visto { opacity: 1; }
+    .card.visto img { filter: brightness(0.35); }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 1px;
+      background: rgba(200,16,46,0.2);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 1px 4px;
+      border-radius: 8px;
+      font-size: 0.4rem;
+      margin-bottom: 3px;
+      cursor: pointer;
+    }
+    .movie-detail-container {
+      background: var(--bg-panel);
+      border-radius: 2px;
+      padding: 3px;
+    }
+    /* Reproductor GRANDE pero los textos pequeños */
+    .video-wrapper {
+      width: 100%;
+      background: #000;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+    .video-wrapper iframe {
+      width: 100%;
+      height: 380px;
+      border: none;
+      display: block;
+    }
+    .fallback-button {
+      margin-top: 2px;
+      text-align: center;
+    }
+    .fallback-button a {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 12px;
+      font-size: 0.45rem;
+      text-decoration: none;
+    }
+    @media (min-width: 768px) {
+      .video-wrapper iframe { height: 580px; }
+    }
+    .info-row {
+      display: flex;
+      gap: 3px;
+      flex-wrap: wrap;
+    }
+    .poster-col {
+      width: 35px;
+      flex-shrink: 0;
+    }
+    .poster-col img {
+      width: 100%;
+      border-radius: 2px;
+    }
+    .movie-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.7rem;
+      border-left: 2px solid var(--accent);
+      padding-left: 2px;
+      margin-bottom: 1px;
+    }
+    .sinopsis {
+      font-size: 0.45rem;
+      color: var(--text-mid);
+      line-height: 1.1;
+    }
+    .director, .actores, .año {
+      font-size: 0.4rem;
+      color: var(--text-dim);
+    }
+    .similares-section {
+      margin-top: 5px;
+    }
+    .similares-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.6rem;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+    .similares-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+      gap: 2px;
+    }
+    .similares-card {
+      cursor: pointer;
+      border-radius: 1px;
+      overflow: hidden;
+      background: var(--bg-card);
+      text-align: center;
+    }
+    .similares-card img {
+      width: 100%;
+      aspect-ratio: 2/3;
+      object-fit: cover;
+    }
+    .similares-card p {
+      padding: 1px 1px;
+      font-size: 0.4rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tv-player iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 2px;
+    }
+    .footer-actions {
+      text-align: center;
+      padding: 4px 1px 1px;
+    }
+    .btn-borrar {
+      background: transparent;
+      border: 1px solid var(--border-sub);
+      color: var(--text-dim);
+      padding: 1px 4px;
+      font-size: 0.35rem;
+      cursor: pointer;
+    }
+    .hidden { display: none !important; }
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .film-reel {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(200,16,46,0.3);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 768px) {
+      .nav-links, .search-bar { display: none; }
+      .hamburger { display: flex; }
+      .poster-col { width: 30px; }
+      .movie-title { font-size: 0.65rem; }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="loader" class="loader-overlay"><div class="film-reel"></div></div>
+
+<nav class="navbar">
+  <div class="nav-content">
+    <div class="logo" onclick="mostrarSeccion('peliculas')" style="cursor:pointer">
+      <div class="logo-cinema">CINEMA</div>
+      <div class="logo-strange">STRANGER</div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="mostrarSeccion('peliculas')">Películas</button>
+      <button class="nav-btn" onclick="mostrarSeccion('series')">Series</button>
+      <button class="nav-btn" onclick="mostrarSeccion('novelas')">Novelas</button>
+      <button class="nav-btn" onclick="mostrarSeccion('tv')">TV</button>
+    </div>
+    <div class="search-bar">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="buscador" placeholder="Buscar..." onkeyup="filtrarContenido()">
+    </div>
+    <button class="btn-desktop" onclick="toggleDesktopMode()">💻 Escritorio</button>
+    <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mobile-menu hidden" id="mobile-menu">
+    <button class="mobile-nav-btn" onclick="mostrarSeccion('peliculas'); toggleMenu()">Películas</button>
+    <button class="mobile-nav-btn" onclick="mostrarSeccion('series'); toggleMenu()">Series</button>
+    <button class="mobile-nav-btn" onclick="mostrarSeccion('novelas'); toggleMenu()">Novelas</button>
+    <button class="mobile-nav-btn" onclick="mostrarSeccion('tv'); toggleMenu()">TV</button>
+    <input type="text" id="buscador-mobile" placeholder="Buscar..." oninput="syncSearch()">
+  </div>
+</nav>
+
+<header id="header-slider" class="hero-slider"><div id="slider" class="slider-wrapper"></div></header>
+
+<main class="container">
+  <section id="sec-peliculas" class="content-section">
+    <h2 class="category-title">01 PELÍCULAS</h2>
+    <div id="grid-peliculas" class="movie-grid"></div>
+  </section>
+  <section id="sec-series" class="content-section hidden">
+    <h2 class="category-title">02 SERIES</h2>
+    <div id="grid-series" class="movie-grid"></div>
+  </section>
+  <section id="sec-novelas" class="content-section hidden">
+    <h2 class="category-title">03 NOVELAS</h2>
+    <div id="grid-novelas" class="movie-grid"></div>
+  </section>
+  <section id="sec-tv" class="content-section hidden">
+    <h2 class="category-title">04 TV EN VIVO</h2>
+    <div class="tv-player"><iframe src="https://www.youtube.com/embed/t8HuqJeu6LE" allowfullscreen></iframe></div>
+  </section>
+  <section id="sec-movie-detail" class="content-section hidden">
+    <button class="btn-back" onclick="volver()">← REGRESAR</button>
+    <div id="movie-detail-container" class="movie-detail-container"></div>
+  </section>
+  <div class="footer-actions"><button class="btn-borrar" onclick="borrarHistorial()">🗑 LIMPIAR VISTOS</button></div>
+</main>
+
+<script>
+function toggleMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+function syncSearch() { let v = document.getElementById('buscador-mobile').value; document.getElementById('buscador').value = v; filtrarContenido(); }
+function toggleDesktopMode() {
+  document.body.classList.toggle('desktop-mode');
+  let btn = document.querySelector('.btn-desktop');
+  let isDesktop = document.body.classList.contains('desktop-mode');
+  btn.textContent = isDesktop ? '📱 Móvil' : '💻 Escritorio';
+  localStorage.setItem('desktopMode', isDesktop ? 'true' : 'false');
+}
+function loadDesktopPreference() { if(localStorage.getItem('desktopMode') === 'true') toggleDesktopMode(); }
+
+let peliculas = [], series = {}, novelas = {};
+let vistos = JSON.parse(localStorage.getItem('vistos_strange')) || [];
+
+function ocultarLoader() { document.getElementById('loader').style.display = 'none'; }
+function normalizarTexto(t) { return t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+function eliminarDuplicados(lista) {
+  let set = new Set();
+  return lista.filter(p => { let norm = normalizarTexto(p.titulo); if(set.has(norm)) return false; set.add(norm); return true; });
+}
+function ordenarPorFecha(pelis) {
+  return [...pelis].sort((a,b) => (new Date(b.fecha||0)) - (new Date(a.fecha||0)));
+}
+function agruparPorTitulo(items) {
+  let grupos = {};
+  Object.keys(items).forEach(nombre => {
+    let baseNombre = nombre.replace(/\s*Temporada\s*\d+/i,'').replace(/\s*Parte\s*\d+/i,'').trim();
+    let num = (nombre.match(/Temporada\s*(\d+)/i)||nombre.match(/Parte\s*(\d+)/i))?.[1] || 1;
+    if(!grupos[baseNombre]) grupos[baseNombre] = { titulo: baseNombre, temporadas: {}, portada: items[nombre][0]?.portada || '' };
+    if(!grupos[baseNombre].temporadas[num]) grupos[baseNombre].temporadas[num] = [];
+    grupos[baseNombre].temporadas[num].push(...items[nombre]);
+  });
+  Object.keys(grupos).forEach(base => {
+    grupos[base].temporadasList = Object.entries(grupos[base].temporadas).sort((a,b)=>a[0]-b[0]).map(([num, caps]) => ({ numero: parseInt(num), capitulos: caps }));
+  });
+  return grupos;
+}
+async function cargarCatalogo() {
+  try {
+    let res = await fetch(`catalogo.json?v=${Date.now()}`);
+    if(!res.ok) throw new Error();
+    let data = await res.json();
+    peliculas = eliminarDuplicados(data.peliculas || []);
+    series = data.series || {};
+    novelas = data.novelas || {};
+  } catch(e) { console.error(e); document.body.innerHTML += '<div style="background:#c8102e;color:white;padding:4px;text-align:center;font-size:8px;">Error catálogo</div>'; }
+  finally { ocultarLoader(); }
+}
+function marcarVisto(id) { if(!id || vistos.includes(id)) return; vistos.push(id); localStorage.setItem('vistos_strange',JSON.stringify(vistos)); document.querySelectorAll(`.card[data-id="${id}"]`).forEach(c=>c.classList.add('visto')); }
+function borrarHistorial() { if(confirm("¿Borrar?")) { vistos=[]; localStorage.removeItem('vistos_strange'); document.querySelectorAll('.card').forEach(c=>c.classList.remove('visto')); } }
+function mostrarSeccion(seccion) {
+  document.querySelectorAll('.content-section').forEach(s=>s.classList.add('hidden'));
+  document.getElementById(`sec-${seccion}`).classList.remove('hidden');
+  document.getElementById('header-slider').style.display = seccion === 'peliculas' ? 'block' : 'none';
+  let genBar = document.getElementById('generos-container');
+  if(seccion === 'peliculas') { if(!genBar) renderizarGeneros(); else genBar.style.display = 'flex'; }
+  else if(genBar) genBar.style.display = 'none';
+  document.getElementById('buscador').value = "";
+  document.querySelectorAll('.card').forEach(c=>c.style.display='block');
+}
+function volver() { mostrarSeccion('peliculas'); }
+function asignarGenero(p) {
+  let t = normalizarTexto(p.titulo);
+  if(t.includes('telefono')||t.includes('abismo')||t.includes('conjuro')||t.includes('chucky')||t.includes('terrifier')||t.includes('scream')||t.includes('silent')||t.includes('the room')||t.includes('five nights')||t.includes('exterminio')||t.includes('resplandor')) return 'Terror';
+  if(t.includes('yo antes')||t.includes('sonido libertad')||t.includes('dejar el mundo')||t.includes('babel')||t.includes('trust')) return 'Drama';
+  if(t.includes('tron')||t.includes('apocalypto')||t.includes('pantera')||t.includes('estado electrico')||t.includes('4 fantasticos')) return 'Acción';
+  if(t.includes('bambi')||t.includes('como entrenar')||t.includes('harry potter')||t.includes('mufasa')||t.includes('robot salvaje')) return 'Animación';
+  return 'Otros';
+}
+function obtenerGeneros() { let gen={}; peliculas.forEach(p=>{ let g=asignarGenero(p); if(!gen[g]) gen[g]=[]; gen[g].push(p); }); return gen; }
+function renderizarGeneros() {
+  let cont = document.getElementById('generos-container');
+  if(cont) cont.remove();
+  cont = document.createElement('div'); cont.id='generos-container'; cont.className='generos-bar';
+  document.querySelector('.hero-slider').after(cont);
+  let mapa = obtenerGeneros();
+  let lista = ['todos', ...Object.keys(mapa).sort()];
+  lista.forEach(g=>{
+    let btn = document.createElement('button');
+    btn.className = 'genero-btn' + (g==='todos'?' active':'');
+    btn.textContent = g==='todos'?'🎬 TODOS':g;
+    btn.onclick = () => { document.querySelectorAll('.genero-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); filtrarPorGenero(g==='todos'?'todos':g); };
+    cont.appendChild(btn);
+  });
+  window.generosMap = mapa;
+}
+function filtrarPorGenero(genero) {
+  let grid = document.getElementById('grid-peliculas');
+  grid.innerHTML = '';
+  let pelis = genero==='todos' ? [...peliculas] : (window.generosMap[genero]||[]);
+  pelis = ordenarPorFecha(pelis);
+  pelis.forEach(p => grid.appendChild(crearCard(p.titulo, p.portada, ()=>mostrarDetallePelicula(p), p.id)));
+}
+function getDrivePreviewUrl(id) { return `https://drive.google.com/file/d/${id}/preview`; }
+function cambiarVideo(id) { window.open(getDrivePreviewUrl(id), '_blank'); marcarVisto(id); }
+function mostrarDetallePelicula(peli) {
+  document.querySelectorAll('.content-section').forEach(s=>s.classList.add('hidden'));
+  document.getElementById('sec-movie-detail').classList.remove('hidden');
+  document.getElementById('header-slider').style.display = 'none';
+  let genBar = document.getElementById('generos-container');
+  if(genBar) genBar.style.display = 'none';
+  let defaultId = peli.id;
+  if(peli.idiomas && peli.idiomas.length) defaultId = peli.idiomas[0].id;
+  let similares = peliculas.filter(p => asignarGenero(p) === asignarGenero(peli) && p.titulo !== peli.titulo).slice(0,6);
+  let similaresHtml = similares.length ? `<div class="similares-section"><h4 class="similares-title">🎬 SIMILARES</h4><div class="similares-grid" id="similaresGrid"></div></div>` : '';
+  let previewUrl = getDrivePreviewUrl(defaultId);
+  let videoHtml = `
+    <div class="video-wrapper">
+      <iframe src="${previewUrl}" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+    <div class="fallback-button"><a href="${previewUrl}" target="_blank">📽 Abrir en Drive</a></div>
+  `;
+  let añoHtml = peli.fecha ? `<div class="año">📅 ${peli.fecha.split('-')[0]}</div>` : '';
+  let container = document.getElementById('movie-detail-container');
+  container.innerHTML = `
+    ${videoHtml}
+    <div class="info-row">
+      <div class="poster-col"><img src="${peli.portada}" onerror="this.src='https://placehold.co/35x52'"></div>
+      <div class="info-col">
+        <h3 class="movie-title">${peli.titulo}</h3>
+        <p class="sinopsis">${peli.sinopsis || '🎬 Cinema STRANGER'}</p>
+        ${añoHtml}
+        ${peli.director ? `<div class="director">🎬 ${peli.director}</div>` : ''}
+        ${peli.actores ? `<div class="actores">⭐ ${peli.actores}</div>` : ''}
+      </div>
+    </div>
+    ${similaresHtml}
+  `;
+  marcarVisto(defaultId);
+  let similaresGrid = document.getElementById('similaresGrid');
+  if(similaresGrid) {
+    similares.forEach(sim => {
+      let card = document.createElement('div');
+      card.className = 'similares-card';
+      card.innerHTML = `<img src="${sim.portada}" onerror="this.src='https://placehold.co/45x67'"><p>${sim.titulo}</p>`;
+      card.onclick = () => mostrarDetallePelicula(sim);
+      similaresGrid.appendChild(card);
+    });
+  }
+  window.scrollTo(0,0);
+}
+function mostrarDetalleSerie(serieTitulo, serieData) {
+  document.querySelectorAll('.content-section').forEach(s=>s.classList.add('hidden'));
+  document.getElementById('sec-movie-detail').classList.remove('hidden');
+  document.getElementById('header-slider').style.display = 'none';
+  if(document.getElementById('generos-container')) document.getElementById('generos-container').style.display = 'none';
+  let primerCap = serieData.temporadasList[0]?.capitulos[0];
+  let defaultId = primerCap?.id || '';
+  let previewUrl = getDrivePreviewUrl(defaultId);
+  let videoHtml = defaultId ? `
+    <div class="video-wrapper"><iframe src="${previewUrl}" allowfullscreen></iframe></div>
+    <div class="fallback-button"><a href="${previewUrl}" target="_blank">📽 Abrir en Drive</a></div>
+  ` : '<div class="video-wrapper"><div style="padding:10px;text-align:center;">No disponible</div></div>';
+  let temporadasHtml = '';
+  serieData.temporadasList.forEach(temp => {
+    let capsHtml = '';
+    temp.capitulos.forEach(cap => {
+      capsHtml += `<div class="similares-card" onclick="window.open('${getDrivePreviewUrl(cap.id)}','_blank'); marcarVisto('${cap.id}')">
+        <img src="${cap.portada}" onerror="this.src='https://placehold.co/45x67'"><p>${cap.titulo}</p>
+      </div>`;
+    });
+    temporadasHtml += `<div class="similares-section"><h4 class="similares-title">📺 TEMP ${temp.numero}</h4><div class="similares-grid">${capsHtml}</div></div>`;
+  });
+  let container = document.getElementById('movie-detail-container');
+  container.innerHTML = `
+    ${videoHtml}
+    <div class="info-row"><div class="poster-col"><img src="${serieData.portada}" onerror="this.src='https://placehold.co/35x52'"></div>
+    <div class="info-col"><h3 class="movie-title">${serieTitulo}</h3><p class="sinopsis">📺 Serie</p></div></div>
+    ${temporadasHtml}
+  `;
+  if(defaultId) marcarVisto(defaultId);
+  window.scrollTo(0,0);
+}
+function mostrarDetalleNovela(novelaTitulo, novelaData) {
+  document.querySelectorAll('.content-section').forEach(s=>s.classList.add('hidden'));
+  document.getElementById('sec-movie-detail').classList.remove('hidden');
+  document.getElementById('header-slider').style.display = 'none';
+  if(document.getElementById('generos-container')) document.getElementById('generos-container').style.display = 'none';
+  let primerCap = novelaData.temporadasList[0]?.capitulos[0];
+  let defaultId = primerCap?.id || '';
+  let previewUrl = getDrivePreviewUrl(defaultId);
+  let videoHtml = defaultId ? `
+    <div class="video-wrapper"><iframe src="${previewUrl}" allowfullscreen></iframe></div>
+    <div class="fallback-button"><a href="${previewUrl}" target="_blank">📽 Abrir en Drive</a></div>
+  ` : '<div class="video-wrapper"><div style="padding:10px;text-align:center;">No disponible</div></div>';
+  let capitulosHtml = '';
+  novelaData.temporadasList.forEach(temp => {
+    let capsHtml = '';
+    temp.capitulos.forEach(cap => {
+      capsHtml += `<div class="similares-card" onclick="window.open('${getDrivePreviewUrl(cap.id)}','_blank'); marcarVisto('${cap.id}')">
+        <img src="${cap.portada}" onerror="this.src='https://placehold.co/45x67'"><p>${cap.titulo}</p>
+      </div>`;
+    });
+    let tituloParte = temp.numero === 1 && novelaData.temporadasList.length === 1 ? 'CAPÍTULOS' : `PARTE ${temp.numero}`;
+    capitulosHtml += `<div class="similares-section"><h4 class="similares-title">📖 ${tituloParte}</h4><div class="similares-grid">${capsHtml}</div></div>`;
+  });
+  let container = document.getElementById('movie-detail-container');
+  container.innerHTML = `
+    ${videoHtml}
+    <div class="info-row"><div class="poster-col"><img src="${novelaData.portada}" onerror="this.src='https://placehold.co/35x52'"></div>
+    <div class="info-col"><h3 class="movie-title">${novelaTitulo}</h3><p class="sinopsis">📖 Novela</p></div></div>
+    ${capitulosHtml}
+  `;
+  if(defaultId) marcarVisto(defaultId);
+  window.scrollTo(0,0);
+}
+function crearCard(titulo, portada, accion, id) {
+  let div = document.createElement('div'); div.className='card';
+  if(id && vistos.includes(id)) div.classList.add('visto');
+  if(id) div.dataset.id = id;
+  div.innerHTML = `<div class="badge-visto">✓</div><img src="${portada}" onerror="this.src='https://placehold.co/50x75'"><p>${titulo}</p>`;
+  div.onclick = (e) => { e.stopPropagation(); accion(); };
+  return div;
+}
+function cargarTodo() {
+  renderizarGeneros(); filtrarPorGenero('todos');
+  let seriesAgrup = agruparPorTitulo(series);
+  let gridSeries = document.getElementById('grid-series');
+  if(gridSeries) { gridSeries.innerHTML=''; Object.entries(seriesAgrup).forEach(([tit,data])=>gridSeries.appendChild(crearCard(tit, data.portada, ()=>mostrarDetalleSerie(tit,data)))); }
+  let novelasAgrup = agruparPorTitulo(novelas);
+  let gridNovelas = document.getElementById('grid-novelas');
+  if(gridNovelas) { gridNovelas.innerHTML=''; Object.entries(novelasAgrup).forEach(([tit,data])=>gridNovelas.appendChild(crearCard(tit, data.portada, ()=>mostrarDetalleNovela(tit,data)))); }
+}
+function filtrarContenido() {
+  let q = document.getElementById('buscador').value.toLowerCase();
+  let activa = document.querySelector('.content-section:not(.hidden)');
+  if(!activa) return;
+  activa.querySelectorAll('.card').forEach(c => { let tit = c.querySelector('p')?.innerText?.toLowerCase() || ''; c.style.display = tit.includes(q) ? 'block' : 'none'; });
+}
+function initSlider() {
+  let wrapper = document.getElementById('slider');
+  if(!wrapper) return;
+  wrapper.innerHTML = '';
+  let portadas = [...new Set(ordenarPorFecha(peliculas).map(p=>p.portada))].slice(0,15);
+  portadas.forEach(ruta => {
+    let img = document.createElement('img'); img.src=ruta; img.onerror=()=>img.style.display='none';
+    img.onclick = () => { let p = peliculas.find(peli=>peli.portada===ruta); if(p) mostrarDetallePelicula(p); };
+    wrapper.appendChild(img);
+  });
+}
+document.addEventListener("DOMContentLoaded", async () => { await cargarCatalogo(); initSlider(); cargarTodo(); loadDesktopPreference(); });
+</script>
+</body>
+</html>
