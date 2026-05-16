@@ -783,17 +783,30 @@ function filtrarPorGenero(genero) {
 }
 
 // Función universal para cambiar el video (tanto en películas como series)
+function esMkv(id) {
+  // Los IDs de Drive no tienen extension, pero podemos marcarlos via catalogo
+  // Por ahora asumimos que si el wrapper ya tiene clase mkv la usamos
+  return false;
+}
+
+function ajustarAlturaIframe(iframe) {
+  // Detectar si el contenido es MKV por el titulo del archivo en Drive
+  // Como no podemos saberlo por ID, usamos altura generosa para todos
+  iframe.style.height = (window.innerWidth <= 768)
+    ? Math.max(window.innerHeight * 0.45, 280) + 'px'
+    : Math.max(window.innerHeight * 0.6, 400) + 'px';
+}
+
 function cambiarVideo(id) {
   const directUrl = `https://drive.google.com/uc?export=download&id=${id}`;
   if (window.AndroidBridge && window.AndroidBridge.playVideo) {
     AndroidBridge.playVideo(directUrl);
   } else {
-    // En navegador: buscar el iframe dentro del detalle
     const iframe = document.querySelector('#movie-detail-container .video-wrapper iframe');
     if (iframe) {
       iframe.src = `https://drive.google.com/file/d/${id}/preview`;
+      ajustarAlturaIframe(iframe);
     } else {
-      // Fallback (reproductor flotante)
       document.getElementById('videoFrame').src = `https://drive.google.com/file/d/${id}/preview`;
       document.getElementById('player').classList.remove('hidden');
     }
