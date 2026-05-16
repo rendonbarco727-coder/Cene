@@ -461,42 +461,27 @@
 
     .hidden { display: none !important; }
 
-    body.desktop-mode {
+    /* SIEMPRE MODO ESCRITORIO */
+    body {
       min-width: 1024px;
       overflow-x: auto;
     }
-    body.desktop-mode .container {
+    .container {
       max-width: 1400px;
       margin: 0 auto;
     }
-    body.desktop-mode .movie-grid {
+    .movie-grid {
       grid-template-columns: repeat(5, 1fr);
     }
-    body.desktop-mode .similares-grid {
+    .similares-grid {
       grid-template-columns: repeat(6, 1fr);
     }
-    body.desktop-mode .genero-btn {
+    .genero-btn {
       font-size: 0.8rem;
       padding: 8px 18px;
     }
-
-    @media (max-width: 768px) {
-      .nav-links, .search-bar { display: none; }
-      .hamburger { display: flex; }
-      .movie-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-      .category-title { font-size: 1.5rem; }
-      .movie-title { font-size: 1.3rem; }
-      .poster-col { width: 100px; }
-      .similares-grid { grid-template-columns: repeat(3, 1fr); }
-      .genero-btn { padding: 4px 12px; font-size: 0.65rem; }
-      .btn-desktop { display: inline-block; }
-    }
-
-    @media (max-width: 480px) {
-      .poster-col { width: 80px; }
-      .similares-grid { grid-template-columns: repeat(2, 1fr); }
-      .movie-title { font-size: 1.1rem; }
-    }
+    .nav-links, .search-bar { display: flex; }
+    .hamburger { display: none; }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 </head>
