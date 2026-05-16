@@ -805,8 +805,14 @@ function filtrarPorGenero(genero) {
 }
 
 function abrirReproductor(id) {
-  document.getElementById('videoFrame').src = `https://drive.google.com/file/d/${id}/preview`;
-  document.getElementById('player').classList.remove('hidden');
+  const directUrl = `https://drive.google.com/uc?export=download&id=${id}`;
+  if (window.AndroidBridge && window.AndroidBridge.playVideo) {
+    AndroidBridge.playVideo(directUrl);
+  } else {
+    document.getElementById('videoFrame').src = `https://drive.google.com/file/d/${id}/preview`;
+    document.getElementById('player').classList.remove('hidden');
+  }
+  marcarVisto(id);
 }
 
 function cerrarPlayer() {
