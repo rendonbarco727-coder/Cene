@@ -355,11 +355,27 @@
       margin-bottom: 20px;
       position: relative;
     }
-    .video-wrapper iframe {
+    .video-wrapper {
       width: 100%;
-      height: 576px;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      position: relative;
+      padding-top: 56.25%;
+      height: 0;
+    }
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       display: block;
       border: none;
+    }
+    @media (max-width: 768px) {
+      .video-wrapper { padding-top: 0; height: 260px; }
     }
 
     .info-row {
@@ -452,27 +468,36 @@
 
     .hidden { display: none !important; }
 
-    /* SIEMPRE MODO ESCRITORIO */
-    body {
-      min-width: 1024px;
-      overflow-x: auto;
-    }
+    /* INTERFAZ COMPACTA NATIVA PARA MÓVIL Y ESCRITORIO */
     .container {
+      padding: 16px 4% 60px;
       max-width: 1400px;
       margin: 0 auto;
     }
     .movie-grid {
-      grid-template-columns: repeat(5, 1fr);
+      display: grid;
+      gap: 12px;
+    }
+    .card p {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: linear-gradient(transparent, rgba(0,0,0,0.95));
+      padding: 20px 6px 6px;
+      text-align: center;
+      font-size: 0.65rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .similares-grid {
-      grid-template-columns: repeat(6, 1fr);
+      display: grid;
+      gap: 8px;
     }
-    .genero-btn {
-      font-size: 0.8rem;
-      padding: 8px 18px;
+    @media (max-width: 768px) {
+      .nav-links, .search-bar { display: none; }
+      .hamburger { display: flex; }
     }
-    .nav-links, .search-bar { display: flex; }
-    .hamburger { display: none; }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 </head>
