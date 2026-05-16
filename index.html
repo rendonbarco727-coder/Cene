@@ -607,7 +607,8 @@ function toggleDesktopMode() {
 
 function loadDesktopPreference() {
   const saved = localStorage.getItem('desktopMode');
-  if (saved === 'true') {
+  // Desktop mode activo por defecto
+  if (saved !== 'false') {
     document.body.classList.add('desktop-mode');
     const btn = document.getElementById('btnDesktopMode');
     if (btn) {
