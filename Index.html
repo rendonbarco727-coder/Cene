@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinema Stranger</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #0a0a0a; color: #fff; }
+        .header { background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 16px 20px; position: sticky; top: 0; z-index: 100; }
+        h1 { font-size: 1.4rem; text-align: center; margin-bottom: 12px; }
+        h1 span { color: #e50914; }
+        .search-container { max-width: 500px; margin: 0 auto; display: flex; gap: 8px; }
+        .search-container input { flex: 1; padding: 10px 14px; border: none; border-radius: 8px; background: #2a2a3a; color: white; }
+        .search-container button { padding: 10px 20px; background: #e50914; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+        .tabs { display: flex; justify-content: center; gap: 12px; margin-top: 12px; }
+        .tab-btn { background: none; border: none; color: #888; padding: 6px 20px; cursor: pointer; border-radius: 20px; }
+        .tab-btn.active { color: #e50914; background: #2a2a3a; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+        .card { background: #1e1e2e; border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-4px); }
+        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .card h3 { font-size: 0.85rem; padding: 10px 8px; text-align: center; }
+        .loading { text-align: center; padding: 40px; color: #888; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 1000; overflow-y: auto; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { max-width: 900px; width: 95%; background: #1a1a2e; border-radius: 16px; overflow: hidden; }
+        .video-container { position: relative; padding-bottom: 56.25%; background: #000; }
+        video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .modal-info { padding: 20px; }
+        .close-modal { position: absolute; top: 15px; right: 20px; color: white; font-size: 36px; cursor: pointer; background: rgba(0,0,0,0.5); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .episodes-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; margin-top: 10px; max-height: 250px; overflow-y: auto; }
+        .episode-btn { padding: 8px; background: #2a2a3a; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 0.75rem; }
+        .episode-btn:hover { background: #e50914; }
+        .server-input { margin-top: 10px; text-align: center; font-size: 0.8rem; }
+        .server-input input { background: #2a2a3a; border: 1px solid #444; color: white; padding: 5px 10px; border-radius: 6px; width: 200px; text-align: center; }
+        @media (max-width: 600px) { .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎬 CINEMA <span>STRANGER</span></h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar..." onkeypress="if(event.key==='Enter') buscar()">
+            <button onclick="buscar()">🔍 Buscar</button>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="cambiarTab('pelicula')">🎬 Películas</button>
+            <button class="tab-btn" onclick="cambiarTab('serie')">📺 Series</button>
+        </div>
+        <div class="server-input">
+            🔗 Servidor: <input type="text" id="serverUrl" value="http://100.96.249.54:8080" size="25">
+        </div>
+    </div>
+    <div class="container"><div id="content" class="grid"><div class="loading">Cargando...</div></div></div>
+    <div id="modal" class="modal"><span class="close-modal" onclick="cerrarModal()">&times;</span><div class="modal-content"><div class="video-container"><video id="videoPlayer" controls controlsList="nodownload"></video><div id="videoLoading" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.7); padding:10px 20px; border-radius:8px; display:none;">Resolviendo...</div></div><div class="modal-info"><h2 id="modalTitle"></h2><div id="episodesContainer"></div></div></div></div>
+
+    <script>
+        let currentTab = 'pelicula';
+        let currentPage = 1;
+        let currentSerieUrl = null;
+
+        function getAPI() { return document.getElementById('serverUrl').value; }
+
+        async function cargarCatalogo() {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">Cargando...</div>';
+            try {
+                const url = `${getAPI()}/cinecalidad/${currentTab === 'pelicula' ? 'peliculas' : 'series'}?pagina=1&limite=100`;
+                const resp = await fetch(url);
+                const data = await resp.json();
+                if (data.items && data.items.length) mostrarGrid(data.items);
+                else content.innerHTML = '<div class="loading">Sin contenido</div>';
+            } catch(e) { content.innerHTML = '<div class="loading">Error: ¿Servidor activo?</div>'; }
+        }
+
+        async function buscar() {
+            const q = document.getElementById('searchInput').value.trim();
+            if (!q) return;
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">Buscando...</div>';
+            try {
+                const resp = await fetch(`${getAPI()}/buscar?q=${encodeURIComponent(q)}`);
+                const data = await resp.json();
+                if (data.length) mostrarGrid(data);
+                else content.innerHTML = '<div class="loading">Sin resultados</div>';
+            } catch(e) { content.innerHTML = '<div class="loading">Error en búsqueda</div>'; }
+        }
+
+        function mostrarGrid(items) {
+            const content = document.getElementById('content');
+            content.innerHTML = '';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => abrirItem(item);
+                const img = document.createElement('img');
+                img.src = item.portada || 'https://via.placeholder.com/300x450?text=Sin+Imagen';
+                img.onerror = () => img.src = 'https://via.placeholder.com/300x450?text=No+Image';
+                const title = document.createElement('h3');
+                title.textContent = item.titulo || 'Sin título';
+                card.appendChild(img); card.appendChild(title);
+                content.appendChild(card);
+            });
+        }
+
+        async function abrirItem(item) {
+            const modal = document.getElementById('modal');
+            document.getElementById('modalTitle').textContent = item.titulo;
+            const episodesDiv = document.getElementById('episodesContainer');
+            
+            if (item.tipo === 'serie') {
+                currentSerieUrl = item.url;
+                episodesDiv.innerHTML = '<h3>Cargando episodios...</h3>';
+                episodesDiv.style.display = 'block';
+                try {
+                    const resp = await fetch(`${getAPI()}/episodios?url=${encodeURIComponent(item.url)}`);
+                    const episodios = await resp.json();
+                    mostrarEpisodios(episodios);
+                } catch(e) { episodesDiv.innerHTML = '<h3>Error cargando episodios</h3>'; }
+            } else {
+                episodesDiv.style.display = 'none';
+                modal.classList.add('active');
+                reproducir(item.url);
+            }
+            modal.classList.add('active');
+        }
+
+        function mostrarEpisodios(episodios) {
+            const container = document.getElementById('episodesContainer');
+            container.innerHTML = '<h3>📺 Episodios</h3><div class="episodes-list"></div>';
+            const list = container.querySelector('.episodes-list');
+            Object.keys(episodios).sort().forEach(temp => {
+                const label = document.createElement('div');
+                label.style.marginTop = '10px';
+                label.style.fontWeight = 'bold';
+                label.style.color = '#e50914';
+                label.textContent = `🎯 ${temp}`;
+                list.appendChild(label);
+                episodios[temp].forEach(ep => {
+                    const btn = document.createElement('button');
+                    btn.className = 'episode-btn';
+                    btn.textContent = ep.titulo || 'Episodio';
+                    btn.onclick = () => reproducir(ep.url);
+                    list.appendChild(btn);
+                });
+            });
+        }
+
+        async function reproducir(url) {
+            const video = document.getElementById('videoPlayer');
+            const loading = document.getElementById('videoLoading');
+            loading.style.display = 'block';
+            video.pause();
+            video.src = '';
+            try {
+                const resp = await fetch(`${getAPI()}/resolver?url=${encodeURIComponent(url)}`);
+                const data = await resp.json();
+                const streamUrl = data.url || data.stream;
+                if (streamUrl) { video.src = streamUrl; video.play().catch(e => console.log(e)); }
+                else alert('No se pudo resolver el stream');
+            } catch(e) { alert('Error: ' + e.message); }
+            finally { loading.style.display = 'none'; }
+        }
+
+        function cambiarTab(tab) { currentTab = tab; cargarCatalogo(); }
+        function cerrarModal() {
+            const modal = document.getElementById('modal');
+            const video = document.getElementById('videoPlayer');
+            video.pause();
+            video.src = '';
+            modal.classList.remove('active');
+        }
+        document.querySelectorAll('.tab-btn').forEach((btn, i) => btn.onclick = () => { cambiarTab(i===0?'pelicula':'serie'); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); });
+        document.getElementById('serverUrl').addEventListener('change', () => cargarCatalogo());
+        document.addEventListener('keydown', (e) => { if(e.key === 'Escape') cerrarModal(); });
+        cargarCatalogo();
+    </script>
+</body>
+</html>
