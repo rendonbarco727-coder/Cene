@@ -385,6 +385,8 @@
                 
                 if (data.items && data.items.length > 0) {
                     mostrarGrid(data.items);
+                } else if (Array.isArray(data) && data.length > 0) {
+                    mostrarGrid(data);
                 } else {
                     content.innerHTML = '<div class="loading">📭 No hay contenido disponible</div>';
                 }
@@ -409,6 +411,8 @@
                 
                 if (data && data.length > 0) {
                     mostrarGrid(data);
+                } else if (data.items && data.items.length > 0) {
+                    mostrarGrid(data.items);
                 } else {
                     content.innerHTML = '<div class="loading">❌ No se encontraron resultados para "' + query + '"</div>';
                 }
