@@ -413,7 +413,6 @@
   }
 
   /* ── SEARCH RESULTS ── */
-  #search-section { display: none; }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
@@ -451,7 +450,7 @@
 <!-- MAIN -->
 <main>
   <!-- Search results -->
-  <section id="search-section">
+  <section id="search-section" style="display:none">
     <div class="section-header">
       <div class="section-title">Resultados</div>
       <div class="section-count" id="search-count"></div>
@@ -702,27 +701,52 @@ document.getElementById('search-input').addEventListener('input', () => {
   clearTimeout(searchTimer);
   const q = document.getElementById('search-input').value.trim();
   if (!q) { goHome(); return; }
+  // Mostrar spinner de inmediato para feedback visual
+  document.getElementById('peliculas-section').style.display = 'none';
+  document.getElementById('series-section').style.display = 'none';
+  document.getElementById('search-section').style.display = 'block';
+  document.getElementById('search-grid').innerHTML = '';
+  document.getElementById('search-count').textContent = '';
+  document.getElementById('search-state').innerHTML =
+    `<div class="state-msg"><div class="spinner"></div><br>Buscando...</div>`;
   searchTimer = setTimeout(doSearch, 500);
 });
 
-async function doSearch() {
-  const q = document.getElementById('search-input').value.trim();
-  if (!q) return;
+let _searchAbort = null;
 
+async function doSearch() {
+  clearTimeout(searchTimer); // cancelar timer pendiente
+  const q = document.getElementById('search-input').value.trim();
+  if (!q) { goHome(); return; }
+
+  // Cancelar fetch anterior si estaba en curso
+  if (_searchAbort) { _searchAbort.abort(); }
+  _searchAbort = new AbortController();
+
+  // Mostrar sección de búsqueda, ocultar catálogo
   document.getElementById('peliculas-section').style.display = 'none';
   document.getElementById('series-section').style.display = 'none';
-  document.getElementById('search-section').style.display = '';
+  const searchSection = document.getElementById('search-section');
+  searchSection.style.display = 'block';
 
+  // Limpiar resultados anteriores inmediatamente
   const grid = document.getElementById('search-grid');
   const stateEl = document.getElementById('search-state');
   grid.innerHTML = '';
-  stateEl.innerHTML = `<div class="state-msg"><div class="spinner"></div><br>Buscando "${q}"...</div>`;
   document.getElementById('search-count').textContent = '';
+  stateEl.innerHTML = `<div class="state-msg"><div class="spinner"></div><br>Buscando "${q}"...</div>`;
 
   try {
-    const res = await fetch(`${getServer()}/buscar?q=${encodeURIComponent(q)}`);
+    const res = await fetch(
+      `${getServer()}/buscar?q=${encodeURIComponent(q)}`,
+      { signal: _searchAbort.signal }
+    );
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const items = await res.json();
+
+    // Solo actualizar si la query no cambió mientras esperábamos
+    if (q !== document.getElementById('search-input').value.trim()) return;
+
     stateEl.innerHTML = '';
     document.getElementById('search-count').textContent = `${items.length} resultados`;
     if (!items.length) {
@@ -731,6 +755,7 @@ async function doSearch() {
       renderCards(items, 'search-grid');
     }
   } catch (e) {
+    if (e.name === 'AbortError') return; // búsqueda cancelada, ignorar
     stateEl.innerHTML = `<div class="state-msg"><div class="icon">⚠️</div>Error: ${e.message}</div>`;
   }
 }
