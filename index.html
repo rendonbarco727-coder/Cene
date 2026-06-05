@@ -590,7 +590,9 @@ async function resolveAndEmbed(url, trackingUrl) {
   try {
     const res = await fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
     const data = await res.json();
-    const streamUrl = `${getServer()}/stream?url=${encodeURIComponent(data.original || data.url)}`;
+    const streamUrl = data.direct
+      ? (data.url || data.original)
+      : `${getServer()}/stream?url=${encodeURIComponent(data.original || data.url)}`;
     startHlsStream(streamUrl);
   } catch (e) {
     alert("Error cargando el flujo de streaming.");
