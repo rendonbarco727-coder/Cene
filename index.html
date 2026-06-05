@@ -116,11 +116,13 @@
     cursor: pointer;
     border: none;
     transition: all 0.2s ease;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
   }
-  .btn-primary { background: var(--text-color); color: #000000; }
-  .btn-secondary { background: #262626; color: var(--text-color); }
-  .btn-rotate { background: #31a24c; color: white; display: none; } /* Verde nativo para identificar acción de rotado */
+  .btn-primary { background: #fff; color: #000; font-size: 15px; }
+  .btn-secondary { background: #1f1f1f; color: #aaa; border: 1px solid #333; font-size: 13px; }
+  .btn-rotate { background: rgba(255,255,255,0.12); color: white; display: none; flex: 0 0 auto !important; width: 42px; height: 42px; padding: 0; border-radius: 50%; font-size: 18px; min-width: unset; }
 
   /* GRID & CAROUSEL */
   .tabs { display: flex; gap: 12px; margin-bottom: 20px; padding: 0 16px; }
@@ -203,7 +205,7 @@
   .detail-inline-meta { display: flex; align-items: center; gap: 14px; font-size: 13px; color: var(--text-muted); margin-bottom: 18px; }
   .meta-maturity { background: #333; color: #e2e2e2; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 700; }
   
-  .detail-action-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+  .detail-action-buttons { display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; align-items: center; }
   .detail-desc { font-size: 14px; color: #f5f5f5; line-height: 1.45; margin-bottom: 14px; }
   .detail-credits { font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-bottom: 26px; }
   .detail-credits span { color: var(--text-muted); }
@@ -356,7 +358,7 @@
         <div class="detail-action-buttons">
           <button class="btn-premium btn-primary" id="btn-play-main" onclick="playMain()">▶ Ver</button>
           
-          <button class="btn-premium btn-rotate" id="btn-rotate-screen" onclick="toggleScreenRotation()">🔄 Girar Pantalla</button>
+          <button class="btn-premium btn-rotate" id="btn-rotate-screen" onclick="toggleScreenRotation()">🔄</button>
           
           <button class="btn-premium btn-secondary" id="btn-download-mock">↓ Descargar T1:E1</button>
         </div>
