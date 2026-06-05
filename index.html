@@ -590,9 +590,12 @@ async function resolveAndEmbed(url, trackingUrl) {
   try {
     const res = await fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
     const data = await res.json();
-    const streamUrl = data.direct
-      ? (data.url || data.original)
-      : `${getServer()}/stream?url=${encodeURIComponent(data.original || data.url)}`;
+    if (data.error || (!data.url && !data.original)) {
+      alert("No se pudo resolver el video: " + (data.error || "sin URL"));
+      closePlayerMechanics();
+      return;
+    }
+    const streamUrl = data.url || `${getServer()}/stream?url=${encodeURIComponent(data.original)}`;
     startHlsStream(streamUrl);
   } catch (e) {
     alert("Error cargando el flujo de streaming.");
