@@ -447,9 +447,13 @@ const state = {
 function initPlyr() {
   if (!state.plyrInstance) {
     state.plyrInstance = new Plyr('#video-player', {
-      controls: ['play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'fullscreen'],
+      controls: ['rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'fullscreen'],
       tooltips: { controls: false, seek: true },
-      clickToPlay: true
+      clickToPlay: true,
+      rewind: 10,
+      seekTime: 10,
+      invertTime: false,
+      toggleInvert: false
     });
   }
 }
