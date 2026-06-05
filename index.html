@@ -564,6 +564,8 @@ function openDetail(item) {
 
   document.getElementById('detail-overlay').style.display = 'flex';
   updateMiListaBtn();
+  // Similares solo para películas
+  document.getElementById('detail-similares-section').style.display = item.tipo === 'pelicula' ? 'block' : 'none';
 
   // Cargar similares
   const grid = document.getElementById('detail-similares-grid');
