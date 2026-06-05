@@ -369,16 +369,16 @@
           Creado por: <span>Cinema Stranger Inc.</span>
         </div>
         
+        <div style="margin-bottom:16px;">
+          <button onclick="toggleMiLista()" id="btn-mi-lista" style="background:var(--bg-surface);border:1px solid var(--border-color);color:#fff;padding:8px 18px;border-radius:4px;font-size:13px;cursor:pointer;">＋ Mi lista</button>
+        </div>
+
         <div id="detail-similares-section" style="margin: 20px 0;">
           <div style="font-family:'Bebas Neue',sans-serif; color:var(--accent); font-size:1.1rem; margin-bottom:12px; letter-spacing:1px;">MÁS COMO ESTA</div>
           <div id="detail-similares-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;"></div>
         </div>
 
-        <div class="detail-utility-row" style="display: flex; gap: 44px; margin-bottom: 24px;">
-          <div style="text-align: center; font-size: 11px; color: var(--text-muted);"><div>＋</div><div>Mi lista</div></div>
-          <div style="text-align: center; font-size: 11px; color: var(--text-muted);"><div>👍</div><div>Calificar</div></div>
-          <div style="text-align: center; font-size: 11px; color: var(--text-muted);"><div>↗</div><div>Compartir</div></div>
-        </div>
+
       </div>
       
       <div id="detail-episodes-section" style="display:none">
@@ -563,6 +563,7 @@ function openDetail(item) {
   }
 
   document.getElementById('detail-overlay').style.display = 'flex';
+  updateMiListaBtn();
 
   // Cargar similares
   const grid = document.getElementById('detail-similares-grid');
@@ -793,6 +794,40 @@ function renderContinueWatching() {
 }
 
 loadCatalog('peliculas');
+
+// ── MI LISTA ─────────────────────────────────────────────────────
+let miLista = JSON.parse(localStorage.getItem('cs_milista') || '[]');
+
+function toggleMiLista() {
+  const item = state.currentItem;
+  if (!item) return;
+  const btn = document.getElementById('btn-mi-lista');
+  const idx = miLista.findIndex(i => i.url === item.url);
+  if (idx === -1) {
+    miLista.push(item);
+    btn.textContent = '✓ En mi lista';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--accent)';
+  } else {
+    miLista.splice(idx, 1);
+    btn.textContent = '＋ Mi lista';
+    btn.style.borderColor = 'var(--border-color)';
+    btn.style.color = '#fff';
+  }
+  localStorage.setItem('cs_milista', JSON.stringify(miLista));
+}
+
+function updateMiListaBtn() {
+  const item = state.currentItem;
+  if (!item) return;
+  const btn = document.getElementById('btn-mi-lista');
+  if (!btn) return;
+  const enLista = miLista.some(i => i.url === item.url);
+  btn.textContent = enLista ? '✓ En mi lista' : '＋ Mi lista';
+  btn.style.borderColor = enLista ? 'var(--accent)' : 'var(--border-color)';
+  btn.style.color = enLista ? 'var(--accent)' : '#fff';
+}
+// ─────────────────────────────────────────────────────────────────
 
 // ── BÚSQUEDA ──────────────────────────────────────────────────────
 let _searchTimer = null;
