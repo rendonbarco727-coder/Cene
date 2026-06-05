@@ -793,6 +793,48 @@ function renderContinueWatching() {
 }
 
 loadCatalog('peliculas');
+
+// ── BÚSQUEDA ──────────────────────────────────────────────────────
+let _searchTimer = null;
+
+function renderSearchResults(items) {
+  const grid = document.getElementById('search-grid');
+  const state = document.getElementById('search-state');
+  grid.innerHTML = '';
+  if (!items || !items.length) {
+    state.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:40px 0;">Sin resultados</div>';
+    return;
+  }
+  state.innerHTML = '';
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'movie-card';
+    card.innerHTML = `<img src="${item.portada}" loading="lazy">
+      <div class="movie-card-title">${item.titulo}</div>`;
+    card.onclick = () => openDetail(item);
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('search-input').addEventListener('input', function() {
+  const q = this.value.trim();
+  clearTimeout(_searchTimer);
+  const grid = document.getElementById('search-grid');
+  const state = document.getElementById('search-state');
+  if (q.length < 2) {
+    grid.innerHTML = '';
+    state.innerHTML = '';
+    return;
+  }
+  state.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:20px;">Buscando...</div>';
+  _searchTimer = setTimeout(() => {
+    fetch(`${getServer()}/buscar?q=${encodeURIComponent(q)}`)
+      .then(r => r.json())
+      .then(data => renderSearchResults(data.resultados || data))
+      .catch(() => { state.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:20px;">Error de conexión</div>'; });
+  }, 400);
+});
+// ─────────────────────────────────────────────────────────────────
 </script>
 </body>
 </html>
