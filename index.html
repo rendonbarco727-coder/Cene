@@ -558,14 +558,22 @@ function setupHeroBanner(item) {
 function renderCards(items, gridId, append = false) {
   const grid = document.getElementById(gridId);
   if (!append) grid.innerHTML = '';
+  const saved = JSON.parse(localStorage.getItem('cs_progress') || '{}');
   items.forEach((item) => {
     const card = document.createElement('div');
     card.className = 'movie-card';
     card.ontouchstart = () => prefetchItem(item);
     card.onmouseenter = () => prefetchItem(item);
+    const prog = saved[item.url];
+    const percent = prog && prog.duration > 0 ? Math.min((prog.time / prog.duration) * 100, 100) : 0;
+    const finished = percent >= 90;
+    const progressBar = percent > 2
+      ? `<div class="progress-container"><div class="progress-bar" style="width:${finished ? 100 : percent}%;background:${finished ? '#4caf50' : 'var(--accent)'};"></div></div>`
+      : '';
     card.innerHTML = `<div class="movie-badge">${item.tipo === 'serie' ? 'SERIE' : '4K'}</div>
       <img class="movie-poster" src="${item.portada || ''}" loading="lazy">
-      <div class="card-meta"><div class="movie-title">${item.titulo}</div></div>`;
+      <div class="card-meta"><div class="movie-title">${item.titulo}</div></div>
+      ${progressBar}`;
     card.onclick = () => openDetail(item);
     grid.appendChild(card);
   });
@@ -824,20 +832,36 @@ function renderEpisodes(t) {
 }
 
 function renderContinueWatching() {
+  const saved = JSON.parse(localStorage.getItem('cs_progress') || '{}');
+  const entries = Object.entries(saved).sort((a,b) => (b[1].time||0)-(a[1].time||0));
+
+  // Sección profile
   const container = document.getElementById('continue-watching-grid');
   container.innerHTML = '';
-  const saved = JSON.parse(localStorage.getItem('cs_progress') || '{}');
-  Object.keys(saved).forEach(url => {
-    const data = saved[url];
-    const card = document.createElement('div');
-    card.className = 'movie-card';
-    card.style.flex = 'initial';
-    const percent = data.duration > 0 ? (data.time / data.duration) * 100 : 0;
-    card.innerHTML = `<img class="movie-poster" src="${data.portada || ''}">
-      <div class="card-meta"><div class="movie-title">${data.titulo}</div></div>
-      <div class="progress-container"><div class="progress-bar" style="width: ${percent}%"></div></div>`;
-    card.onclick = () => openDetail(data.itemRaw);
-    container.appendChild(card);
+
+  // Sección home
+  const homeGrid = document.getElementById('home-continue-watching-grid');
+  const homeSection = document.getElementById('home-continue-watching-section');
+  if (homeGrid) homeGrid.innerHTML = '';
+  if (homeSection) homeSection.style.display = entries.length ? 'block' : 'none';
+
+  entries.forEach(([url, data]) => {
+    const percent = data.duration > 0 ? Math.min((data.time / data.duration) * 100, 100) : 0;
+    const finished = percent >= 90;
+    const barColor = finished ? '#4caf50' : 'var(--accent)';
+    const barWidth = finished ? 100 : percent;
+
+    [container, homeGrid].forEach(grid => {
+      if (!grid) return;
+      const card = document.createElement('div');
+      card.className = 'movie-card';
+      card.style.flex = 'initial';
+      card.innerHTML = `<img class="movie-poster" src="${data.portada || ''}">
+        <div class="card-meta"><div class="movie-title">${data.titulo}</div></div>
+        <div class="progress-container"><div class="progress-bar" style="width:${barWidth}%;background:${barColor};"></div></div>`;
+      card.onclick = () => openDetail(data.itemRaw);
+      grid.appendChild(card);
+    });
   });
 }
 
