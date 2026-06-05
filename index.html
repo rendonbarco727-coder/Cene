@@ -447,7 +447,7 @@ const state = {
 function initPlyr() {
   if (!state.plyrInstance) {
     state.plyrInstance = new Plyr('#video-player', {
-      controls: ['rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'fullscreen'],
+      controls: ['play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'fullscreen'],
       tooltips: { controls: false, seek: true },
       clickToPlay: true,
       rewind: 10,
