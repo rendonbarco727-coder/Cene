@@ -471,7 +471,36 @@ function saveSettings() {
   const v = document.getElementById('server-url-input').value.trim();
   if (v) localStorage.setItem('cs_server', v);
   closeSettings();
-  resetCatalog('peliculas'); loadCatalog('peliculas');
+  resetCatalog('peliculas'); // ── PREFETCH INTELIGENTE ─────────────────────────────────────────
+const _prefetchCache = new Set();
+
+function prefetchUrl(url) {
+  if (!url || _prefetchCache.has(url)) return;
+  _prefetchCache.add(url);
+  fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`)
+    .then(r => r.json())
+    .catch(() => {});
+}
+
+function prefetchItem(item) {
+  if (!item || !item.url) return;
+  prefetchUrl(item.url);
+  // Para series prefetch también episodios
+  if (item.tipo === 'serie') {
+    fetch(`${getServer()}/episodios?url=${encodeURIComponent(item.url)}`)
+      .then(r => r.json())
+      .then(data => {
+        const firstKey = Object.keys(data)[0];
+        if (firstKey && data[firstKey]) {
+          data[firstKey].slice(0, 3).forEach(ep => prefetchUrl(ep.url));
+        }
+      })
+      .catch(() => {});
+  }
+}
+// ─────────────────────────────────────────────────────────────────
+
+loadCatalog('peliculas');
 }
 
 function switchMainView(target, btn) {
@@ -527,6 +556,8 @@ function renderCards(items, gridId, append = false) {
   items.forEach((item) => {
     const card = document.createElement('div');
     card.className = 'movie-card';
+    card.ontouchstart = () => prefetchItem(item);
+    card.onmouseenter = () => prefetchItem(item);
     card.innerHTML = `<div class="movie-badge">${item.tipo === 'serie' ? 'SERIE' : '4K'}</div>
       <img class="movie-poster" src="${item.portada || ''}" loading="lazy">
       <div class="card-meta"><div class="movie-title">${item.titulo}</div></div>`;
@@ -599,6 +630,10 @@ async function playMain() {
 
 async function playEpisodeData(url, idx) {
   await resolveAndEmbed(url, state.currentItem.url);
+  // Prefetch episodio siguiente
+  const eps = state.currentTemporadas[state.currentTab] || [];
+  if (eps[idx + 1]) prefetchUrl(eps[idx + 1].url);
+  if (eps[idx + 2]) prefetchUrl(eps[idx + 2].url);
 }
 
 async function resolveAndEmbed(url, trackingUrl) {
@@ -765,7 +800,7 @@ function renderEpisodes(t) {
     node.innerHTML = `
       <div class="ep-row-top">
         <div class="ep-media-box" onclick="playEpisodeData('${ep.url}', ${i})">
-          <img src="${ep.portada || state.currentItem.portada || ''}">
+          <img src="${ep.portada || state.currentItem?.portada || ''}" onerror="this.src='${state.currentItem?.portada || ''}'">
           <div class="ep-play-overlay"><div class="ep-play-ring">▶</div></div>
         </div>
         <div class="ep-meta-info">
@@ -794,6 +829,35 @@ function renderContinueWatching() {
     container.appendChild(card);
   });
 }
+
+// ── PREFETCH INTELIGENTE ─────────────────────────────────────────
+const _prefetchCache = new Set();
+
+function prefetchUrl(url) {
+  if (!url || _prefetchCache.has(url)) return;
+  _prefetchCache.add(url);
+  fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`)
+    .then(r => r.json())
+    .catch(() => {});
+}
+
+function prefetchItem(item) {
+  if (!item || !item.url) return;
+  prefetchUrl(item.url);
+  // Para series prefetch también episodios
+  if (item.tipo === 'serie') {
+    fetch(`${getServer()}/episodios?url=${encodeURIComponent(item.url)}`)
+      .then(r => r.json())
+      .then(data => {
+        const firstKey = Object.keys(data)[0];
+        if (firstKey && data[firstKey]) {
+          data[firstKey].slice(0, 3).forEach(ep => prefetchUrl(ep.url));
+        }
+      })
+      .catch(() => {});
+  }
+}
+// ─────────────────────────────────────────────────────────────────
 
 loadCatalog('peliculas');
 
