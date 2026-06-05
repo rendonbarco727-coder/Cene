@@ -339,6 +339,10 @@
       <div class="detail-backdrop-wrap" id="detail-backdrop"></div>
       
       <div class="embedded-player-wrap" id="embedded-player-container">
+        <div id="video-loader" style="display:none; position:absolute; inset:0; z-index:20; background:#000; align-items:center; justify-content:center; flex-direction:column; gap:12px;">
+          <div style="width:48px;height:48px;border:4px solid #333;border-top-color:#E50914;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+          <div style="color:#aaa;font-size:13px;letter-spacing:1px;">Cargando stream...</div>
+        </div>
         <video id="video-player" playsinline crossorigin></video>
       </div>
     </div>
@@ -451,13 +455,14 @@ const state = {
 function initPlyr() {
   if (!state.plyrInstance) {
     state.plyrInstance = new Plyr('#video-player', {
-      controls: ['play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'fullscreen'],
-      tooltips: { controls: false, seek: true },
+      controls: ['rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'fullscreen'],
+      tooltips: { controls: false, seek: false },
       clickToPlay: true,
       rewind: 10,
       seekTime: 10,
       invertTime: false,
-      toggleInvert: false
+      toggleInvert: false,
+      displayDuration: true
     });
   }
 }
@@ -640,6 +645,8 @@ async function resolveAndEmbed(url, trackingUrl) {
   // 1. Mostrar contenedor del reproductor y ocultar portada estática
   document.getElementById('detail-backdrop').style.display = 'none';
   document.getElementById('embedded-player-container').style.display = 'block';
+  const vloader = document.getElementById('video-loader');
+  if (vloader) { vloader.style.display = 'flex'; }
   
   state.trackingUrl = trackingUrl;
   initPlyr();
@@ -676,12 +683,16 @@ function startHlsStream(src) {
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
       syncSavedProgress(video);
       state.plyrInstance.play();
+      const vl = document.getElementById('video-loader');
+      if (vl) vl.style.display = 'none';
     });
   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
     video.src = src;
     video.addEventListener('loadedmetadata', () => {
       syncSavedProgress(video);
       state.plyrInstance.play();
+      const vl = document.getElementById('video-loader');
+      if (vl) vl.style.display = 'none';
     });
   }
 
