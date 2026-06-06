@@ -516,8 +516,7 @@ function switchMainView(target, btn) {
   document.getElementById('view-mylist').style.display  = target === 'mylist'  ? 'flex' : 'none';
   document.getElementById('view-profile').style.display = target === 'profile' ? 'flex' : 'none';
   document.getElementById('main-header').style.display = (target === 'search') ? 'none' : 'flex';
-  if(target === 'profile') renderContinueWatching();
-  if(target === 'catalog') renderContinueWatching();
+  if(target === 'profile' || target === 'catalog') renderContinueWatching();
 }
 
 function switchTab(tab) {
@@ -857,13 +856,25 @@ function renderContinueWatching() {
       const card = document.createElement('div');
       card.className = 'movie-card';
       card.style.flex = 'initial';
-      card.innerHTML = `<img class="movie-poster" src="${data.portada || ''}">
+      card.style.width = '140px';
+      card.style.minWidth = '140px';
+      card.style.position = 'relative';
+      card.innerHTML = `
+        <button onclick="event.stopPropagation();deleteContinueWatching('${url}')" style="position:absolute;top:4px;right:4px;z-index:10;background:rgba(0,0,0,0.7);border:none;color:white;border-radius:50%;width:22px;height:22px;font-size:13px;cursor:pointer;">✕</button>
+        <img class="movie-poster" src="${data.portada || ''}">
         <div class="card-meta"><div class="movie-title">${data.titulo}</div></div>
         <div class="progress-container"><div class="progress-bar" style="width:${barWidth}%;background:${barColor};"></div></div>`;
       card.onclick = () => openDetail(data.itemRaw);
       grid.appendChild(card);
     });
   });
+}
+
+function deleteContinueWatching(url) {
+  const saved = JSON.parse(localStorage.getItem('cs_progress') || '{}');
+  delete saved[url];
+  localStorage.setItem('cs_progress', JSON.stringify(saved));
+  renderContinueWatching();
 }
 
 // ── PREFETCH INTELIGENTE ─────────────────────────────────────────
