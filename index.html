@@ -812,24 +812,34 @@ async function loadEpisodes(url) {
 function renderEpisodes(t) {
   const eps = state.currentTemporadas[t] || [];
   const list = document.getElementById('ep-list');
+  const saved = JSON.parse(localStorage.getItem('cs_progress') || '{}');
   list.innerHTML = '';
   eps.forEach((ep, i) => {
+    const prog = saved[ep.url];
+    const percent = prog && prog.duration > 0 ? Math.min((prog.time / prog.duration) * 100, 100) : 0;
+    const finished = percent >= 90;
+    const barColor = finished ? '#4caf50' : 'var(--accent)';
+    const progressBar = percent > 2
+      ? `<div style="position:absolute;bottom:0;left:0;width:100%;height:3px;background:rgba(255,255,255,0.2)"><div style="width:${percent}%;height:100%;background:${barColor};"></div></div>`
+      : '';
     const node = document.createElement('div');
     node.className = 'ep-node';
     node.innerHTML = `
       <div class="ep-row-top">
-        <div class="ep-media-box" onclick="playEpisodeData('${ep.url}', ${i})">
+        <div class="ep-media-box" onclick="playEpisodeData('${ep.url}', ${i})" style="position:relative;">
           <img src="${ep.portada || state.currentItem?.portada || ''}" onerror="this.src='${state.currentItem?.portada || ''}'">
-          <div class="ep-play-overlay"><div class="ep-play-ring">▶</div></div>
+          <div class="ep-play-overlay"><div class="ep-play-ring">&#9654;</div></div>
+          ${progressBar}
         </div>
         <div class="ep-meta-info">
-          <div class="ep-headline">${i + 1}. Episodio ${i+1}</div>
-          <div class="ep-runtime">45m</div>
+          <div class="ep-headline">${i + 1}. ${ep.titulo || 'Episodio ' + (i+1)}</div>
+          <div class="ep-runtime">${finished ? '&#10003; Visto' : percent > 2 ? Math.round(percent) + '% visto' : '45m'}</div>
         </div>
       </div>`;
     list.appendChild(node);
   });
 }
+
 
 function renderContinueWatching() {
   const saved = JSON.parse(localStorage.getItem('cs_progress') || '{}');
