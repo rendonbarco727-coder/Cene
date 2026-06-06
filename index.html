@@ -907,6 +907,7 @@ function prefetchItem(item) {
 // ─────────────────────────────────────────────────────────────────
 
 loadCatalog('peliculas');
+renderContinueWatching();
 
 // ── MI LISTA ─────────────────────────────────────────────────────
 let miLista = JSON.parse(localStorage.getItem('cs_milista') || '[]');
