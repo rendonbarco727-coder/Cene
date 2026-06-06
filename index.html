@@ -968,8 +968,8 @@ function renderSearchResults(items) {
   items.forEach(item => {
     const card = document.createElement('div');
     card.className = 'movie-card';
-    card.innerHTML = `<img src="${item.portada}" loading="lazy">
-      <div class="movie-card-title">${item.titulo}</div>`;
+    card.innerHTML = `<img class="movie-poster" src="${item.portada}" loading="lazy">
+      <div class="card-meta"><div class="movie-title">${item.titulo}</div></div>`;
     card.onclick = () => openDetail(item);
     grid.appendChild(card);
   });
