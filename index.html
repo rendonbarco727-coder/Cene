@@ -247,6 +247,35 @@
   .nav-icon { font-size: 20px; margin-bottom: 3px; opacity: 0.5; }
   .nav-item.active { color: var(--text-color); }
   .nav-item.active .nav-icon { opacity: 1; color: var(--accent); }
+
+/* ── RESPONSIVE TABLET / LAPTOP ─────────────────────────────── */
+@media (min-width: 768px) {
+  body { max-width: 1400px; margin: 0 auto; }
+  .movie-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; padding: 0 24px 24px; }
+  .movie-card { flex: 0 0 150px; }
+  .movie-carousel { gap: 14px; }
+  .hero-banner { height: 420px; }
+  .hero-title { font-size: 36px; }
+  .bottom-nav { max-width: 1400px; margin: 0 auto; left: 0; right: 0; }
+  .detail-overlay { padding: 0 10%; }
+  .detail-body-content { max-width: 900px; }
+  .ep-media-box { width: 200px; min-width: 200px; }
+  .section-title { font-size: 16px; }
+  .tabs { max-width: 400px; }
+}
+
+@media (min-width: 1024px) {
+  .movie-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 0 32px 32px; }
+  .movie-card { flex: 0 0 180px; }
+  .hero-banner { height: 500px; }
+  .hero-title { font-size: 44px; }
+  .detail-overlay { padding: 0 15%; }
+  .ep-media-box { width: 240px; min-width: 240px; }
+  .movie-carousel { padding: 0 32px; }
+  .section-header { padding: 0 32px; }
+  .main-header { padding: 0 32px; }
+  #home-continue-watching-grid .movie-card { flex: 0 0 180px; min-width: 180px; }
+}
 </style>
 </head>
 <body>
