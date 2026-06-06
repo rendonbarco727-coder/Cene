@@ -508,7 +508,7 @@ function prefetchItem(item) {
 loadCatalog('peliculas');
 }
 
-function switchMainView(target, btn) {
+function switchMainView(target, btn, fromPopstate) {
   document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('view-catalog').style.display = target === 'catalog' ? 'flex' : 'none';
@@ -517,6 +517,7 @@ function switchMainView(target, btn) {
   document.getElementById('view-profile').style.display = target === 'profile' ? 'flex' : 'none';
   document.getElementById('main-header').style.display = (target === 'search') ? 'none' : 'flex';
   if(target === 'profile' || target === 'catalog') renderContinueWatching();
+  if (!fromPopstate) history.pushState({view: target}, '', '');
 }
 
 function switchTab(tab) {
@@ -580,8 +581,9 @@ function renderCards(items, gridId, append = false) {
 }
 
 // CONTROL DE DETALLES E INYECCIÓN DE REPRODUCTOR LOCAL
-function openDetail(item) {
+function openDetail(item, fromPopstate) {
   state.currentItem = item;
+  if (!fromPopstate) history.pushState({view: 'detail', item: item}, '', '');
   
   // Reseteo de UI multimedia para prevenir fugas de video previo
   closePlayerMechanics();
@@ -631,9 +633,10 @@ function openDetail(item) {
     .catch(() => { grid.innerHTML = ''; });
 }
 
-function closeDetail() {
+function closeDetail(fromPopstate) {
   closePlayerMechanics();
   document.getElementById('detail-overlay').style.display = 'none';
+  if (!fromPopstate) history.pushState({view: 'catalog'}, '', '');
 }
 
 // RESOLUCIÓN Y CAMBIO EN CALIENTE DE PORTADA -> REPRODUCTOR
@@ -918,6 +921,24 @@ function prefetchItem(item) {
 
 loadCatalog('peliculas');
 renderContinueWatching();
+history.replaceState({view: 'catalog'}, '', '');
+window.addEventListener('popstate', function(e) {
+  const s = e.state;
+  if (!s) return;
+  if (s.view === 'detail' && s.item) {
+    openDetail(s.item, true);
+  } else if (s.view === 'catalog') {
+    const detailOpen = document.getElementById('detail-overlay').style.display === 'flex';
+    if (detailOpen) closeDetail(true);
+    else {
+      const btn = document.getElementById('nav-catalog-btn');
+      switchMainView('catalog', btn, true);
+    }
+  } else {
+    const btn = document.querySelector(`.nav-item[onclick*="${s.view}"]`);
+    if (btn) switchMainView(s.view, btn, true);
+  }
+});
 
 // ── MI LISTA ─────────────────────────────────────────────────────
 let miLista = JSON.parse(localStorage.getItem('cs_milista') || '[]');
