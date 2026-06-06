@@ -642,7 +642,7 @@ async function playMain() {
 }
 
 async function playEpisodeData(url, idx) {
-  await resolveAndEmbed(url, state.currentItem.url);
+  await resolveAndEmbed(url, url);
   // Prefetch episodio siguiente
   const eps = state.currentTemporadas[state.currentTab] || [];
   if (eps[idx + 1]) prefetchUrl(eps[idx + 1].url);
