@@ -517,6 +517,7 @@ function switchMainView(target, btn) {
   document.getElementById('view-profile').style.display = target === 'profile' ? 'flex' : 'none';
   document.getElementById('main-header').style.display = (target === 'search') ? 'none' : 'flex';
   if(target === 'profile') renderContinueWatching();
+  if(target === 'catalog') renderContinueWatching();
 }
 
 function switchTab(tab) {
