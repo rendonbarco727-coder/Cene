@@ -621,7 +621,7 @@ function openDetail(item, fromPopstate) {
   document.getElementById('detail-title').textContent = item.titulo;
   
   const isSerie = item.tipo === 'serie';
-  document.getElementById('detail-duration-lbl').textContent = isSerie ? '3 temporadas' : '1h 56m';
+  document.getElementById('detail-duration-lbl').textContent = isSerie ? 'Serie' : '1h 56m';
   document.getElementById('detail-year').textContent = isSerie ? '2026' : '2025';
 
   const btnPlay = document.getElementById('btn-play-main');
