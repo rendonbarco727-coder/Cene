@@ -248,6 +248,33 @@
   .nav-item.active { color: var(--text-color); }
   .nav-item.active .nav-icon { opacity: 1; color: var(--accent); }
 
+.header-search-input {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  margin: 0 8px;
+}
+.header-search-input::placeholder { color: rgba(255,255,255,0.4); }
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.search-result-item:hover { background: rgba(255,255,255,0.08); }
+.search-result-item img { width: 48px; height: 68px; object-fit: cover; border-radius: 6px; background: #222; }
+.search-result-item .sri-info { display: flex; flex-direction: column; gap: 4px; }
+.search-result-item .sri-title { font-size: 14px; font-weight: 700; color: #fff; }
+.search-result-item .sri-meta { font-size: 12px; color: rgba(255,255,255,0.5); }
+
 /* ── RESPONSIVE TABLET / LAPTOP ─────────────────────────────── */
 @media (min-width: 768px) {
   body { max-width: 1400px; margin: 0 auto; }
@@ -281,10 +308,14 @@
 <body>
 
   <div class="cinema-header" id="main-header">
-    <div class="cinema-logo">STRANGER</div>
-    <button class="icon-btn" onclick="openSearch()">🔍</button>
+    <div class="cinema-logo" id="header-logo">STRANGER</div>
+    <input type="text" id="header-search-input" class="header-search-input" placeholder="Buscar título..." oninput="onHeaderSearch(this.value)" style="display:none;">
+    <button class="icon-btn" id="btn-search-open" onclick="openSearch()">🔍</button>
+    <button class="icon-btn" id="btn-search-close" onclick="closeSearch()" style="display:none;">✕</button>
     <button class="icon-btn" onclick="openSettings()">⚙</button>
   </div>
+  <div id="search-blur-overlay" onclick="closeSearch()" style="display:none;position:fixed;top:60px;left:0;right:0;bottom:0;backdrop-filter:blur(4px);background:rgba(0,0,0,0.5);z-index:150;"></div>
+  <div id="header-search-results" style="display:none;position:fixed;top:60px;left:0;right:0;max-height:70vh;overflow-y:auto;background:rgba(18,18,18,0.98);z-index:160;padding:12px;"></div>
 
   <div class="app-screen" id="view-catalog">
     <div class="hero-banner" id="hero-display" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&q=80');">
@@ -496,7 +527,52 @@ function initPlyr() {
 }
 
 function openSearch() {
-  switchMainView('search', null);
+  document.getElementById('header-logo').style.display = 'none';
+  document.getElementById('btn-search-open').style.display = 'none';
+  document.getElementById('btn-search-close').style.display = '';
+  const inp = document.getElementById('header-search-input');
+  inp.style.display = '';
+  inp.value = '';
+  inp.focus();
+  document.getElementById('search-blur-overlay').style.display = '';
+  document.getElementById('header-search-results').style.display = 'none';
+}
+function closeSearch() {
+  document.getElementById('header-logo').style.display = '';
+  document.getElementById('btn-search-open').style.display = '';
+  document.getElementById('btn-search-close').style.display = 'none';
+  document.getElementById('header-search-input').style.display = 'none';
+  document.getElementById('search-blur-overlay').style.display = 'none';
+  document.getElementById('header-search-results').style.display = 'none';
+}
+let _searchTimer = null;
+function onHeaderSearch(q) {
+  clearTimeout(_searchTimer);
+  const box = document.getElementById('header-search-results');
+  if (!q || q.length < 2) { box.style.display = 'none'; return; }
+  box.style.display = '';
+  box.innerHTML = '<div style="color:rgba(255,255,255,0.4);padding:16px;text-align:center;">Buscando...</div>';
+  _searchTimer = setTimeout(async () => {
+    try {
+      const res = await fetch(`${getServer()}/buscar?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      const items = data.resultados || data || [];
+      if (!items.length) {
+        box.innerHTML = '<div style="color:rgba(255,255,255,0.4);padding:16px;text-align:center;">Sin resultados</div>';
+        return;
+      }
+      box.innerHTML = items.slice(0, 15).map(it => `
+        <div class="search-result-item" onclick="closeSearch();openDetail(${JSON.stringify(it).replace(/"/g,'&quot;')})">
+          <img src="${it.portada || it.poster || ''}" onerror="this.style.background='#333';this.src=''">
+          <div class="sri-info">
+            <div class="sri-title">${it.titulo || it.title || ''}</div>
+            <div class="sri-meta">${it.tipo || ''} ${it.year || it.anio || ''}</div>
+          </div>
+        </div>`).join('');
+    } catch(e) {
+      box.innerHTML = '<div style="color:rgba(255,255,255,0.4);padding:16px;text-align:center;">Error al buscar</div>';
+    }
+  }, 350);
 }
 function openSettings() {
   document.getElementById('server-url-input').value = getServer();
