@@ -423,7 +423,7 @@
         <div class="detail-action-buttons">
           <button class="btn-premium btn-primary" id="btn-play-main" onclick="playMain()">▶ Ver</button>
           
-          <button class="btn-premium btn-rotate" id="btn-rotate-screen" onclick="toggleScreenRotation()">🌑</button>
+          <button class="btn-premium btn-rotate" id="btn-rotate-screen" onclick="cycleAudioTrack()">🌐 ES</button>
           
           <button class="btn-premium btn-secondary" id="btn-download-mock">↓ Descargar T1:E1</button>
         </div>
@@ -772,6 +772,14 @@ function startHlsStream(src) {
     hls.attachMedia(video);
     state.hls = hls;
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      const tracks = hls.audioTracks;
+      if (tracks && tracks.length > 0) {
+        // Buscar track en español
+        const esIdx = tracks.findIndex(t => t.lang === 'es' || (t.name||'').toLowerCase().includes('espa'));
+        if (esIdx >= 0) hls.audioTrack = esIdx;
+        const label = tracks[hls.audioTrack]?.lang || 'ES';
+        document.getElementById('btn-rotate-screen').textContent = '🌐 ' + label.toUpperCase().slice(0,2);
+      }
       syncSavedProgress(video);
       state.plyrInstance.play();
       const vl = document.getElementById('video-loader');
@@ -811,6 +819,17 @@ function syncSavedProgress(video) {
 }
 
 // CONTROL DE ROTACIÓN MEDIANTE JAVASCRIPT / SCREEN ORIENTATION API
+function cycleAudioTrack() {
+  if (!state.hls) return;
+  const tracks = state.hls.audioTracks;
+  if (!tracks || tracks.length < 2) return;
+  const current = state.hls.audioTrack;
+  const next = (current + 1) % tracks.length;
+  state.hls.audioTrack = next;
+  const label = tracks[next].lang || tracks[next].name || ('Track ' + next);
+  document.getElementById('btn-rotate-screen').textContent = '🌐 ' + label.toUpperCase().slice(0,2);
+}
+
 function toggleScreenRotation() {
   const mediaContainer = document.querySelector('.detail-media-container');
   
