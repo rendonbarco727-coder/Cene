@@ -773,12 +773,16 @@ function startHlsStream(src) {
     state.hls = hls;
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
       const tracks = hls.audioTracks;
-      if (tracks && tracks.length > 0) {
+      if (tracks && tracks.length > 1) {
         // Buscar track en español
         const esIdx = tracks.findIndex(t => t.lang === 'es' || (t.name||'').toLowerCase().includes('espa'));
         if (esIdx >= 0) hls.audioTrack = esIdx;
         const label = tracks[hls.audioTrack]?.lang || 'ES';
-        document.getElementById('btn-rotate-screen').textContent = '🌐 ' + label.toUpperCase().slice(0,2);
+        const btn = document.getElementById('btn-rotate-screen');
+        btn.textContent = '🌐 ' + label.toUpperCase().slice(0,2);
+        btn.style.display = 'inline-flex';
+      } else {
+        document.getElementById('btn-rotate-screen').style.display = 'none';
       }
       syncSavedProgress(video);
       state.plyrInstance.play();
