@@ -754,7 +754,14 @@ async function resolveAndEmbed(url, trackingUrl) {
       closePlayerMechanics();
       return;
     }
-    const streamUrl = data.url || `${getServer()}/stream?url=${encodeURIComponent(data.original)}`;
+    let streamUrl;
+    if (data.m3u8_content) {
+      const blob = new Blob([data.m3u8_content], { type: 'application/vnd.apple.mpegurl' });
+      streamUrl = URL.createObjectURL(blob);
+      console.log('[CS] usando m3u8_content blob, len=', data.m3u8_content.length);
+    } else {
+      streamUrl = data.url || `${getServer()}/stream?url=${encodeURIComponent(data.original)}`;
+    }
     startHlsStream(streamUrl);
   } catch (e) {
     alert("Error cargando el flujo de streaming.");
