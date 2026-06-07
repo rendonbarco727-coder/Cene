@@ -541,7 +541,7 @@ loadCatalog('peliculas');
 
 function switchMainView(target, btn, fromPopstate) {
   document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
   document.getElementById('view-catalog').style.display = target === 'catalog' ? 'flex' : 'none';
   document.getElementById('view-search').style.display  = target === 'search'  ? 'flex' : 'none';
   document.getElementById('view-mylist').style.display  = target === 'mylist'  ? 'flex' : 'none';
