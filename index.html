@@ -583,36 +583,8 @@ function saveSettings() {
   const v = document.getElementById('server-url-input').value.trim();
   if (v) localStorage.setItem('cs_server', v);
   closeSettings();
-  resetCatalog('peliculas'); // ── PREFETCH INTELIGENTE ─────────────────────────────────────────
-const _prefetchCache = new Set();
-
-function prefetchUrl(url) {
-  if (!url || _prefetchCache.has(url)) return;
-  _prefetchCache.add(url);
-  fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`)
-    .then(r => r.json())
-    .catch(() => {});
-}
-
-function prefetchItem(item) {
-  if (!item || !item.url) return;
-  prefetchUrl(item.url);
-  // Para series prefetch también episodios
-  if (item.tipo === 'serie') {
-    fetch(`${getServer()}/episodios?url=${encodeURIComponent(item.url)}`)
-      .then(r => r.json())
-      .then(data => {
-        const firstKey = Object.keys(data)[0];
-        if (firstKey && data[firstKey]) {
-          data[firstKey].slice(0, 3).forEach(ep => prefetchUrl(ep.url));
-        }
-      })
-      .catch(() => {});
-  }
-}
-// ─────────────────────────────────────────────────────────────────
-
-loadCatalog('peliculas');
+  resetCatalog('peliculas');
+  loadCatalog('peliculas');
 }
 
 function switchMainView(target, btn, fromPopstate) {
@@ -1109,7 +1081,6 @@ function updateMiListaBtn() {
 // ─────────────────────────────────────────────────────────────────
 
 // ── BÚSQUEDA ──────────────────────────────────────────────────────
-let _searchTimer = null;
 
 function renderSearchResults(items) {
   const grid = document.getElementById('search-grid');
