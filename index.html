@@ -243,7 +243,7 @@
   .btn-primary-action { background: var(--accent); color: white; }
 
   /* NAVIGATION GLOBAL INFERIOR */
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(18, 18, 18, 0.97); border-top: 1px solid var(--border-color); display: flex; padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 190; backdrop-filter: blur(30px); }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: transparent; border-top: 1px solid rgba(255,255,255,0.08); display: flex; padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 190; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
   .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; color: var(--text-dim); font-size: 10px; font-weight: 700; background: none; border: none; }
   .nav-icon { font-size: 20px; margin-bottom: 3px; opacity: 0.5; }
   .nav-item.active { color: var(--text-color); }
@@ -478,14 +478,14 @@
 
   <div class="bottom-nav">
     <button class="nav-item active" id="nav-catalog-btn" onclick="switchMainView('catalog', this)">
-      <div class="nav-icon">🏠</div><span>Inicio</span>
+      <span>Inicio</span>
     </button>
 
     <button class="nav-item" id="nav-mylist-btn" onclick="switchMainView('mylist', this)">
-      <div class="nav-icon">＋</div><span>Mi Lista</span>
+      <span>Mi Lista</span>
     </button>
     <button class="nav-item" onclick="switchMainView('profile', this)">
-      <div class="nav-icon">👤</div><span>Perfil</span>
+      <span>Perfil</span>
     </button>
   </div>
 
