@@ -856,11 +856,14 @@ async function loadEpisodes(url) {
   try {
     const res = await fetch(`${getServer()}/episodios?url=${encodeURIComponent(url)}`);
     const data = await res.json();
-    const temps = Object.keys(data);
     state.currentTemporadas = data;
+    const temps = Object.keys(data).filter(t => data[t] && data[t].length > 0);
     if(temps.length > 0) {
       state.currentTab = temps[0];
       renderEpisodes(temps[0]);
+      const n = temps.length;
+      document.getElementById('detail-duration-lbl').textContent = n + (n === 1 ? ' temporada' : ' temporadas');
+      document.getElementById('season-dropdown-label').textContent = 'Temporada ' + temps[0].replace('T','');
     }
   } catch (e) { }
 }
