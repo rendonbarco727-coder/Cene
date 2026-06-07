@@ -832,7 +832,7 @@ function openSeasonPicker() {
   const picker = document.getElementById('season-picker');
   const list = document.getElementById('season-picker-options');
   list.innerHTML = '';
-  const temps = Object.keys(state.currentTemporadas).filter(t => state.currentTemporadas[t] && state.currentTemporadas[t].length > 0);
+  const temps = Object.keys(state.currentTemporadas).filter(t => state.currentTemporadas[t] && state.currentTemporadas[t].length > 0).sort((a,b) => parseInt(a.replace("T","")) - parseInt(b.replace("T","")));
   temps.forEach(t => {
     const btn = document.createElement('button');
     btn.className = 'season-picker-opt' + (t === state.currentTab ? ' active' : '');
