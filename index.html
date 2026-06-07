@@ -828,6 +828,30 @@ function closePlayerMechanics() {
   }
 }
 
+function openSeasonPicker() {
+  const picker = document.getElementById('season-picker');
+  const list = document.getElementById('season-picker-options');
+  list.innerHTML = '';
+  const temps = Object.keys(state.currentTemporadas).filter(t => state.currentTemporadas[t] && state.currentTemporadas[t].length > 0);
+  temps.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'season-picker-opt' + (t === state.currentTab ? ' active' : '');
+    btn.textContent = 'Temporada ' + t.replace('T', '');
+    btn.onclick = () => {
+      state.currentTab = t;
+      document.getElementById('season-dropdown-label').textContent = 'Temporada ' + t.replace('T', '');
+      renderEpisodes(t);
+      closeSeasonPicker();
+    };
+    list.appendChild(btn);
+  });
+  picker.style.display = 'flex';
+}
+
+function closeSeasonPicker() {
+  document.getElementById('season-picker').style.display = 'none';
+}
+
 async function loadEpisodes(url) {
   try {
     const res = await fetch(`${getServer()}/episodios?url=${encodeURIComponent(url)}`);
