@@ -773,6 +773,7 @@ function startHlsStream(src) {
     state.hls = hls;
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
       const tracks = hls.audioTracks;
+      alert('tracks: ' + tracks.map((t,i)=>i+':'+t.lang+'/'+t.name).join(' | ') + ' | active:' + hls.audioTrack);
       if (tracks && tracks.length > 1) {
         // Buscar track en español
         const esIdx = tracks.findIndex(t => t.lang === 'es' || (t.name||'').toLowerCase().includes('espa'));
