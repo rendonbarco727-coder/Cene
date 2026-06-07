@@ -282,6 +282,7 @@
 
   <div class="cinema-header" id="main-header">
     <div class="cinema-logo">STRANGER</div>
+    <button class="icon-btn" onclick="openSearch()">🔍</button>
     <button class="icon-btn" onclick="openSettings()">⚙</button>
   </div>
 
@@ -447,9 +448,7 @@
     <button class="nav-item active" id="nav-catalog-btn" onclick="switchMainView('catalog', this)">
       <div class="nav-icon">🏠</div><span>Inicio</span>
     </button>
-    <button class="nav-item" onclick="switchMainView('search', this)">
-      <div class="nav-icon">🔍</div><span>Buscar</span>
-    </button>
+
     <button class="nav-item" id="nav-mylist-btn" onclick="switchMainView('mylist', this)">
       <div class="nav-icon">＋</div><span>Mi Lista</span>
     </button>
@@ -496,6 +495,9 @@ function initPlyr() {
   }
 }
 
+function openSearch() {
+  switchMainView('search', null);
+}
 function openSettings() {
   document.getElementById('server-url-input').value = getServer();
   document.getElementById('settings-modal').style.display = 'flex';
