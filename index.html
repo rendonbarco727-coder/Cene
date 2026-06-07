@@ -857,7 +857,7 @@ async function loadEpisodes(url) {
     const res = await fetch(`${getServer()}/episodios?url=${encodeURIComponent(url)}`);
     const data = await res.json();
     state.currentTemporadas = data;
-    const temps = Object.keys(data).filter(t => data[t] && data[t].length > 0 && t !== "T0");
+    const temps = Object.keys(data).filter(t => data[t] && data[t].length > 0 && t !== "T0").sort((a,b) => parseInt(a.replace("T","")) - parseInt(b.replace("T","")));
     if(temps.length > 0) {
       state.currentTab = temps[0];
       renderEpisodes(temps[0]);
