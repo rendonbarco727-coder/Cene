@@ -1290,16 +1290,17 @@ class _Bubble {
   update() { this.y-=this.s; this.w+=this.ws; this.x+=Math.sin(this.w)*0.5; if(this.y<-50) this.reset(); }
   draw(ctx) { ctx.save(); ctx.globalAlpha=0.5; const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r); g.addColorStop(0,'rgba(57,255,20,0.4)'); g.addColorStop(1,'rgba(57,255,20,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill(); ctx.strokeStyle='rgba(57,255,20,0.5)'; ctx.lineWidth=2; ctx.stroke(); ctx.restore(); }
 }
-class _Donut {
-  constructor() { this.reset(); this.y=Math.random()*-200-20; }
-  reset() { this.x=Math.random()*(window.innerWidth-60)+30; this.y=-30; this.r=Math.random()*20+14; this.ri=this.r*0.35; this.vy=Math.random()*1.5+1; this.vx=(Math.random()-0.5)*2; this.rot=0; this.rs=(Math.random()-0.5)*0.05; }
-  update() { this.y+=this.vy; this.x+=this.vx; this.rot+=this.rs; if(this.y>window.innerHeight+40) this.reset(); }
-  draw(ctx) { ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.rot); ctx.globalAlpha=0.8; const dg=ctx.createRadialGradient(0,0,this.ri,0,0,this.r); dg.addColorStop(0,'#d4a574'); dg.addColorStop(1,'#b8845e'); ctx.fillStyle=dg; ctx.beginPath(); ctx.arc(0,0,this.r,0,Math.PI*2); ctx.arc(0,0,this.ri,0,Math.PI*2,true); ctx.fill(); const gg=ctx.createRadialGradient(0,-2,this.ri,0,0,this.r); gg.addColorStop(0,'#ff69b4'); gg.addColorStop(1,'#ff1493'); ctx.fillStyle=gg; ctx.beginPath(); ctx.arc(0,0,this.r+1,0,Math.PI*2); ctx.arc(0,0,this.ri-1,0,Math.PI*2,true); ctx.fill(); ctx.restore(); }
+class _Sparkle {
+  constructor(x,y) { this.x=x; this.y=y; this.size=Math.random()*4+2; this.life=1; this.decay=Math.random()*0.03+0.015; this.color=`hsl(${Math.random()*360},100%,${Math.random()*30+60}%)`; this.angle=Math.random()*Math.PI*2; this.speed=Math.random()*2+1; }
+  update() { this.life-=this.decay; this.x+=Math.cos(this.angle)*this.speed; this.y+=Math.sin(this.angle)*this.speed; this.size*=0.97; }
+  draw(ctx) { if(this.life<=0) return; ctx.save(); ctx.globalAlpha=this.life; ctx.fillStyle=this.color; ctx.shadowColor=this.color; ctx.shadowBlur=8; ctx.beginPath(); for(let i=0;i<4;i++){const a=(i*Math.PI)/2;const ox=Math.cos(a)*this.size,oy=Math.sin(a)*this.size;const ix=Math.cos(a+Math.PI/4)*this.size*0.4,iy=Math.sin(a+Math.PI/4)*this.size*0.4;if(i===0)ctx.moveTo(this.x+ox,this.y+oy);else ctx.lineTo(this.x+ox,this.y+oy);ctx.lineTo(this.x+ix,this.y+iy);}ctx.closePath();ctx.fill();ctx.restore(); }
 }
-class _Cactus {
-  constructor() { this.x=Math.random()>0.5?Math.random()*60+30:window.innerWidth-Math.random()*60-30; this.y=window.innerHeight; this.h=Math.random()*250+180; this.w=Math.random()*35+25; this.prog=0; this.spd=Math.random()*0.006+0.003; this.arms=Math.floor(Math.random()*3)+1; }
-  update() { if(this.prog<1) this.prog+=this.spd; }
-  draw(ctx) { if(this.prog<0.1)return; const ch=this.h*this.prog; ctx.save(); ctx.globalAlpha=0.6; const tg=ctx.createLinearGradient(this.x-this.w/2,0,this.x+this.w/2,0); tg.addColorStop(0,'#1a4a0f'); tg.addColorStop(0.5,'#2d6b1e'); tg.addColorStop(1,'#1a4a0f'); ctx.fillStyle=tg; ctx.strokeStyle='#0d2d0a'; ctx.lineWidth=3; ctx.beginPath(); ctx.roundRect(this.x-this.w/2,this.y-ch,this.w,ch,12); ctx.fill(); ctx.stroke(); for(let i=0;i<this.arms;i++){const ay=this.y-ch*0.6-i*ch*0.15;ctx.beginPath();ctx.moveTo(this.x+(i%2?this.w/2:-this.w/2),ay);ctx.lineTo(this.x+(i%2?this.w/2+30:-this.w/2-30),ay-15);ctx.lineWidth=this.w*0.5;ctx.stroke();} if(this.prog>0.9){ctx.fillStyle='#ff69b4';ctx.beginPath();ctx.arc(this.x,this.y-ch+8,8,0,Math.PI*2);ctx.fill();} ctx.restore(); }
+class _Donut {
+  constructor() { this.reset(); this.y=Math.random()*-200-20; this.sprinkles=this._genSp(); }
+  _genSp() { const s=[]; for(let i=0;i<10;i++){const a=Math.random()*Math.PI*2,d=Math.random()*(this.r||10)*0.7; s.push({a,d,color:`hsl(${Math.random()*360},100%,60%)`,sz:Math.random()*2+1});} return s; }
+  reset() { this.x=Math.random()*((_themeCanvas.width||300)-60)+30; this.y=-30; this.r=Math.random()*14+10; this.ri=this.r*0.35; this.vy=Math.random()*1.2+0.8; this.vx=(Math.random()-0.5)*1.5; this.rot=0; this.rs=(Math.random()-0.5)*0.05; }
+  update() { this.y+=this.vy; this.x+=this.vx; this.rot+=this.rs; if(this.y>(_themeCanvas.height||400)+40) this.reset(); }
+  draw(ctx) { ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.rot); ctx.globalAlpha=0.75; ctx.fillStyle='#c4956a'; ctx.beginPath(); ctx.arc(0,0,this.r,0,Math.PI*2); ctx.arc(0,0,this.ri,0,Math.PI*2,true); ctx.fill(); ctx.fillStyle='#ff69b4'; ctx.beginPath(); ctx.arc(0,0,this.r+1,0,Math.PI*2); ctx.arc(0,0,this.ri-1,0,Math.PI*2,true); ctx.fill(); this.sprinkles.forEach(s=>{const sx=Math.cos(s.a)*s.d,sy=Math.sin(s.a)*s.d;ctx.fillStyle=s.color;ctx.fillRect(sx-s.sz/2,sy-s.sz/2,s.sz,s.sz*2);}); ctx.restore(); }
 }
 class _Crow {
   constructor() { this.fl=Math.random()>0.5; this.x=this.fl?-60:window.innerWidth+60; this.y=Math.random()*window.innerHeight*0.7+30; this.s=Math.random()*3+2; this.wa=0; this.ws=Math.random()*0.12+0.06; this.bs=Math.random()*10+14; this.yo=Math.random()*Math.PI*2; }
@@ -1332,6 +1333,10 @@ function _animateTheme() {
   if (!_themeCtx) return;
   _themeCtx.clearRect(0,0,_themeCanvas.width,_themeCanvas.height);
   _themeEffects.forEach(e=>{e.update();e.draw(_themeCtx);});
+  if (_themeEffectType==='donuts') {
+    _themeEffects.forEach(e=>{ if(e instanceof _Donut && Math.random()<0.15) _themeEffects.push(new _Sparkle(e.x,e.y)); });
+    _themeEffects = _themeEffects.filter(e=>!(e instanceof _Sparkle)||e.life>0);
+  }
   if (_themeEffectType==='blood') {
     _themeEffects = _themeEffects.filter(e=>!(e instanceof _BloodDrip)||!e.done||e.drips.length>0);
     if (_themeEffects.length<12 && Math.random()<0.04) _themeEffects.push(new _BloodDrip());
