@@ -1028,6 +1028,7 @@ async function playEpisodeData(url, idx) {
 async function resolveAndEmbed(url, trackingUrl) {
   document.getElementById('detail-backdrop').style.display = 'none';
   document.getElementById('embedded-player-container').style.display = 'block';
+  const tc = document.getElementById('themeCanvas'); if(tc) tc.style.zIndex = '1';
   const vloader = document.getElementById('video-loader');
   if (vloader) { vloader.style.display = 'flex'; }
   
@@ -1135,6 +1136,7 @@ function closePlayerMechanics() {
   
   document.getElementById('detail-backdrop').style.display = 'block';
   document.getElementById('embedded-player-container').style.display = 'none';
+  const tc2 = document.getElementById('themeCanvas'); if(tc2) tc2.style.zIndex = '201';
   document.getElementById('btn-rotate-screen').style.display = 'none';
   if(state.currentItem && state.currentItem.tipo !== 'serie') {
     document.getElementById('btn-play-main').style.display = 'block';
