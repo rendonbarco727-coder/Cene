@@ -162,6 +162,18 @@
     z-index: 200; 
     flex-direction: column;
   }
+  .detail-overlay::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: var(--detail-bg);
+    background-size: cover;
+    background-position: center;
+    filter: blur(30px) brightness(0.3);
+    transform: scale(1.1);
+    z-index: 0;
+  }
+  .detail-scroller { position: relative; z-index: 1; }
   .detail-scroller { flex: 1; overflow-y: auto; padding-bottom: 90px; }
 
   /* Zona Activa Intercambiable (Poster VS Video) */
@@ -672,6 +684,7 @@ function openDetail(item, fromPopstate) {
   closePlayerMechanics();
 
   document.getElementById('detail-backdrop').style.backgroundImage = `url('${item.portada || ''}')`;
+  document.getElementById('detail-overlay').style.setProperty('--detail-bg', `url('${item.portada || ''}')`);
   document.getElementById('detail-title').textContent = item.titulo;
   
   const isSerie = item.tipo === 'serie';
