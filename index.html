@@ -413,13 +413,14 @@
   </div>
 
   <div class="detail-overlay" id="detail-overlay">
+    <div class="backdrop-gradient-theme" id="theme-gradient"></div>
+    <canvas id="themeCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:201;"></canvas>
     
     <div class="detail-media-container">
       <button class="detail-back-btn" onclick="closeDetail()">←</button>
       
       <div class="detail-backdrop-wrap" id="detail-backdrop"></div>
-      <div class="backdrop-gradient-theme" id="theme-gradient"></div>
-      <canvas id="themeCanvas" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3;"></canvas>
+
       
       <div class="embedded-player-wrap" id="embedded-player-container">
         <div id="video-loader" style="display:none; position:absolute; inset:0; z-index:20; background:#000; align-items:center; justify-content:center; flex-direction:column; gap:12px;">
@@ -1088,10 +1089,9 @@ const _themeCtx = _themeCanvas ? _themeCanvas.getContext('2d') : null;
 let _themeAnimId = null, _themeEffects = [], _themeEffectType = 'none';
 
 function _resizeTC() {
-  const mc = document.querySelector('.detail-media-container');
-  if (!mc || !_themeCanvas) return;
-  _themeCanvas.width = mc.offsetWidth;
-  _themeCanvas.height = mc.offsetHeight;
+  if (!_themeCanvas) return;
+  _themeCanvas.width = window.innerWidth;
+  _themeCanvas.height = window.innerHeight;
 }
 window.addEventListener('resize', _resizeTC);
 
