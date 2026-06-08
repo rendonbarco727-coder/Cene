@@ -617,6 +617,7 @@ function resetCatalog(tipo) {
 async function loadCatalog(tipo) {
   const s = state[tipo];
   if (s.loading || s.done) return;
+  if (document.getElementById('detail-overlay').style.display === 'flex') return;
   s.loading = true;
   try {
     const endpoint = tipo === 'peliculas' ? 'peliculas' : 'series';
@@ -1040,6 +1041,7 @@ function prefetchUrl(url) {
 
 function prefetchItem(item) {
   if (!item || !item.url) return;
+  if (document.getElementById('detail-overlay').style.display === 'flex') return;
   prefetchUrl(item.url);
   // Para series prefetch también episodios
   if (item.tipo === 'serie') {
