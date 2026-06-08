@@ -302,6 +302,7 @@
     height: 100vh !important;
     pointer-events: none !important;
     z-index: 0 !important;
+    display: none;
   }
 
   /* Rick and Morty - Verde ácido sci-fi */
@@ -982,6 +983,7 @@ function openDetail(item, fromPopstate) {
   }
 
   document.getElementById('detail-overlay').style.display = 'flex';
+  const tcShow = document.getElementById('themeCanvas'); if(tcShow) tcShow.style.display = 'block';
   updateMiListaBtn();
   
   document.getElementById('detail-similares-section').style.display = item.tipo === 'pelicula' ? 'block' : 'none';
@@ -1011,6 +1013,7 @@ function closeDetail(fromPopstate) {
   if (_themeCtx) _themeCtx.clearRect(0, 0, _themeCanvas.width, _themeCanvas.height);
   _themeEffects = [];
   document.getElementById('detail-overlay').style.display = 'none';
+  const tcHide = document.getElementById('themeCanvas'); if(tcHide) tcHide.style.display = 'none';
   if (!fromPopstate) history.pushState({view: 'catalog'}, '', '');
 }
 
