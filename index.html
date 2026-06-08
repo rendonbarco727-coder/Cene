@@ -173,9 +173,9 @@
     background-position: center;
     filter: blur(30px) brightness(0.3);
     transform: scale(1.1);
-    z-index: 0;
+    z-index: -1;
   }
-  .detail-scroller { position: relative; z-index: 1; flex: 1; overflow-y: auto; padding-bottom: 90px; }
+  .detail-scroller { position: relative; z-index: 0; flex: 1; overflow-y: auto; padding-bottom: 90px; }
 
   .detail-media-container {
     width: 100%;
@@ -301,7 +301,7 @@
     width: 100vw !important;
     height: 100vh !important;
     pointer-events: none !important;
-    z-index: 201 !important;
+    z-index: 0 !important;
   }
 
   /* Rick and Morty - Verde ácido sci-fi */
@@ -1028,7 +1028,7 @@ async function playEpisodeData(url, idx) {
 async function resolveAndEmbed(url, trackingUrl) {
   document.getElementById('detail-backdrop').style.display = 'none';
   document.getElementById('embedded-player-container').style.display = 'block';
-  const tc = document.getElementById('themeCanvas'); if(tc) tc.style.zIndex = '1';
+  const tc = document.getElementById('themeCanvas'); if(tc) tc.style.zIndex = '-2';
   const vloader = document.getElementById('video-loader');
   if (vloader) { vloader.style.display = 'flex'; }
   
@@ -1136,7 +1136,7 @@ function closePlayerMechanics() {
   
   document.getElementById('detail-backdrop').style.display = 'block';
   document.getElementById('embedded-player-container').style.display = 'none';
-  const tc2 = document.getElementById('themeCanvas'); if(tc2) tc2.style.zIndex = '201';
+  const tc2 = document.getElementById('themeCanvas'); if(tc2) tc2.style.zIndex = '0';
   document.getElementById('btn-rotate-screen').style.display = 'none';
   if(state.currentItem && state.currentItem.tipo !== 'serie') {
     document.getElementById('btn-play-main').style.display = 'block';
