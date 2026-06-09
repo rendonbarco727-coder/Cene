@@ -1339,6 +1339,7 @@ function highlightActiveEp(idx) {
       node.style.paddingLeft = '10px';
       node.style.transition = 'all 0.3s ease';
       let badge = node.querySelector('.ep-playing-badge');
+      if (badge == null) {
         badge = document.createElement('div');
         badge.className = 'ep-playing-badge';
         badge.innerHTML = '&#9654; Reproduciendo';
