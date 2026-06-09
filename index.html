@@ -701,7 +701,8 @@ const state = {
   plyrInstance: null,
   trackingUrl: null,
   progressSaverInterval: null,
-  isRotated: false
+  isRotated: false,
+  currentEpIdx: null
 };
 
 function initPlyr() {
@@ -1022,6 +1023,8 @@ async function playMain() {
 }
 
 async function playEpisodeData(url, idx) {
+  state.currentEpIdx = idx;
+  highlightActiveEp(idx);
   await resolveAndEmbed(url, url);
   const eps = state.currentTemporadas[state.currentTab] || [];
   if (eps[idx + 1]) prefetchUrl(eps[idx + 1].url);
@@ -1133,6 +1136,8 @@ function cycleAudioTrack() {
 }
 
 function closePlayerMechanics() {
+  state.currentEpIdx = null;
+  highlightActiveEp(null);
   clearInterval(state.progressSaverInterval);
   if (state.plyrInstance) state.plyrInstance.stop();
   if (state.hls) { state.hls.destroy(); state.hls = null; }
@@ -1322,6 +1327,33 @@ class _BloodDrip {
   constructor() { this.x=Math.random()*window.innerWidth; this.sy=Math.random()*window.innerHeight*0.5; this.len=0; this.max=Math.random()*120+50; this.spd=Math.random()*0.6+0.3; this.w=Math.random()*4+2; this.op=Math.random()*0.5+0.3; this.done=false; this.drips=[]; }
   update() { if(this.len<this.max) this.len+=this.spd; else this.done=true; if(this.done&&Math.random()<0.03){this.drips.push({x:this.x,y:this.sy+this.len,size:Math.random()*3+1,vy:0,life:1});} this.drips.forEach(d=>{d.vy+=0.15;d.y+=d.vy;d.life-=0.015;}); this.drips=this.drips.filter(d=>d.life>0&&d.y<window.innerHeight); }
   draw(ctx) { if(this.len<2) return; ctx.save(); ctx.globalAlpha=this.op; const g=ctx.createLinearGradient(this.x,this.sy,this.x,this.sy+this.len); g.addColorStop(0,'rgba(139,0,0,0.9)'); g.addColorStop(1,'rgba(200,0,0,0.3)'); ctx.fillStyle=g; ctx.fillRect(this.x-this.w/2,this.sy,this.w,this.len); this.drips.forEach(d=>{ctx.globalAlpha=d.life*0.6;ctx.fillStyle='#8b0000';ctx.beginPath();ctx.arc(d.x,d.y,d.size,0,Math.PI*2);ctx.fill();}); ctx.restore(); }
+}
+
+function highlightActiveEp(idx) {
+  const nodes = document.querySelectorAll('#ep-list .ep-node');
+  nodes.forEach((node, i) => {
+    if (i === idx) {
+      node.style.background = 'rgba(229,9,20,0.12)';
+      node.style.borderRadius = '8px';
+      node.style.borderLeft = '3px solid var(--accent)';
+      node.style.paddingLeft = '10px';
+      node.style.transition = 'all 0.3s ease';
+      let badge = node.querySelector('.ep-playing-badge');
+        badge = document.createElement('div');
+        badge.className = 'ep-playing-badge';
+        badge.innerHTML = '&#9654; Reproduciendo';
+        badge.style.cssText = 'font-size:10px;font-weight:700;color:var(--accent);letter-spacing:1px;margin-top:4px;padding-left:2px;';
+        node.appendChild(badge);
+      }
+    } else {
+      node.style.background = '';
+      node.style.borderRadius = '';
+      node.style.borderLeft = '';
+      node.style.paddingLeft = '';
+      const badge = node.querySelector('.ep-playing-badge');
+      if (badge) badge.remove();
+    }
+  });
 }
 
 function _initThemeEffects(type) {
