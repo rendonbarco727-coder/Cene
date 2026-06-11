@@ -1057,7 +1057,10 @@ async function resolveAndEmbed(url, trackingUrl) {
       const blob = new Blob([data.m3u8_content], { type: 'application/vnd.apple.mpegurl' });
       streamUrl = URL.createObjectURL(blob);
     } else {
-      streamUrl = data.url || `${getServer()}/stream?url=${encodeURIComponent(data.original)}`;
+      const isVimeos = data.original && (data.original.includes('vimeos.zip') || data.original.includes('vimeos.net'));
+      streamUrl = isVimeos
+        ? data.original
+        : (data.url || `${getServer()}/stream?url=${encodeURIComponent(data.original)}`);
     }
     startHlsStream(streamUrl);
   } catch (e) {
