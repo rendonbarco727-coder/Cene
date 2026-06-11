@@ -1057,17 +1057,6 @@ async function resolveAndEmbed(url, trackingUrl) {
       const blob = new Blob([data.m3u8_content], { type: 'application/vnd.apple.mpegurl' });
       streamUrl = URL.createObjectURL(blob);
     } else {
-      if (data.embed && (data.embed.includes('vimeos.net') || data.embed.includes('vimeos.zip'))) {
-        // vimeos: usar iframe embed directo (el m3u8 directo da 403 por Referer)
-        const video = document.getElementById('video-player');
-        const iframe = document.createElement('iframe');
-        iframe.src = data.embed;
-        iframe.style.cssText = 'width:100%;height:100%;border:none;position:absolute;top:0;left:0;';
-        iframe.allowFullscreen = true;
-        iframe.allow = 'autoplay; fullscreen';
-        video.parentNode.replaceChild(iframe, video);
-        return;
-      }
       const isVimeos = data.original && (data.original.includes('vimeos.zip') || data.original.includes('vimeos.net'));
       streamUrl = isVimeos
         ? data.original
