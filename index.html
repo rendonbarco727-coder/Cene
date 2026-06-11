@@ -1057,7 +1057,7 @@ async function resolveAndEmbed(url, trackingUrl) {
       const blob = new Blob([data.m3u8_content], { type: 'application/vnd.apple.mpegurl' });
       streamUrl = URL.createObjectURL(blob);
     } else {
-      streamUrl = `${getServer()}/stream?url=${encodeURIComponent(data.url || data.original)}`;
+      streamUrl = data.url || `${getServer()}/stream?url=${encodeURIComponent(data.original)}`;
     }
     startHlsStream(streamUrl);
   } catch (e) {
