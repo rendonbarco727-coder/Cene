@@ -1027,8 +1027,7 @@ async function playEpisodeData(url, idx) {
   highlightActiveEp(idx);
   await resolveAndEmbed(url, url);
   const eps = state.currentTemporadas[state.currentTab] || [];
-  if (eps[idx + 1]) prefetchUrl(eps[idx + 1].url);
-  if (eps[idx + 2]) prefetchUrl(eps[idx + 2].url);
+  // prefetch episodios siguiente desactivado
 }
 
 async function resolveAndEmbed(url, trackingUrl) {
@@ -1307,6 +1306,7 @@ function prefetchUrl(url) {
 }
 
 function prefetchItem(item) {
+  return; // prefetch desactivado
   if (!item || !item.url) return;
   if (document.getElementById('detail-overlay').style.display === 'flex') return;
   prefetchUrl(item.url);
