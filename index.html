@@ -1092,6 +1092,12 @@ function loadEmbedIframe(embedUrl) {
 }
 
 function startHlsStream(src) {
+  // Si estamos en la app Android, usar ExoPlayer nativo
+  if (window.CineStranger) {
+    const title = state.currentItem ? (state.currentItem.titulo || '') : '';
+    window.CineStranger.playVideo(src, title);
+    return;
+  }
   const video = document.getElementById('video-player');
   if (state.hls) { state.hls.destroy(); state.hls = null; }
 
