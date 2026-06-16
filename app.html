@@ -1046,15 +1046,38 @@ async function resolveAndEmbed(url, trackingUrl) {
   try {
     const res = await fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
     const data = await res.json();
-    if (data.error || (!data.url && !data.original)) {
-      alert("No se pudo resolver el video: " + (data.error || "sin URL"));
+    if (data.error) {
+      alert("No se pudo resolver el video: " + data.error);
+      closePlayerMechanics();
+      return;
+    }
+    const title = state.currentItem ? (state.currentItem.titulo || '') : '';
+    // C8 WebView: app intercepta m3u8 desde embed
+    if (data.webview && data.embed) {
+      if (window.CineStranger) {
+        window.CineStranger.playVideo('webview://' + data.embed, title);
+      } else {
+        loadEmbedIframe(data.embed);
+      }
+      return;
+    }
+    // C8 m3u8 directo (filemoon/vidhide)
+    if (data.m3u8 && !data.url) {
+      if (window.CineStranger) {
+        window.CineStranger.playVideo(data.m3u8, title);
+      } else {
+        startHlsStream(data.m3u8);
+      }
+      return;
+    }
+    if (!data.url && !data.original) {
+      alert("No se pudo resolver el video: sin URL");
       closePlayerMechanics();
       return;
     }
     // App Android: siempre usar ExoPlayer con la URL directa
     if (window.CineStranger) {
       const playUrl = data.original || data.url;
-      const title = state.currentItem ? (state.currentItem.titulo || '') : '';
       window.CineStranger.playVideo(playUrl, title);
       closePlayerMechanics();
       return;
