@@ -1046,13 +1046,34 @@ async function resolveAndEmbed(url, trackingUrl) {
   try {
     const res = await fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
     const data = await res.json();
-    if (data.error || (!data.url && !data.original)) {
-      alert("No se pudo resolver el video: " + (data.error || "sin URL"));
+    if (data.error) {
+      alert("No se pudo resolver el video: " + data.error);
+      closePlayerMechanics();
+      return;
+    }
+    // C8 WebView: servidor indica que la app debe interceptar desde embed
+    if (data.webview && data.embed) {
+      if (window.CineStranger) {
+        // App Android: pasar embed para que WebView intercepte m3u8
+        window.CineStranger.playVideo('webview://' + data.embed, state.currentItem ? (state.currentItem.titulo || '') : '');
+      } else {
+        // Navegador: cargar embed en iframe
+        loadEmbedIframe(data.embed);
+      }
+      return;
+    }
+    // C8 m3u8 directo (filemoon/vidhide)
+    if (data.m3u8 && !data.url) {
+      startHlsStream(data.m3u8);
+      return;
+    }
+    if (!data.url && !data.original) {
+      alert("No se pudo resolver el video: sin URL");
       closePlayerMechanics();
       return;
     }
     // Si hay embed y no hay m3u8 útil, usar iframe
-    const isVimeos = data.original && (data.original.includes('vimeos.zip') || data.original.includes('vimeos.net') || data.original.includes('vimeos.net'));
+    const isVimeos = data.original && (data.original.includes('vimeos.zip') || data.original.includes('vimeos.net'));
     const hasUsableM3u8 = data.original && !isVimeos && !(data.todos && data.todos.length === 0);
     if (data.embed && !hasUsableM3u8) {
       loadEmbedIframe(data.embed);
