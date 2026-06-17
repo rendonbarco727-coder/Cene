@@ -955,6 +955,37 @@ function applyDetailTheme(titulo) {
 }
 
 // CONTROL DE DETALLES
+// Cargar metadatos reales desde /detalle
+function cargarMetadatos(item) {
+  fetch(`${getServer()}/detalle?url=${encodeURIComponent(item.url)}`)
+    .then(r => r.json())
+    .then(d => {
+      if (d.error) return;
+      if (d.sinopsis) {
+        const descEl = document.getElementById('detail-desc');
+        if (descEl && item.tipo === 'pelicula') descEl.textContent = d.sinopsis;
+      }
+      if (d.fecha) {
+        const yearEl = document.getElementById('detail-year');
+        if (yearEl) yearEl.textContent = d.fecha;
+      }
+      if (d.calidad || d.genero) {
+        const durEl = document.getElementById('detail-duration-lbl');
+        if (durEl && item.tipo === 'pelicula') {
+          durEl.textContent = [d.calidad, d.genero].filter(Boolean).join(' · ');
+        }
+      }
+      const credEl = document.querySelector('.detail-credits');
+      if (credEl) {
+        let html = '';
+        if (d.director) html += 'Director: <span>' + d.director + '</span><br>';
+        if (d.elenco) html += 'Elenco: <span>' + d.elenco + '</span>';
+        if (html) credEl.innerHTML = html;
+      }
+    })
+    .catch(() => {});
+}
+
 function openDetail(item, fromPopstate) {
   state.currentItem = item;
   if (!fromPopstate) history.pushState({view: 'detail', item: item}, '', '');
@@ -983,6 +1014,7 @@ function openDetail(item, fromPopstate) {
     document.getElementById('detail-desc').textContent = "Sinopsis oficial no disponible en este momento. Explora las temporadas o reproduce directamente el flujo de streaming sincronizado.";
   }
 
+    cargarMetadatos(item);
   document.getElementById('detail-overlay').style.display = 'flex';
   const tcShow = document.getElementById('themeCanvas'); if(tcShow) tcShow.style.display = 'block';
   updateMiListaBtn();
