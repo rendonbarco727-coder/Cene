@@ -958,17 +958,17 @@ function applyDetailTheme(titulo) {
 function openDetail(item, fromPopstate) {
   state.currentItem = item;
   if (!fromPopstate) history.pushState({view: 'detail', item: item}, '', '');
-  
+
   closePlayerMechanics();
 
   document.getElementById('detail-backdrop').style.backgroundImage = `url('${item.portada || ''}')`;
   applyDetailTheme(item.titulo);
   document.getElementById('detail-overlay').style.setProperty('--detail-bg', `url('${item.portada || ''}')`);
   document.getElementById('detail-title').textContent = item.titulo;
-  
+
   const isSerie = item.tipo === 'serie';
-  document.getElementById('detail-duration-lbl').textContent = isSerie ? 'Serie' : '1h 56m';
-  document.getElementById('detail-year').textContent = isSerie ? '2026' : '2025';
+  document.getElementById('detail-duration-lbl').textContent = isSerie ? 'Serie' : '...';
+  document.getElementById('detail-year').textContent = '...';
 
   const btnPlay = document.getElementById('btn-play-main');
   const epsSection = document.getElementById('detail-episodes-section');
@@ -980,33 +980,29 @@ function openDetail(item, fromPopstate) {
   } else {
     btnPlay.style.display = 'block';
     epsSection.style.display = 'none';
-    document.getElementById('detail-desc').textContent = "Sinopsis oficial no disponible en este momento. Explora las temporadas o reproduce directamente el flujo de streaming sincronizado.";
   }
+
+  // Cargar metadatos reales desde el servidor
+  fetch(`${getServer()}/detalle?url=${encodeURIComponent(item.url)}`)
+    .then(r => r.json())
+    .then(d => {
+      if (d.sinopsis) document.getElementById('detail-desc').textContent = d.sinopsis;
+      else if (!isSerie) document.getElementById('detail-desc').textContent = "Sinopsis oficial no disponible en este momento.";
+      if (d.fecha) document.getElementById('detail-year').textContent = d.fecha;
+      if (d.genero || d.calidad) {
+        document.getElementById('detail-duration-lbl').textContent = [d.calidad, d.genero].filter(Boolean).join(' · ');
+      }
+      if (d.director || d.elenco) {
+        document.querySelector('.detail-credits').innerHTML = 
+          (d.director ? 'Director: <span>' + d.director + '</span><br>' : '') +
+          (d.elenco ? 'Elenco: <span>' + d.elenco + '</span>' : '');
+      }
+    })
+    .catch(() => {});
 
   document.getElementById('detail-overlay').style.display = 'flex';
   const tcShow = document.getElementById('themeCanvas'); if(tcShow) tcShow.style.display = 'block';
   updateMiListaBtn();
-  
-  document.getElementById('detail-similares-section').style.display = item.tipo === 'pelicula' ? 'block' : 'none';
-
-  const grid = document.getElementById('detail-similares-grid');
-  grid.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">Cargando...</div>';
-  fetch(`${getServer()}/similares?titulo=${encodeURIComponent(item.titulo)}&tipo=${item.tipo}&limite=9`)
-    .then(r => r.json())
-    .then(items => {
-      grid.innerHTML = '';
-      items.filter(s => s.url !== item.url).slice(0, 9).forEach(s => {
-        const div = document.createElement('div');
-        div.style.cssText = 'cursor:pointer;border-radius:6px;overflow:hidden;background:var(--bg-card);';
-        div.innerHTML = `<img src="${s.portada}" style="width:100%;aspect-ratio:2/3;object-fit:cover;" loading="lazy">
-          <div style="padding:4px 6px;font-size:10px;text-align:center;color:var(--text-muted);">${s.titulo}</div>`;
-        div.onclick = () => openDetail(s);
-        grid.appendChild(div);
-      });
-      if (!grid.children.length) grid.innerHTML = '';
-    })
-    .catch(() => { grid.innerHTML = ''; });
-}
 
 function closeDetail(fromPopstate) {
   closePlayerMechanics();
