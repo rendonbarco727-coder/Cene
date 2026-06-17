@@ -1092,7 +1092,13 @@ async function resolveAndEmbed(url, trackingUrl) {
       closePlayerMechanics();
       return;
     }
-    // Siempre usar el proxy del servidor (maneja vimeos, filemoon, etc.)
+    // Si es vimeos y hay embed, usar iframe (más confiable)
+    if (data.embed && (data.embed.includes('vimeos.net') || data.embed.includes('vimeos.zip'))) {
+      debugLog('Usando embed iframe para vimeos');
+      loadEmbedIframe(data.embed);
+      return;
+    }
+    // Para otros CDNs, usar el proxy
     let streamUrl;
     if (data.original) {
       streamUrl = `${getServer()}/stream?url=${encodeURIComponent(data.original)}` +
