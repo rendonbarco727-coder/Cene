@@ -1645,24 +1645,15 @@ function playSelectedVariant() {
   const audios = data.variantes.filter(v => v.tipo === 'audio');
   const selectedVideo = videos[parseInt(videoIdx)];
   const selectedAudio = audios.length > 0 && audioIdx !== undefined ? audios[parseInt(audioIdx)] : null;
-  const embed = data.embed || '';
   
-  // Pasar las URLs a través del proxy para que el CDN las acepte
-  const videoUrl = `${getServer()}/stream?url=${encodeURIComponent(selectedVideo.url)}` +
-    (embed ? `&referer=${encodeURIComponent(embed)}` : '');
-  const audioUrl = selectedAudio 
-    ? `${getServer()}/stream?url=${encodeURIComponent(selectedAudio.url)}` +
-      (embed ? `&referer=${encodeURIComponent(embed)}` : '')
-    : '';
-  
-  // Construir un M3U8 maestro que use el proxy
+  // Las URLs ya vienen proxyficadas desde el servidor, solo construir el master M3U8
   let m3u8Content = '#EXTM3U\n';
-  if (audioUrl) {
-    m3u8Content += `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio0",NAME="${selectedAudio.nombre}",LANGUAGE="${selectedAudio.idioma}",AUTOSELECT=YES,DEFAULT=YES,URI="${audioUrl}"\n`;
+  if (selectedAudio) {
+    m3u8Content += `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio0",NAME="${selectedAudio.nombre}",LANGUAGE="${selectedAudio.idioma}",AUTOSELECT=YES,DEFAULT=YES,URI="${selectedAudio.url}"\n`;
   }
   m3u8Content += `#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=${selectedVideo.bitrate},RESOLUTION=${selectedVideo.resolucion},CODECS="${selectedVideo.codecs}"`;
-  if (audioUrl) m3u8Content += `,AUDIO="audio0"`;
-  m3u8Content += `\n${videoUrl}`;
+  if (selectedAudio) m3u8Content += `,AUDIO="audio0"`;
+  m3u8Content += `\n${selectedVideo.url}`;
   
   const blob = new Blob([m3u8Content], { type: 'application/vnd.apple.mpegurl' });
   const streamUrl = URL.createObjectURL(blob);
