@@ -961,20 +961,24 @@ function cargarMetadatos(item) {
     .then(r => r.json())
     .then(d => {
       if (d.error) return;
+      // Sinopsis (películas y series)
       if (d.sinopsis) {
         const descEl = document.getElementById('detail-desc');
-        if (descEl && item.tipo === 'pelicula') descEl.textContent = d.sinopsis;
+        if (descEl) descEl.textContent = d.sinopsis;
       }
+      // Año / fecha
       if (d.fecha) {
         const yearEl = document.getElementById('detail-year');
         if (yearEl) yearEl.textContent = d.fecha;
       }
+      // Calidad y género (reemplaza el texto genérico en películas y series)
       if (d.calidad || d.genero) {
         const durEl = document.getElementById('detail-duration-lbl');
-        if (durEl && item.tipo === 'pelicula') {
+        if (durEl) {
           durEl.textContent = [d.calidad, d.genero].filter(Boolean).join(' · ');
         }
       }
+      // Director/creador y elenco
       const credEl = document.querySelector('.detail-credits');
       if (credEl) {
         let html = '';
