@@ -1075,7 +1075,7 @@ async function resolveAndEmbed(url, trackingUrl) {
     // Si hay embed y no hay m3u8 útil, usar iframe
     const isVimeos = data.original && (data.original.includes('vimeos.zip') || data.original.includes('vimeos.net'));
     const hasUsableM3u8 = data.original && !isVimeos && !(data.todos && data.todos.length === 0);
-    if (data.embed && !hasUsableM3u8) {
+    if (data.embed && !hasUsableM3u8 && !isVimeos) {
       loadEmbedIframe(data.embed);
       return;
     }
