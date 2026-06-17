@@ -1640,20 +1640,27 @@ function playSelectedVariant() {
   const audios = data.variantes.filter(v => v.tipo === 'audio');
   const selectedVideo = videos[parseInt(videoIdx)];
   const selectedAudio = audios.length > 0 && audioIdx !== undefined ? audios[parseInt(audioIdx)] : null;
+  const embed = data.embed || '';
   
-  let streamUrl;
-  if (selectedAudio) {
-    // Crear un M3U8 personalizado con la combinación seleccionada
-    const m3u8Content = `#EXTM3U
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio0",NAME="${selectedAudio.nombre}",LANGUAGE="${selectedAudio.idioma}",AUTOSELECT=YES,DEFAULT=YES,URI="${selectedAudio.url}"
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=${selectedVideo.bitrate},RESOLUTION=${selectedVideo.resolucion},CODECS="${selectedVideo.codecs}",AUDIO="audio0"
-${selectedVideo.url}`;
-    const blob = new Blob([m3u8Content], { type: 'application/vnd.apple.mpegurl' });
-    streamUrl = URL.createObjectURL(blob);
-  } else {
-    // Usar el proxy con el video seleccionado
-    streamUrl = `${getServer()}/stream?url=${encodeURIComponent(selectedVideo.url)}`;
+  // Pasar las URLs a través del proxy para que el CDN las acepte
+  const videoUrl = `${getServer()}/stream?url=${encodeURIComponent(selectedVideo.url)}` +
+    (embed ? `&referer=${encodeURIComponent(embed)}` : '');
+  const audioUrl = selectedAudio 
+    ? `${getServer()}/stream?url=${encodeURIComponent(selectedAudio.url)}` +
+      (embed ? `&referer=${encodeURIComponent(embed)}` : '')
+    : '';
+  
+  // Construir un M3U8 maestro que use el proxy
+  let m3u8Content = '#EXTM3U\n';
+  if (audioUrl) {
+    m3u8Content += `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio0",NAME="${selectedAudio.nombre}",LANGUAGE="${selectedAudio.idioma}",AUTOSELECT=YES,DEFAULT=YES,URI="${audioUrl}"\n`;
   }
+  m3u8Content += `#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=${selectedVideo.bitrate},RESOLUTION=${selectedVideo.resolucion},CODECS="${selectedVideo.codecs}"`;
+  if (audioUrl) m3u8Content += `,AUDIO="audio0"`;
+  m3u8Content += `\n${videoUrl}`;
+  
+  const blob = new Blob([m3u8Content], { type: 'application/vnd.apple.mpegurl' });
+  const streamUrl = URL.createObjectURL(blob);
   
   closeStreamOptions();
   startHlsStream(streamUrl);
