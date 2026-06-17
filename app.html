@@ -1077,7 +1077,10 @@ async function resolveAndEmbed(url, trackingUrl) {
     }
     // App Android: siempre usar ExoPlayer con la URL directa
     if (window.CineStranger) {
-      const playUrl = data.original || data.url;
+      let playUrl = data.original || data.url;
+      if (playUrl && (playUrl.includes('vimeos.zip') || playUrl.includes('vimeos.net'))) {
+        playUrl = getServer() + '/stream?url=' + encodeURIComponent(playUrl) + '&ref=' + encodeURIComponent('https://vimeos.net/');
+      }
       window.CineStranger.playVideo(playUrl, title);
       closePlayerMechanics();
       return;
