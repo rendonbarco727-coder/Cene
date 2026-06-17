@@ -1095,7 +1095,8 @@ async function resolveAndEmbed(url, trackingUrl) {
     // Siempre usar el proxy del servidor (maneja vimeos, filemoon, etc.)
     let streamUrl;
     if (data.original) {
-      streamUrl = `${getServer()}/stream?url=${encodeURIComponent(data.original)}`;
+      streamUrl = `${getServer()}/stream?url=${encodeURIComponent(data.original)}` +
+        (data.embed ? `&referer=${encodeURIComponent(data.embed)}` : '');
     } else if (data.url) {
       streamUrl = data.url;
     } else {
