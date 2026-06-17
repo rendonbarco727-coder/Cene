@@ -1152,7 +1152,12 @@ function startHlsStream(src) {
 
   if (Hls.isSupported()) {
     debugLog('HLS soportado, cargando...');
-    const hls = new Hls({ enableWorker: false });
+    const hls = new Hls({ 
+      enableWorker: false,
+      fragLoadingTimeOut: 60000,
+      manifestLoadingTimeOut: 30000,
+      levelLoadingTimeOut: 60000
+    });
     hls.loadSource(src);
     hls.on(Hls.Events.ERROR, function(event, data) {
       debugLog('ERROR HLS: ' + data.type + ' - ' + (data.details || ''));
