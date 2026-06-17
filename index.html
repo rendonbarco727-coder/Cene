@@ -1036,7 +1036,7 @@ async function resolveAndEmbed(url, trackingUrl) {
   const tc = document.getElementById('themeCanvas'); if(tc) tc.style.zIndex = '-2';
   const vloader = document.getElementById('video-loader');
   if (vloader) { vloader.style.display = 'flex'; }
-  
+
   state.trackingUrl = trackingUrl;
   initPlyr();
 
@@ -1051,40 +1051,16 @@ async function resolveAndEmbed(url, trackingUrl) {
       closePlayerMechanics();
       return;
     }
-    // C8 WebView: servidor indica que la app debe interceptar desde embed
-    if (data.webview && data.embed) {
-      if (window.CineStranger) {
-        // App Android: pasar embed para que WebView intercepte m3u8
-        window.CineStranger.playVideo('webview://' + data.embed, state.currentItem ? (state.currentItem.titulo || '') : '');
-      } else {
-        // Navegador: cargar embed en iframe
-        loadEmbedIframe(data.embed);
-      }
-      return;
-    }
-    // C8 m3u8 directo (filemoon/vidhide)
-    if (data.m3u8 && !data.url) {
-      startHlsStream(data.m3u8);
-      return;
-    }
-    if (!data.url && !data.original) {
+    // Siempre usar el proxy del servidor (maneja vimeos, filemoon, etc.)
+    let streamUrl;
+    if (data.original) {
+      streamUrl = `${getServer()}/stream?url=${encodeURIComponent(data.original)}`;
+    } else if (data.url) {
+      streamUrl = data.url;
+    } else {
       alert("No se pudo resolver el video: sin URL");
       closePlayerMechanics();
       return;
-    }
-    // Si hay embed y no hay m3u8 útil, usar iframe
-    const isVimeos = data.original && (data.original.includes('vimeos.zip') || data.original.includes('vimeos.net'));
-    const hasUsableM3u8 = data.original && !isVimeos && !(data.todos && data.todos.length === 0);
-    if (data.embed && !hasUsableM3u8 && !isVimeos) {
-      loadEmbedIframe(data.embed);
-      return;
-    }
-    let streamUrl;
-    if (data.m3u8_content) {
-      const blob = new Blob([data.m3u8_content], { type: 'application/vnd.apple.mpegurl' });
-      streamUrl = URL.createObjectURL(blob);
-    } else {
-      streamUrl = data.url || `${getServer()}/stream?url=${encodeURIComponent(data.original)}`;
     }
     startHlsStream(streamUrl);
   } catch (e) {
@@ -1092,7 +1068,6 @@ async function resolveAndEmbed(url, trackingUrl) {
     closePlayerMechanics();
   }
 }
-
 function loadEmbedIframe(embedUrl) {
   const container = document.getElementById('embedded-player-container');
   const video = document.getElementById('video-player');
