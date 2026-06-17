@@ -750,6 +750,7 @@ function onHeaderSearch(q) {
     try {
       const res = await fetch(`${getServer()}/buscar?q=${encodeURIComponent(q)}`);
       const data = await res.json();
+    debugLog('Resolver data: ' + JSON.stringify(data).substring(0,200));
       const items = data.resultados || data || [];
       if (!items.length) {
         box.innerHTML = '<div style="color:rgba(255,255,255,0.4);padding:16px;text-align:center;">Sin resultados</div>';
@@ -816,10 +817,12 @@ async function loadCatalog(tipo) {
     const endpoint = tipo === 'peliculas' ? 'peliculas' : 'series';
     const res = await fetch(`${getServer()}/cinecalidad/${endpoint}?pagina=${s.page}&limite=50`);
     const data = await res.json();
+    debugLog('Resolver data: ' + JSON.stringify(data).substring(0,200));
     const items = data.items || data || [];
     if (s.page === 1 && items.length > 0 && tipo === 'peliculas') setupHeroBanner(items[0]);
     renderCards(items, `${tipo}-grid`, true);
   } catch (e) {
+    debugLog('ERROR en resolveAndEmbed: ' + e.message);
     document.getElementById(`${tipo}-state`).innerHTML = `<div class="state-msg">⚠️ Servidor desconectado.</div>`;
   } finally { s.loading = false; }
 }
@@ -1067,6 +1070,7 @@ async function playEpisodeData(url, idx) {
 }
 
 async function resolveAndEmbed(url, trackingUrl) {
+  debugLog('resolveAndEmbed: ' + url);
   document.getElementById('detail-backdrop').style.display = 'none';
   document.getElementById('embedded-player-container').style.display = 'block';
   const tc = document.getElementById('themeCanvas'); if(tc) tc.style.zIndex = '-2';
@@ -1082,6 +1086,7 @@ async function resolveAndEmbed(url, trackingUrl) {
   try {
     const res = await fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
     const data = await res.json();
+    debugLog('Resolver data: ' + JSON.stringify(data).substring(0,200));
     if (data.error) {
       alert("No se pudo resolver el video: " + data.error);
       closePlayerMechanics();
@@ -1098,8 +1103,10 @@ async function resolveAndEmbed(url, trackingUrl) {
       closePlayerMechanics();
       return;
     }
+    debugLog('Llamando startHlsStream con: ' + streamUrl);
     startHlsStream(streamUrl);
   } catch (e) {
+    debugLog('ERROR en resolveAndEmbed: ' + e.message);
     alert("Error cargando el flujo de streaming.");
     closePlayerMechanics();
   }
@@ -1124,6 +1131,7 @@ function loadEmbedIframe(embedUrl) {
 }
 
 function startHlsStream(src) {
+  debugLog('startHlsStream: ' + src.substring(0,100));
   // Si estamos en la app Android, usar ExoPlayer nativo
   if (window.CineStranger) {
     const title = state.currentItem ? (state.currentItem.titulo || '') : '';
@@ -1134,11 +1142,16 @@ function startHlsStream(src) {
   if (state.hls) { state.hls.destroy(); state.hls = null; }
 
   if (Hls.isSupported()) {
+    debugLog('HLS soportado, cargando...');
     const hls = new Hls({ enableWorker: false });
     hls.loadSource(src);
+    hls.on(Hls.Events.ERROR, function(event, data) {
+      debugLog('ERROR HLS: ' + data.type + ' - ' + (data.details || ''));
+    });
     hls.attachMedia(video);
     state.hls = hls;
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      debugLog('MANIFEST PARSED, iniciando reproducción');
       const tracks = hls.audioTracks;
       if (tracks && tracks.length > 1) {
         const esIdx = tracks.findIndex(t => t.lang === 'es' || (t.name||'').toLowerCase().includes('espa'));
@@ -1156,6 +1169,7 @@ function startHlsStream(src) {
       if (vl) vl.style.display = 'none';
     });
   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    debugLog('Usando reproducción nativa HLS');
     video.src = src;
     video.addEventListener('loadedmetadata', () => {
       syncSavedProgress(video);
@@ -1246,6 +1260,7 @@ async function loadEpisodes(url) {
   try {
     const res = await fetch(`${getServer()}/episodios?url=${encodeURIComponent(url)}`);
     const data = await res.json();
+    debugLog('Resolver data: ' + JSON.stringify(data).substring(0,200));
     state.currentTemporadas = data;
     const temps = Object.keys(data).filter(t => data[t] && data[t].length > 0).sort((a,b) => parseInt(a.replace("T","")) - parseInt(b.replace("T","")));
     if(temps.length > 0) {
@@ -1255,7 +1270,8 @@ async function loadEpisodes(url) {
       document.getElementById('detail-duration-lbl').textContent = n + (n === 1 ? ' temporada' : ' temporadas');
       document.getElementById('season-dropdown-label').textContent = 'Temporada ' + temps[0].replace('T','');
     }
-  } catch (e) { }
+  } catch (e) {
+    debugLog('ERROR en resolveAndEmbed: ' + e.message); }
 }
 
 function renderEpisodes(t) {
@@ -1636,6 +1652,22 @@ function copyLogs() {
   });
 }
 </script>
+
+<div id="debug-panel" style="position:fixed;bottom:0;left:0;width:100%;max-height:180px;overflow-y:auto;background:rgba(0,0,0,0.9);color:#0f0;font-family:monospace;font-size:11px;z-index:99999;padding:6px;display:none;"></div>
+<script>
+function debugLog(msg) {
+  var p = document.getElementById('debug-panel');
+  if (p) {
+    p.style.display = 'block';
+    p.innerHTML += '[' + new Date().toLocaleTimeString() + '] ' + msg + '<br>';
+    p.scrollTop = p.scrollHeight;
+  }
+  console.log('[DEBUG] ' + msg);
+}
+// Activar debug por defecto
+debugLog('DEBUG activado');
+</script>
+
 </body>
 </html>
 
