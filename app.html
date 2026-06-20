@@ -1038,7 +1038,7 @@ async function downloadMain() {
     if (data.error) { alert("No se pudo resolver: " + data.error); return; }
 
     const finalUrl = data.m3u8 || data.original || data.url;
-    const referer  = data.embed || url;
+    const referer  = data.referer || data.embed || url;
 
     if (!finalUrl) { alert("No se encontró URL de descarga"); return; }
 
@@ -1112,7 +1112,9 @@ async function resolveAndEmbed(url, trackingUrl) {
         // WebView captura m3u8 directo; fallback al m3u8 via onPlayerError en DetalleActivity
         window.CineStranger.playVideo('webview://' + data.embed, title);
       } else {
-        window.CineStranger.playVideo(data.original || data.url, title);
+        // Pasar referer para reproducción con headers correctos
+        const ref = data.referer || data.embed || '';
+        window.CineStranger.playVideo(data.original || data.url, title, ref);
       }
       closePlayerMechanics();
       return;
