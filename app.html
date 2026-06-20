@@ -1094,7 +1094,8 @@ async function resolveAndEmbed(url, trackingUrl) {
     // C8 m3u8 directo (filemoon/vidhide)
     if (data.m3u8 && !data.url) {
       if (window.CineStranger) {
-        window.CineStranger.playVideo(data.m3u8, title);
+        const ref1 = data.referer || data.embed || '';
+        window.CineStranger.showVideoOptions(data.m3u8, title, ref1);
       } else {
         startHlsStream(data.m3u8);
       }
@@ -1112,9 +1113,8 @@ async function resolveAndEmbed(url, trackingUrl) {
         // WebView captura m3u8 directo; fallback al m3u8 via onPlayerError en DetalleActivity
         window.CineStranger.playVideo('webview://' + data.embed, title);
       } else {
-        // Pasar referer para reproducción con headers correctos
         const ref = data.referer || data.embed || '';
-        window.CineStranger.playVideo(data.original || data.url, title, ref);
+        window.CineStranger.showVideoOptions(data.original || data.url, title, ref);
       }
       closePlayerMechanics();
       return;
