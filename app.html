@@ -973,11 +973,14 @@ function openDetail(item, fromPopstate) {
   const btnPlay = document.getElementById('btn-play-main');
   const epsSection = document.getElementById('detail-episodes-section');
 
+  const btnDownload = document.getElementById('btn-download-main');
   if (isSerie) {
     btnPlay.style.display = 'none';
+    if (btnDownload) btnDownload.style.display = 'none';
     epsSection.style.display = 'block';
     loadEpisodes(item.url);
   } else {
+    if (btnDownload) btnDownload.style.display = 'inline-flex';
     btnPlay.style.display = 'block';
     epsSection.style.display = 'none';
     document.getElementById('detail-desc').textContent = "Sinopsis oficial no disponible en este momento. Explora las temporadas o reproduce directamente el flujo de streaming sincronizado.";
@@ -1020,6 +1023,33 @@ function closeDetail(fromPopstate) {
 
 async function playMain() {
   if (state.currentItem) await resolveAndEmbed(state.currentItem.url, state.currentItem.url);
+}
+
+async function downloadMain() {
+  if (!state.currentItem) return;
+  const title = state.currentItem.titulo || 'video';
+  const url = state.currentItem.url;
+  if (!url) return;
+
+  // Resolver URL antes de descargar
+  try {
+    const res = await fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+    if (data.error) { alert("No se pudo resolver: " + data.error); return; }
+
+    const finalUrl = data.m3u8 || data.original || data.url;
+    const referer  = data.embed || url;
+
+    if (!finalUrl) { alert("No se encontró URL de descarga"); return; }
+
+    if (window.CineStranger) {
+      window.CineStranger.showVideoOptions(finalUrl, title, referer);
+    } else {
+      alert("Descarga no disponible en navegador. Usa la app Android.");
+    }
+  } catch(e) {
+    alert("Error al resolver: " + e.message);
+  }
 }
 
 async function playEpisodeData(url, idx) {
