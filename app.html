@@ -1112,7 +1112,6 @@ async function resolveAndEmbed(url, trackingUrl) {
       } else {
         window.CineStranger.playVideo('webview://' + (data.original || data.url), title);
       }
-      closePlayerMechanics();
       return;
     }
     // Si hay embed y no hay m3u8 útil, usar iframe
