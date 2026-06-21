@@ -1084,6 +1084,8 @@ async function resolveAndEmbed(url, trackingUrl) {
     // C8 WebView: app intercepta m3u8 desde embed
     if (data.webview && data.embed) {
       if (window.CineStranger) {
+        const vloader1 = document.getElementById('video-loader');
+        if (vloader1) vloader1.style.display = 'none';
         window.CineStranger.playVideo('webview://' + data.embed, title);
       } else {
         loadEmbedIframe(data.embed);
@@ -1093,6 +1095,8 @@ async function resolveAndEmbed(url, trackingUrl) {
     // C8 m3u8 directo (filemoon/vidhide)
     if (data.m3u8 && !data.url) {
       if (window.CineStranger) {
+        const vloader2 = document.getElementById('video-loader');
+        if (vloader2) vloader2.style.display = 'none';
         window.CineStranger.playVideo('webview://' + data.m3u8, title);
       } else {
         startHlsStream(data.m3u8);
@@ -1106,6 +1110,8 @@ async function resolveAndEmbed(url, trackingUrl) {
     }
     // App Android: siempre usar ExoPlayer con la URL directa
     if (window.CineStranger) {
+      const vloader3 = document.getElementById('video-loader');
+      if (vloader3) vloader3.style.display = 'none';
       // Sin ExoPlayer: cualquier fuente con embed (pagina HTML real) va por WebView
       if (data.embed && /^https?:\/\//i.test(data.embed)) {
         window.CineStranger.playVideo('webview://' + data.embed, title);
