@@ -1106,12 +1106,10 @@ async function resolveAndEmbed(url, trackingUrl) {
     }
     // App Android: siempre usar ExoPlayer con la URL directa
     if (window.CineStranger) {
-      const isVimeosAndroid = data.original && (data.original.includes('vimeos.zip') || data.original.includes('vimeos.net'));
-      if (isVimeosAndroid && data.embed) {
-        // WebView captura m3u8 directo; fallback al m3u8 via onPlayerError en DetalleActivity
+      // Sin ExoPlayer: cualquier fuente con embed (pagina HTML real) va por WebView
+      if (data.embed && /^https?:\/\//i.test(data.embed)) {
         window.CineStranger.playVideo('webview://' + data.embed, title);
       } else {
-        const ref = data.referer || data.embed || '';
         window.CineStranger.playVideo('webview://' + (data.original || data.url), title);
       }
       closePlayerMechanics();
