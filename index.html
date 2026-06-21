@@ -179,8 +179,6 @@
     position: relative;
     background-color: #000;
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 400px;
-    overflow: hidden;
   }
   @media (min-width: 768px) {
     .detail-media-container { max-height: 55vh; }
@@ -422,6 +420,13 @@
     #detail-similares-grid { grid-template-columns: repeat(6, 1fr) !important; }
   }
 
+
+  @media (min-width: 768px) {
+    .detail-media-container {
+      max-height: 55vh;
+      overflow: hidden;
+    }
+  }
 </style>
 </head>
 <body>
