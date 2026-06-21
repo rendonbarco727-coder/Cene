@@ -1071,7 +1071,6 @@ async function resolveAndEmbed(url, trackingUrl) {
   initPlyr();
 
   document.getElementById('btn-play-main').style.display = 'none';
-  document.getElementById('btn-rotate-screen').style.display = 'inline-flex';
 
   try {
     const res = await fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
@@ -1180,11 +1179,7 @@ function startHlsStream(src) {
         const esIdx = tracks.findIndex(t => t.lang === 'es' || (t.name||'').toLowerCase().includes('espa'));
         if (esIdx >= 0) hls.audioTrack = esIdx;
         const label = tracks[hls.audioTrack]?.lang || 'ES';
-        const btn = document.getElementById('btn-rotate-screen');
-        btn.textContent = '🌐 ' + label.toUpperCase().slice(0,2);
-        btn.style.display = 'inline-flex';
       } else {
-        document.getElementById('btn-rotate-screen').style.display = 'none';
       }
       syncSavedProgress(video);
       state.plyrInstance.play();
@@ -1223,16 +1218,7 @@ function syncSavedProgress(video) {
   if (saved[state.trackingUrl]) video.currentTime = saved[state.trackingUrl].time;
 }
 
-function cycleAudioTrack() {
-  if (!state.hls) return;
-  const tracks = state.hls.audioTracks;
-  if (!tracks || tracks.length < 2) return;
-  const current = state.hls.audioTrack;
-  const next = (current + 1) % tracks.length;
-  state.hls.audioTrack = next;
-  const label = tracks[next].lang || tracks[next].name || ('Track ' + next);
-  document.getElementById('btn-rotate-screen').textContent = '🌐 ' + label.toUpperCase().slice(0,2);
-}
+
 
 function closePlayerMechanics() {
   state.currentEpIdx = null;
@@ -1249,7 +1235,6 @@ function closePlayerMechanics() {
   document.getElementById('embedded-player-container').style.display = 'none';
   if (window.CineStranger) window.CineStranger.hidePlayer();
   const tc2 = document.getElementById('themeCanvas'); if(tc2) tc2.style.zIndex = '0';
-  document.getElementById('btn-rotate-screen').style.display = 'none';
   if(state.currentItem && state.currentItem.tipo !== 'serie') {
     document.getElementById('btn-play-main').style.display = 'block';
   }
