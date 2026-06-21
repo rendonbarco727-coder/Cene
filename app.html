@@ -1159,10 +1159,10 @@ function loadEmbedIframe(embedUrl) {
 }
 
 function startHlsStream(src) {
-  // Si estamos en la app Android, usar ExoPlayer nativo
+  // Si estamos en la app Android, abrir como embed WebView
   if (window.CineStranger) {
     const title = state.currentItem ? (state.currentItem.titulo || '') : '';
-    window.CineStranger.playVideo(src, title);
+    window.CineStranger.playVideo('webview://' + src, title);
     return;
   }
   const video = document.getElementById('video-player');
