@@ -1247,6 +1247,7 @@ function closePlayerMechanics() {
   
   document.getElementById('detail-backdrop').style.display = 'block';
   document.getElementById('embedded-player-container').style.display = 'none';
+  if (window.CineStranger) window.CineStranger.hidePlayer();
   const tc2 = document.getElementById('themeCanvas'); if(tc2) tc2.style.zIndex = '0';
   document.getElementById('btn-rotate-screen').style.display = 'none';
   if(state.currentItem && state.currentItem.tipo !== 'serie') {
