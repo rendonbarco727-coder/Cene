@@ -751,7 +751,7 @@ function onHeaderSearch(q) {
     try {
       const res = await fetch(`${getServer()}/buscar?q=${encodeURIComponent(q)}`);
       const data = await res.json();
-    debugLog('Resolver data: ' + JSON.stringify(data).substring(0,200));
+    console.log('Resolver data: ' + JSON.stringify(data).substring(0,200));
       const items = data.resultados || data || [];
       if (!items.length) {
         box.innerHTML = '<div style="color:rgba(255,255,255,0.4);padding:16px;text-align:center;">Sin resultados</div>';
@@ -818,12 +818,12 @@ async function loadCatalog(tipo) {
     const endpoint = tipo === 'peliculas' ? 'peliculas' : 'series';
     const res = await fetch(`${getServer()}/cinecalidad/${endpoint}?pagina=${s.page}&limite=50`);
     const data = await res.json();
-    debugLog('Resolver data: ' + JSON.stringify(data).substring(0,200));
+    console.log('Resolver data: ' + JSON.stringify(data).substring(0,200));
     const items = data.items || data || [];
     if (s.page === 1 && items.length > 0 && tipo === 'peliculas') setupHeroBanner(items[0]);
     renderCards(items, `${tipo}-grid`, true);
   } catch (e) {
-    debugLog('ERROR en resolveAndEmbed: ' + e.message);
+    console.log('ERROR en resolveAndEmbed: ' + e.message);
     document.getElementById(`${tipo}-state`).innerHTML = `<div class="state-msg">⚠️ Servidor desconectado.</div>`;
   } finally { s.loading = false; }
 }
@@ -1071,7 +1071,7 @@ async function playEpisodeData(url, idx) {
 }
 
 async function resolveAndEmbed(url, trackingUrl) {
-  debugLog('resolveAndEmbed: ' + url);
+  console.log('resolveAndEmbed: ' + url);
   document.getElementById('detail-backdrop').style.display = 'none';
   document.getElementById('embedded-player-container').style.display = 'block';
   const tc = document.getElementById('themeCanvas'); if(tc) tc.style.zIndex = '-2';
@@ -1087,7 +1087,7 @@ async function resolveAndEmbed(url, trackingUrl) {
   try {
     const res = await fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
     const data = await res.json();
-    debugLog('Resolver data: ' + JSON.stringify(data).substring(0,200));
+    console.log('Resolver data: ' + JSON.stringify(data).substring(0,200));
     if (data.error) {
       alert("No se pudo resolver el video: " + data.error);
       closePlayerMechanics();
@@ -1095,7 +1095,7 @@ async function resolveAndEmbed(url, trackingUrl) {
     }
     // Si es vimeos y hay embed, usar iframe (más confiable)
     if (data.embed && (data.embed.includes('vimeos.net') || data.embed.includes('vimeos.zip'))) {
-      debugLog('Usando embed iframe para vimeos');
+      console.log('Usando embed iframe para vimeos');
       loadEmbedIframe(data.embed);
       return;
     }
@@ -1111,10 +1111,10 @@ async function resolveAndEmbed(url, trackingUrl) {
       closePlayerMechanics();
       return;
     }
-    debugLog('Llamando startHlsStream con: ' + streamUrl);
+    console.log('Llamando startHlsStream con: ' + streamUrl);
     startHlsStream(streamUrl);
   } catch (e) {
-    debugLog('ERROR en resolveAndEmbed: ' + e.message);
+    console.log('ERROR en resolveAndEmbed: ' + e.message);
     alert("Error cargando el flujo de streaming.");
     closePlayerMechanics();
   }
@@ -1140,7 +1140,7 @@ function loadEmbedIframe(embedUrl) {
 }
 
 function startHlsStream(src) {
-  debugLog('startHlsStream: ' + src.substring(0,100));
+  console.log('startHlsStream: ' + src.substring(0,100));
   // Si estamos en la app Android, usar ExoPlayer nativo
   if (window.CineStranger) {
     const title = state.currentItem ? (state.currentItem.titulo || '') : '';
@@ -1151,7 +1151,7 @@ function startHlsStream(src) {
   if (state.hls) { state.hls.destroy(); state.hls = null; }
 
   if (Hls.isSupported()) {
-    debugLog('HLS soportado, cargando...');
+    console.log('HLS soportado, cargando...');
     const hls = new Hls({ 
       enableWorker: false,
       fragLoadingTimeOut: 60000,
@@ -1160,12 +1160,12 @@ function startHlsStream(src) {
     });
     hls.loadSource(src);
     hls.on(Hls.Events.ERROR, function(event, data) {
-      debugLog('ERROR HLS: ' + data.type + ' - ' + (data.details || ''));
+      console.log('ERROR HLS: ' + data.type + ' - ' + (data.details || ''));
     });
     hls.attachMedia(video);
     state.hls = hls;
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      debugLog('MANIFEST PARSED, iniciando reproducción');
+      console.log('MANIFEST PARSED, iniciando reproducción');
       const tracks = hls.audioTracks;
       if (tracks && tracks.length > 1) {
         const esIdx = tracks.findIndex(t => t.lang === 'es' || (t.name||'').toLowerCase().includes('espa'));
@@ -1185,7 +1185,7 @@ function startHlsStream(src) {
       if (vl) vl.style.display = 'none';
     });
   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-    debugLog('Usando reproducción nativa HLS');
+    console.log('Usando reproducción nativa HLS');
     video.src = src;
     video.addEventListener('loadedmetadata', () => {
       syncSavedProgress(video);
@@ -1278,7 +1278,7 @@ async function loadEpisodes(url) {
   try {
     const res = await fetch(`${getServer()}/episodios?url=${encodeURIComponent(url)}`);
     const data = await res.json();
-    debugLog('Resolver data: ' + JSON.stringify(data).substring(0,200));
+    console.log('Resolver data: ' + JSON.stringify(data).substring(0,200));
     state.currentTemporadas = data;
     const temps = Object.keys(data).filter(t => data[t] && data[t].length > 0).sort((a,b) => parseInt(a.replace("T","")) - parseInt(b.replace("T","")));
     if(temps.length > 0) {
@@ -1289,7 +1289,7 @@ async function loadEpisodes(url) {
       document.getElementById('season-dropdown-label').textContent = 'Temporada ' + temps[0].replace('T','');
     }
   } catch (e) {
-    debugLog('ERROR en resolveAndEmbed: ' + e.message); }
+    console.log('ERROR en resolveAndEmbed: ' + e.message); }
 }
 
 function renderEpisodes(t) {
