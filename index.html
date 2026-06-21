@@ -32,8 +32,12 @@
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
-    display: flex;
-    justify-content: center;
+  }
+  @media (min-width: 768px) {
+    body {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
   }
 
   .app-container {
@@ -430,7 +434,6 @@
 </style>
 </head>
 <body>
-<div class="app-container">
 
   <div class="cinema-header" id="main-header">
     <div class="cinema-logo" id="header-logo">STRANGER</div>
@@ -1621,7 +1624,7 @@ function copyMasterM3u8(url) {
   </div>
 </div>
 
-</div>
+
 </body>
 </html>
 
