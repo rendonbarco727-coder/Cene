@@ -617,7 +617,7 @@
           
           <button class="btn-premium btn-rotate" id="btn-rotate-screen" onclick="cycleAudioTrack()">🌐 ES</button>
           
-          <button class="btn-premium btn-secondary" id="btn-logs" onclick="openLogsPanel()">📋 Logs</button>
+          
         </div>
         
         <p class="detail-desc" id="detail-desc">Cargando descripción...</p>
@@ -1582,95 +1582,6 @@ document.getElementById('search-input').addEventListener('input', function() {
 });
 </script>
 
-<!-- LOGS PANEL -->
-<div id="logs-panel" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0a;z-index:9999;flex-direction:column;">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#111;border-bottom:1px solid #222;">
-    <span style="color:#fff;font-weight:700;font-size:15px;">📋 Logs del servidor</span>
-    <div style="display:flex;gap:10px;">
-      <button onclick="copyLogs()" style="background:#1e3a5f;color:#fff;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:13px;">📋 Copiar</button>
-      <button onclick="clearLogsView()" style="background:#3a1e1e;color:#fff;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:13px;">🗑 Limpiar</button>
-      <button onclick="refreshLogs()" style="background:#1e3a2a;color:#fff;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:13px;">🔄 Refrescar</button>
-      <button onclick="closeLogsPanel()" style="background:#2a2a2a;color:#fff;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:13px;">✕ Cerrar</button>
-    </div>
-  </div>
-  <div id="logs-filter" style="padding:8px 16px;background:#111;border-bottom:1px solid #1a1a1a;">
-    <input id="logs-search" oninput="filterLogs()" placeholder="Filtrar logs..." style="width:100%;background:#1a1a1a;color:#ccc;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:13px;font-family:monospace;">
-  </div>
-  <div id="logs-container" style="flex:1;overflow-y:auto;padding:12px 16px;font-family:monospace;font-size:12px;line-height:1.6;"></div>
-  <div style="padding:8px 16px;background:#111;border-top:1px solid #222;display:flex;gap:10px;align-items:center;">
-    <label style="color:#666;font-size:12px;">Líneas:</label>
-    <select id="logs-n" onchange="refreshLogs()" style="background:#1a1a1a;color:#ccc;border:1px solid #333;border-radius:4px;padding:4px 8px;font-size:12px;">
-      <option value="50">50</option>
-      <option value="100" selected>100</option>
-      <option value="200">200</option>
-      <option value="500">500</option>
-    </select>
-    <label style="color:#444;font-size:11px;margin-left:auto;" id="logs-status">-</label>
-  </div>
-</div>
 
-<script>
-var _allLogs = [];
-
-function openLogsPanel() {
-  var p = document.getElementById('logs-panel');
-  p.style.display = 'flex';
-  refreshLogs();
-}
-
-function closeLogsPanel() {
-  document.getElementById('logs-panel').style.display = 'none';
-}
-
-function refreshLogs() {
-  var n = document.getElementById('logs-n').value;
-  var server = window.SERVER_URL || 'https://ruben-inspiron-5558.tail5c4d3b.ts.net';
-  document.getElementById('logs-status').textContent = 'Cargando...';
-  fetch(server + '/logs?n=' + n)
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      _allLogs = data.logs || [];
-      renderLogs(_allLogs);
-      document.getElementById('logs-status').textContent = _allLogs.length + ' líneas';
-      var c = document.getElementById('logs-container');
-      c.scrollTop = c.scrollHeight;
-    })
-    .catch(function(e){
-      document.getElementById('logs-status').textContent = 'Error: ' + e.message;
-    });
-}
-
-function renderLogs(lines) {
-  var c = document.getElementById('logs-container');
-  c.innerHTML = lines.map(function(l) {
-    var color = '#ccc';
-    if (l.includes('ERROR') || l.includes('error') || l.includes('Error')) color = '#ff6b6b';
-    else if (l.includes('M3U8') || l.includes('m3u8') || l.includes('tiktok')) color = '#6bffb8';
-    else if (l.includes('Resolviendo') || l.includes('intermediario')) color = '#6bc5ff';
-    else if (l.includes('Timeout') || l.includes('timeout')) color = '#ffd06b';
-    return '<div style="color:' + color + ';border-bottom:1px solid #111;padding:2px 0;">' + 
-           l.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
-  }).join('');
-}
-
-function filterLogs() {
-  var q = document.getElementById('logs-search').value.toLowerCase();
-  if (!q) { renderLogs(_allLogs); return; }
-  renderLogs(_allLogs.filter(function(l){ return l.toLowerCase().includes(q); }));
-}
-
-function clearLogsView() {
-  _allLogs = [];
-  document.getElementById('logs-container').innerHTML = '';
-  document.getElementById('logs-status').textContent = 'Limpiado';
-}
-
-function copyLogs() {
-  var text = _allLogs.join('\n');
-  navigator.clipboard.writeText(text).then(function(){
-    document.getElementById('logs-status').textContent = '¡Copiado!';
-  });
-}
-</script>
 </body>
 </html>
