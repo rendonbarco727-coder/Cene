@@ -382,6 +382,41 @@
   @media (min-width: 1440px) {
     #home-continue-watching-grid .movie-card { flex: 0 0 220px; min-width: 220px; }
   }
+
+  /* ═══ MEJORAS DETALLE EN PC ═══ */
+  @media (min-width: 768px) {
+    .detail-overlay { padding: 0 5%; }
+    .detail-media-container { max-width: 900px; margin: 0 auto; border-radius: 8px; overflow: hidden; }
+    .detail-body-content { max-width: 900px; padding: 32px 40px; }
+    .detail-title { font-size: 36px; }
+    .detail-inline-meta { font-size: 16px; gap: 24px; }
+    .detail-desc { font-size: 16px; line-height: 1.6; }
+    .detail-credits { font-size: 14px; }
+    .detail-action-buttons { gap: 16px; }
+    .detail-action-buttons .btn-premium { padding: 14px 24px; font-size: 16px; }
+    .ep-list-netflix { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .ep-media-box { width: 100%; max-width: 280px; }
+    .season-dropdown-wrapper { padding: 0 40px; }
+    #detail-similares-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 16px; }
+  }
+
+  @media (min-width: 1024px) {
+    .detail-overlay { padding: 0 10%; }
+    .detail-media-container { max-width: 1000px; }
+    .detail-body-content { max-width: 1000px; padding: 40px 48px; }
+    .detail-title { font-size: 42px; }
+    .ep-list-netflix { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    #detail-similares-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 20px; }
+  }
+
+  @media (min-width: 1440px) {
+    .detail-overlay { padding: 0 15%; }
+    .detail-media-container { max-width: 1200px; }
+    .detail-body-content { max-width: 1200px; }
+    .ep-list-netflix { grid-template-columns: repeat(4, 1fr); }
+    #detail-similares-grid { grid-template-columns: repeat(6, 1fr) !important; }
+  }
+
 </style>
 </head>
 <body>
