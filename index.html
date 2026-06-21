@@ -1020,8 +1020,8 @@ async function resolveAndEmbed(url, trackingUrl) {
   state.trackingUrl = trackingUrl;
   initPlyr();
 
-  document.getElementById('btn-play-main').style.display = 'none';
-  document.getElementById('btn-rotate-screen').style.display = 'inline-flex';
+  const btnPlayMain = document.getElementById('btn-play-main'); if (btnPlayMain) btnPlayMain.style.display = 'none';
+  const btnRotateScreen = document.getElementById('btn-rotate-screen'); if (btnRotateScreen) btnRotateScreen.style.display = 'inline-flex';
 
   try {
     const res = await fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
