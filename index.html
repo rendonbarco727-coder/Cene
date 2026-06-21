@@ -129,12 +129,12 @@
   .section-title { font-family: 'Syne', sans-serif; font-size: 16px; color: #ffffff; font-weight: 700; text-transform: uppercase; border-left: 3px solid var(--accent); padding-left: 10px; }
   
   .carousel-container { position: relative; margin-bottom: 32px; width: 100%; }
-  .movie-carousel { display: flex; gap: 16px; overflow-x: auto; padding: 4px 24px 12px; scrollbar-width: none; }
+  .movie-carousel { display: flex; gap: 12px; overflow-x: auto; padding: 4px 16px 12px; scrollbar-width: none; }
   .movie-carousel::-webkit-scrollbar { display: none; }
   
-  .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; padding: 0 24px 24px; }
+  .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 0 16px 16px; }
 
-  .movie-card { border-radius: 6px; background: var(--bg-card); position: relative; aspect-ratio: 2/3; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-premium); width: 100%; }
+  .movie-card { flex: 0 0 115px; border-radius: 6px; background: var(--bg-card); position: relative; aspect-ratio: 2/3; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-premium); width: 100%; }
   .movie-poster { width: 100%; height: 100%; object-fit: cover; }
   .card-meta { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 10px; }
   .movie-title { font-size: 12px; color: var(--text-color); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1178,14 +1178,19 @@ function closePlayerMechanics() {
   if (embedIframe) embedIframe.remove();
   const videoEl = document.getElementById('video-player');
   if (videoEl) videoEl.style.display = 'block';
-  
-  document.getElementById('detail-backdrop').style.display = 'block';
-  document.getElementById('embedded-player-container').style.display = 'none';
+
+  const backdrop = document.getElementById('detail-backdrop');
+  if (backdrop) backdrop.style.display = 'block';
+  const container = document.getElementById('embedded-player-container');
+  if (container) container.style.display = 'none';
   const tc2 = document.getElementById('themeCanvas'); if(tc2) tc2.style.zIndex = '0';
-  document.getElementById('btn-rotate-screen').style.display = 'none';
-  document.getElementById('btn-stream-options').style.display = 'none';
+  const btnRotate = document.getElementById('btn-rotate-screen');
+  if (btnRotate) btnRotate.style.display = 'none';
+  const btnStream = document.getElementById('btn-stream-options');
+  if (btnStream) btnStream.style.display = 'none';
   if(state.currentItem && state.currentItem.tipo !== 'serie') {
-    document.getElementById('btn-play-main').style.display = 'block';
+    const btnPlay = document.getElementById('btn-play-main');
+    if (btnPlay) btnPlay.style.display = 'block';
   }
 }
 
