@@ -1158,6 +1158,11 @@ function startHlsStream(src) {
   // Si estamos en la app Android, abrir como embed WebView
   if (window.CineStranger) {
     const title = state.currentItem ? (state.currentItem.titulo || '') : '';
+    // Ocultar el spinner de "Cargando stream...": en este camino el WebView nativo
+    // Android se encarga de renderizar el embed, asi que el loader HTML no tiene
+    // mas razon de estar visible (a diferencia de los caminos Hls.js / iframe).
+    const vloader = document.getElementById('video-loader');
+    if (vloader) vloader.style.display = 'none';
     window.CineStranger.playVideo('webview://' + src, title);
     return;
   }
