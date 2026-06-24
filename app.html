@@ -1039,6 +1039,7 @@ async function resolveAndEmbed(url, trackingUrl) {
   if (vloader) { vloader.style.display = 'flex'; }
   
   state.trackingUrl = trackingUrl;
+  const title = state.currentItem ? (state.currentItem.titulo || '') : '';
   initPlyr();
 
   const btnPlayMain = document.getElementById('btn-play-main'); if (btnPlayMain) btnPlayMain.style.display = 'none';
