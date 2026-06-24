@@ -1315,7 +1315,8 @@ function closeSeasonPicker() {
 
 async function loadEpisodes(url) {
   try {
-    const res = await fetch(`${getServer()}/episodios?url=${encodeURIComponent(url)}`);
+    const endpoint = url.includes('cuevana.you') ? 'episodios_c3' : 'episodios';
+    const res = await fetch(`${getServer()}/${endpoint}?url=${encodeURIComponent(url)}`);
     const data = await res.json();
     state.currentTemporadas = data;
     const temps = Object.keys(data).filter(t => data[t] && data[t].length > 0).sort((a,b) => parseInt(a.replace("T","")) - parseInt(b.replace("T","")));
