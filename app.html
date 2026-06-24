@@ -820,6 +820,8 @@ async function loadCatalog(tipo) {
     if (s.page === 1 && items.length > 0 && tipo === 'peliculas') setupHeroBanner(items[0]);
     renderCards(items, `${tipo}-grid`, true);
   } catch (e) {
+    const msg2 = e && e.message ? e.message : String(e);
+    if (window.CineStranger) window.CineStranger.logError('CATALOG_ERROR: ' + msg2);
     document.getElementById(`${tipo}-state`).innerHTML = `<div class="state-msg">⚠️ Servidor desconectado.</div>`;
   } finally { s.loading = false; }
 }
@@ -1136,7 +1138,9 @@ async function resolveAndEmbed(url, trackingUrl) {
     }
     startHlsStream(streamUrl);
   } catch (e) {
-    alert("Error cargando el flujo de streaming.");
+    const msg = e && e.message ? e.message : String(e);
+    if (window.CineStranger) window.CineStranger.logError('RESOLVE_ERROR: ' + msg);
+    alert("Error cargando el flujo de streaming: " + msg);
     closePlayerMechanics();
   }
 }
