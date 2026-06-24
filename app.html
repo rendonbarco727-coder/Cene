@@ -1037,7 +1037,7 @@ async function resolveAndEmbed(url, trackingUrl) {
   const tc = document.getElementById('themeCanvas'); if(tc) tc.style.zIndex = '-2';
   const vloader = document.getElementById('video-loader');
   if (vloader) { vloader.style.display = 'flex'; }
-
+  
   state.trackingUrl = trackingUrl;
   initPlyr();
 
@@ -1053,33 +1053,58 @@ async function resolveAndEmbed(url, trackingUrl) {
       closePlayerMechanics();
       return;
     }
-    // Si es vimeos y hay embed, usar iframe (más confiable)
-    if (data.embed && (data.embed.includes('vimeos.net') || data.embed.includes('vimeos.zip'))) {
-      console.log('Usando embed iframe para vimeos');
+    // NUEVA ESTRATEGIA: priorizar webview para cualquier embed
+    if (data.webview && data.embed) {
+      console.log('Usando embed via webview');
       loadEmbedIframe(data.embed);
       return;
     }
-    // Para otros CDNs, usar el proxy
-    let streamUrl;
-    if (data.original) {
-      streamUrl = `${getServer()}/stream?url=${encodeURIComponent(data.original)}` +
-        (data.embed ? `&referer=${encodeURIComponent(data.embed)}` : '');
-    } else if (data.url) {
-      streamUrl = data.url;
-    } else {
+    // Fallback: si hay m3u8 directo (filemoon/vidhide)
+    if (data.m3u8 && !data.url) {
+      if (window.CineStranger) {
+        window.CineStranger.playVideo('webview://' + data.m3u8, title);
+      } else {
+        startHlsStream(data.m3u8);
+      }
+      return;
+    }
+    if (!data.url && !data.original) {
       alert("No se pudo resolver el video: sin URL");
       closePlayerMechanics();
       return;
     }
-    console.log('Llamando startHlsStream con: ' + streamUrl);
+    // App Android: siempre usar ExoPlayer con la URL directa
+    if (window.CineStranger) {
+      const isVimeosAndroid = data.original && (data.original.includes('vimeos.zip') || data.original.includes('vimeos.net'));
+      if (isVimeosAndroid && data.embed) {
+        window.CineStranger.playVideo('webview://' + data.embed, title);
+      } else {
+        const ref = data.referer || data.embed || '';
+        window.CineStranger.showVideoOptions(data.original || data.url, title, ref);
+      }
+      closePlayerMechanics();
+      return;
+    }
+    // Si hay embed y no hay m3u8 útil, usar iframe
+    const isVimeos = data.original && (data.original.includes('vimeos.zip') || data.original.includes('vimeos.net') || data.original.includes('vimeos.net'));
+    const hasUsableM3u8 = data.original && !isVimeos && !(data.todos && data.todos.length === 0);
+    if (data.embed && !hasUsableM3u8) {
+      loadEmbedIframe(data.embed);
+      return;
+    }
+    let streamUrl;
+    if (data.m3u8_content) {
+      const blob = new Blob([data.m3u8_content], { type: 'application/vnd.apple.mpegurl' });
+      streamUrl = URL.createObjectURL(blob);
+    } else {
+      streamUrl = data.url || `${getServer()}/stream?url=${encodeURIComponent(data.original)}`;
+    }
     startHlsStream(streamUrl);
   } catch (e) {
-    console.log('ERROR en resolveAndEmbed: ' + e.message);
     alert("Error cargando el flujo de streaming.");
     closePlayerMechanics();
   }
 }
-
 function loadEmbedIframe(embedUrl) {
   const container = document.getElementById('embedded-player-container');
   const video = document.getElementById('video-player');
