@@ -622,9 +622,10 @@
         
         <p class="detail-desc" id="detail-desc">Cargando descripción...</p>
         
-        <div class="detail-credits">
-          Protagonistas: <span>Stranger Cast, Ruben, AI Agent...</span><br>
-          Creado por: <span>Cinema Stranger Inc.</span>
+        <div class="detail-credits" id="detail-credits">
+          <span id="detail-credits-elenco"></span>
+          <span id="detail-credits-director"></span>
+          <span id="detail-credits-meta"></span>
         </div>
         
         <div style="margin-bottom:16px;">
@@ -985,7 +986,9 @@ function openDetail(item, fromPopstate) {
     if (btnDownload) btnDownload.style.display = 'inline-flex';
     btnPlay.style.display = 'block';
     epsSection.style.display = 'none';
-    document.getElementById('detail-desc').textContent = "Sinopsis oficial no disponible en este momento. Explora las temporadas o reproduce directamente el flujo de streaming sincronizado.";
+    document.getElementById('detail-desc').textContent = "Cargando sinopsis...";
+    // Cargar metadatos reales del servidor
+    cargarDetalle(item.url, isSerie);
   }
 
   document.getElementById('detail-overlay').style.display = 'flex';
@@ -1011,6 +1014,41 @@ function openDetail(item, fromPopstate) {
       if (!grid.children.length) grid.innerHTML = '';
     })
     .catch(() => { grid.innerHTML = ''; });
+}
+
+async function cargarDetalle(url, isSerie) {
+  try {
+    const res = await fetch(`${getServer()}/detalle?url=${encodeURIComponent(url)}`);
+    const d = await res.json();
+    if (d.error) {
+      document.getElementById('detail-desc').textContent = "Sinopsis no disponible.";
+      return;
+    }
+    // Sinopsis
+    if (d.sinopsis) {
+      document.getElementById('detail-desc').textContent = d.sinopsis;
+    } else {
+      document.getElementById('detail-desc').textContent = "Sinopsis no disponible.";
+    }
+    // Año y duración
+    if (d.fecha) document.getElementById('detail-year').textContent = d.fecha;
+    if (d.duracion && !isSerie) document.getElementById('detail-duration-lbl').textContent = d.duracion;
+    // Créditos
+    const elencoEl = document.getElementById('detail-credits-elenco');
+    const directorEl = document.getElementById('detail-credits-director');
+    const metaEl = document.getElementById('detail-credits-meta');
+    if (elencoEl) elencoEl.innerHTML = d.elenco ? `Protagonistas: <span style="color:var(--text-muted)">${d.elenco}</span><br>` : '';
+    if (directorEl) directorEl.innerHTML = d.director ? `Director: <span style="color:var(--text-muted)">${d.director}</span><br>` : '';
+    if (metaEl) {
+      const partes = [];
+      if (d.genero) partes.push(`Género: <span style="color:var(--text-muted)">${d.genero}</span>`);
+      if (d.calidad) partes.push(`Calidad: <span style="color:var(--text-muted)">${d.calidad}</span>`);
+      if (d.audio) partes.push(`Audio: <span style="color:var(--text-muted)">${d.audio}</span>`);
+      metaEl.innerHTML = partes.join(' &nbsp;·&nbsp; ');
+    }
+  } catch(e) {
+    document.getElementById('detail-desc').textContent = "Sinopsis no disponible.";
+  }
 }
 
 function closeDetail(fromPopstate) {
