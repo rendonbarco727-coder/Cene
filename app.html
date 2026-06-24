@@ -19,12 +19,18 @@
     --text-dim: #6c6c6c;
     --border-color: #282828;
     --shadow-premium: 0 8px 24px rgba(0,0,0,0.5);
+    
     --plyr-color-main: #E50914;
     --plyr-video-background: #000000;
     --plyr-video-control-color: #FFFFFF;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent;
+  }
 
   body {
     background: var(--bg-main);
@@ -32,18 +38,6 @@
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
-  }
-  @media (min-width: 768px) {
-    body {
-      max-width: 1600px;
-      margin: 0 auto;
-    }
-  }
-
-  .app-container {
-    width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
   }
 
   .app-screen {
@@ -59,19 +53,25 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 24px;
+    padding: 16px;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     z-index: 100;
-    background: linear-gradient(to bottom, rgba(20,20,20,0.9) 0%, rgba(20,20,20,0) 100%);
+    background: linear-gradient(to bottom, rgba(20,20,20,0.8) 0%, rgba(20,20,20,0) 100%);
     backdrop-filter: blur(4px);
   }
-  .cinema-logo { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+  .cinema-logo { 
+    font-family: 'Syne', sans-serif; 
+    font-size: 22px; 
+    font-weight: 800; 
+    color: var(--accent); 
+    letter-spacing: -0.5px; 
+  }
 
   .icon-btn {
-    width: 40px; height: 40px; border-radius: 50%; background: transparent; border: 1px solid rgba(255,255,255,0.15);
+    width: 38px; height: 38px; border-radius: 50%; background: transparent; border: 1px solid rgba(255,255,255,0.15);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-color);
   }
@@ -80,7 +80,7 @@
     width: 100%;
     height: 55vh;
     min-height: 320px;
-    max-height: 600px;
+    max-height: 500px;
     position: relative;
     background-size: cover;
     background-position: center;
@@ -97,56 +97,56 @@
     background: linear-gradient(to top, var(--bg-main) 0%, rgba(20,20,20,0.2) 60%, rgba(20,20,20,0.7) 100%);
     z-index: 1;
   }
-  .hero-content { position: relative; z-index: 2; text-align: center; max-width: 700px; margin: 0 auto; }
-  .hero-title { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; margin-bottom: 8px; }
-  .hero-meta { font-size: 14px; color: var(--text-muted); margin-bottom: 14px; display: flex; justify-content: center; gap: 10px; align-items: center; }
-  .hero-badge { background: var(--accent); color: white; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+  .hero-content { position: relative; z-index: 2; text-align: center; max-width: 500px; margin: 0 auto; }
+  .hero-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+  .hero-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; display: flex; justify-content: center; gap: 8px; align-items: center; }
+  .hero-badge { background: var(--accent); color: white; font-size: 9px; padding: 1px 5px; border-radius: 3px; font-weight: bold; }
 
   .btn-premium {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 20px;
+    padding: 12px 16px;
     border-radius: 4px;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     border: none;
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    flex: 1;
     min-width: 0;
     white-space: nowrap;
   }
-  .btn-primary { background: rgba(255,255,255,0.15); color: #fff; font-size: 16px; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-  .btn-secondary { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-size: 14px; }
-  .btn-rotate { background: rgba(255,255,255,0.12); color: white; display: none; flex: 0 0 auto !important; width: 44px; height: 44px; padding: 0; border-radius: 50%; font-size: 18px; min-width: unset; }
+  .btn-primary { background: rgba(255,255,255,0.15); color: #fff; font-size: 15px; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .btn-secondary { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-size: 13px; }
+  .btn-rotate { background: rgba(255,255,255,0.12); color: white; display: none; flex: 0 0 auto !important; width: 42px; height: 42px; padding: 0; border-radius: 50%; font-size: 18px; min-width: unset; }
 
-  .tabs { display: flex; gap: 16px; margin-bottom: 24px; padding: 0 24px; max-width: 400px; }
-  .tab { flex: 1; text-align: center; padding: 12px 0; border-radius: 6px; font-size: 14px; color: var(--text-muted); background: var(--bg-surface); border: 1px solid transparent; cursor: pointer; }
+  .tabs { display: flex; gap: 12px; margin-bottom: 20px; padding: 0 16px; }
+  .tab { flex: 1; text-align: center; padding: 10px 0; border-radius: 6px; font-size: 13px; color: var(--text-muted); background: var(--bg-surface); border: 1px solid transparent; cursor: pointer; }
   .tab.active { background: rgba(229, 9, 20, 0.1); border-color: var(--accent); color: var(--text-color); font-weight: 700; }
 
-  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 24px; }
-  .section-title { font-family: 'Syne', sans-serif; font-size: 16px; color: #ffffff; font-weight: 700; text-transform: uppercase; border-left: 3px solid var(--accent); padding-left: 10px; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 16px; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 14px; color: #ffffff; font-weight: 700; text-transform: uppercase; border-left: 3px solid var(--accent); padding-left: 8px; }
   
-  .carousel-container { position: relative; margin-bottom: 32px; width: 100%; }
+  .carousel-container { position: relative; margin-bottom: 24px; width: 100%; }
   .movie-carousel { display: flex; gap: 12px; overflow-x: auto; padding: 4px 16px 12px; scrollbar-width: none; }
   .movie-carousel::-webkit-scrollbar { display: none; }
-  
   .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 0 16px 16px; }
 
-  .movie-card { flex: 0 0 115px; border-radius: 6px; background: var(--bg-card); position: relative; aspect-ratio: 2/3; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-premium); width: 100%; }
+  .movie-card { flex: 0 0 115px; border-radius: 6px; background: var(--bg-card); position: relative; aspect-ratio: 2/3; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-premium); }
   .movie-poster { width: 100%; height: 100%; object-fit: cover; }
-  .card-meta { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 10px; }
-  .movie-title { font-size: 12px; color: var(--text-color); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .movie-badge { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.75); border-radius: 4px; padding: 2px 5px; font-size: 9px; font-weight: bold; }
+  .card-meta { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 8px; }
+  .movie-title { font-size: 11px; color: var(--text-color); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .movie-badge { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.75); border-radius: 4px; padding: 2px 5px; font-size: 8px; font-weight: bold; }
 
   .progress-container { width: 100%; height: 4px; background: rgba(255,255,255,0.2); position: absolute; bottom: 0; left: 0; }
   .progress-bar { height: 100%; background: var(--accent); width: 0%; }
 
-  .search-bar-wrap { display: flex; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); margin: 20px 24px 16px; padding: 12px; border-radius: 8px; gap: 10px; }
-  .search-bar { background: none; border: none; color: #fff; font-size: 15px; width: 100%; outline: none; }
-  .state-msg { text-align: center; padding: 40px 24px; color: var(--text-muted); font-size: 14px; }
-  .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+  .search-bar-wrap { display: flex; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); margin: 20px 16px 16px; padding: 12px; border-radius: 8px; gap: 10px; }
+  .search-bar { background: none; border: none; color: #fff; font-size: 14px; width: 100%; outline: none; }
+  .state-msg { text-align: center; padding: 40px 16px; color: var(--text-muted); font-size: 13px; }
+  .spinner { display: inline-block; width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .backdrop-gradient-theme {
@@ -184,14 +184,11 @@
     background-color: #000;
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  @media (min-width: 768px) {
-    .detail-media-container { max-height: 55vh; }
-  }
   .detail-backdrop-wrap {
     width: 100%;
     height: 100%;
     background-size: cover;
-    background-position: center top;
+    background-position: center;
     transition: box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .detail-backdrop-wrap::after {
@@ -211,56 +208,57 @@
   .detail-back-btn {
     position: absolute; top: 16px; left: 16px; z-index: 220;
     background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff;
-    width: 40px; height: 40px; border-radius: 50%; font-size: 20px;
+    width: 38px; height: 38px; border-radius: 50%; font-size: 18px;
     display: flex; align-items: center; justify-content: center;
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .detail-body-content { padding: 20px 24px; max-width: 900px; margin: 0 auto; width: 100%; }
+  .detail-body-content { padding: 16px; max-width: 800px; margin: 0 auto; width: 100%; }
   .detail-brand-tag { 
-    font-size: 11px; font-weight: 800; color: var(--accent); letter-spacing: 3px; margin-bottom: 4px; text-transform: uppercase;
+    font-size: 10px; font-weight: 800; color: var(--accent); letter-spacing: 2.5px; margin-bottom: 4px; text-transform: uppercase;
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .detail-title { font-size: 28px; color: #fff; margin-bottom: 12px; font-weight: 700; line-height: 1.1; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-  .detail-inline-meta { display: flex; align-items: center; gap: 16px; font-size: 14px; color: var(--text-muted); margin-bottom: 18px; }
-  .meta-maturity { background: #333; color: #e2e2e2; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: 700; }
+  .detail-title { font-size: 26px; color: #fff; margin-bottom: 12px; font-weight: 700; line-height: 1.1; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+  .detail-inline-meta { display: flex; align-items: center; gap: 14px; font-size: 13px; color: var(--text-muted); margin-bottom: 18px; }
+  .meta-maturity { background: #333; color: #e2e2e2; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 700; }
   
-  .detail-action-buttons { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
-  .detail-desc { font-size: 15px; color: #f5f5f5; line-height: 1.5; margin-bottom: 16px; }
-  .detail-credits { font-size: 13px; color: var(--text-dim); line-height: 1.6; margin-bottom: 28px; }
+  .detail-action-buttons { display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; align-items: center; }
+  .detail-desc { font-size: 14px; color: #f5f5f5; line-height: 1.45; margin-bottom: 14px; }
+  .detail-credits { font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-bottom: 26px; }
   .detail-credits span { color: var(--text-muted); }
 
-  .season-dropdown-wrapper { padding: 0 24px; margin-bottom: 20px; }
-  .season-select-btn { background: #333; color: #fff; border: none; padding: 10px 18px; font-size: 14px; font-weight: 700; border-radius: 4px; display: inline-flex; align-items: center; gap: 8px; }
-  .ep-list-netflix { display: flex; flex-direction: column; padding: 0 24px; gap: 28px; }
-  .ep-node { display: flex; flex-direction: column; gap: 12px; }
-  .ep-row-top { display: flex; align-items: center; gap: 16px; }
-  .ep-media-box { width: 160px; aspect-ratio: 16/9; position: relative; border-radius: 4px; overflow: hidden; background: #000; flex-shrink: 0; }
+  .season-dropdown-wrapper { padding: 0 16px; margin-bottom: 18px; }
+  .season-select-btn { background: #333; color: #fff; border: none; padding: 8px 14px; font-size: 13px; font-weight: 700; border-radius: 4px; display: inline-flex; align-items: center; gap: 8px; }
+  .ep-list-netflix { display: flex; flex-direction: column; padding: 0 16px; gap: 24px; }
+  .ep-node { display: flex; flex-direction: column; gap: 10px; }
+  .ep-row-top { display: flex; align-items: center; gap: 14px; }
+  .ep-media-box { width: 125px; aspect-ratio: 16/9; position: relative; border-radius: 4px; overflow: hidden; background: #000; flex-shrink: 0; }
   .ep-media-box img { width: 100%; height: 100%; object-fit: cover; }
   .ep-play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
-  .ep-play-ring { width: 36px; height: 36px; border-radius: 50%; background: rgba(20,20,20,0.8); border: 1px solid #fff; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; }
+  .ep-play-ring { width: 30px; height: 30px; border-radius: 50%; background: rgba(20,20,20,0.8); border: 1px solid #fff; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; }
   .ep-meta-info { flex: 1; min-width: 0; }
-  .ep-headline { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-  .ep-runtime { font-size: 13px; color: var(--text-muted); }
+  .ep-headline { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+  .ep-runtime { font-size: 12px; color: var(--text-muted); }
+  .ep-summary { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
 
   .season-picker-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 250; align-items: center; justify-content: center; flex-direction: column; gap: 28px; }
   .season-picker-list { display: flex; flex-direction: column; gap: 20px; text-align: center; max-height: 70vh; overflow-y: auto; padding: 10px 20px; }
-  .season-picker-opt { background: none; border: none; color: var(--text-muted); font-size: 22px; font-weight: 700; }
-  .season-picker-opt.active { color: #fff; font-size: 26px; }
-  .close-picker-btn { background: #fff; color: #000; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 24px; }
+  .season-picker-opt { background: none; border: none; color: var(--text-muted); font-size: 20px; font-weight: 700; }
+  .season-picker-opt.active { color: #fff; font-size: 24px; }
+  .close-picker-btn { background: #fff; color: #000; border: none; width: 46px; height: 46px; border-radius: 50%; font-size: 22px; }
 
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 300; align-items: center; justify-content: center; padding: 16px; }
-  .modal { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; width: 100%; max-width: 420px; }
-  .modal h2 { font-family: 'Syne', sans-serif; font-size: 20px; color: var(--accent); margin-bottom: 16px; }
-  .modal label { display: block; font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
-  .modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
-  .btn { padding: 12px 20px; border-radius: 6px; font-size: 13px; font-weight: 700; border: none; }
+  .modal { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; }
+  .modal h2 { font-family: 'Syne', sans-serif; font-size: 18px; color: var(--accent); margin-bottom: 12px; }
+  .modal label { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+  .btn { padding: 10px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; border: none; }
   .btn-ghost { background: var(--bg-surface); color: var(--text-color); }
   .btn-primary-action { background: var(--accent); color: white; }
 
   .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: transparent; border-top: 1px solid rgba(255,255,255,0.08); display: flex; padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 190; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; color: var(--text-dim); font-size: 11px; font-weight: 700; background: none; border: none; }
-  .nav-icon { font-size: 22px; margin-bottom: 4px; opacity: 0.5; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; color: var(--text-dim); font-size: 10px; font-weight: 700; background: none; border: none; }
+  .nav-icon { font-size: 20px; margin-bottom: 3px; opacity: 0.5; }
   .nav-item.active { color: var(--text-color); }
   .nav-item.active .nav-icon { opacity: 1; color: var(--accent); }
 
@@ -269,29 +267,33 @@
     background: rgba(255,255,255,0.1);
     border: 1px solid rgba(255,255,255,0.2);
     border-radius: 20px;
-    padding: 10px 20px;
+    padding: 8px 16px;
     color: #fff;
-    font-size: 16px;
+    font-size: 15px;
     outline: none;
-    margin: 0 10px;
+    margin: 0 8px;
   }
   .header-search-input::placeholder { color: rgba(255,255,255,0.4); }
   .search-result-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 12px 12px;
+    gap: 12px;
+    padding: 10px 8px;
     border-radius: 10px;
     cursor: pointer;
     border-bottom: 1px solid rgba(255,255,255,0.07);
   }
   .search-result-item:hover { background: rgba(255,255,255,0.08); }
-  .search-result-item img { width: 56px; height: 80px; object-fit: cover; border-radius: 6px; background: #222; }
-  .search-result-item .sri-info { display: flex; flex-direction: column; gap: 6px; }
-  .search-result-item .sri-title { font-size: 15px; font-weight: 700; color: #fff; }
-  .search-result-item .sri-meta { font-size: 13px; color: rgba(255,255,255,0.5); }
+  .search-result-item img { width: 48px; height: 68px; object-fit: cover; border-radius: 6px; background: #222; }
+  .search-result-item .sri-info { display: flex; flex-direction: column; gap: 4px; }
+  .search-result-item .sri-title { font-size: 14px; font-weight: 700; color: #fff; }
+  .search-result-item .sri-meta { font-size: 12px; color: rgba(255,255,255,0.5); }
 
-  /* TEMAS VISUALES POR SHOW - PANTALLA COMPLETA */
+  /* ═══════════════════════════════════════════
+     TEMAS VISUALES POR SHOW - PANTALLA COMPLETA
+     ═══════════════════════════════════════════ */
+
+  /* Canvas de efectos - pantalla completa */
   #themeCanvas {
     position: fixed !important;
     top: 0 !important;
@@ -303,133 +305,192 @@
     display: none;
   }
 
-  .theme-rick-and-morty .detail-back-btn { border: 1px solid rgba(57, 255, 20, 0.5) !important; box-shadow: 0 0 20px rgba(57, 255, 20, 0.3) !important; background: rgba(57, 255, 20, 0.1) !important; }
-  .theme-rick-and-morty .detail-brand-tag { color: #39ff14 !important; text-shadow: 0 0 15px rgba(57, 255, 20, 0.6); }
-  .theme-rick-and-morty .btn-premium.btn-primary { background: rgba(57, 255, 20, 0.2) !important; border-color: rgba(57, 255, 20, 0.6) !important; color: #39ff14 !important; box-shadow: 0 4px 20px rgba(57, 255, 20, 0.4) !important; }
-  .theme-rick-and-morty #theme-gradient { background: linear-gradient(135deg, rgba(13,59,13,0.4) 0%, rgba(10,31,10,0.3) 50%, rgba(0,0,0,0.6) 100%) !important; }
+  /* Rick and Morty - Verde ácido sci-fi */
+  .theme-rick-and-morty .detail-back-btn {
+    border: 1px solid rgba(57, 255, 20, 0.5) !important;
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.3) !important;
+    background: rgba(57, 255, 20, 0.1) !important;
+  }
+  .theme-rick-and-morty .detail-brand-tag {
+    color: #39ff14 !important;
+    text-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+  }
+  .theme-rick-and-morty .btn-premium.btn-primary {
+    background: rgba(57, 255, 20, 0.2) !important;
+    border-color: rgba(57, 255, 20, 0.6) !important;
+    color: #39ff14 !important;
+    box-shadow: 0 4px 20px rgba(57, 255, 20, 0.4) !important;
+  }
+  .theme-rick-and-morty #theme-gradient {
+    background: linear-gradient(135deg, rgba(13,59,13,0.4) 0%, rgba(10,31,10,0.3) 50%, rgba(0,0,0,0.6) 100%) !important;
+  }
 
-  .theme-los-simpson .detail-back-btn { border: 1px solid rgba(255, 215, 0, 0.5) !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3) !important; background: rgba(255, 215, 0, 0.1) !important; }
-  .theme-los-simpson .detail-brand-tag { color: #ffd700 !important; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
-  .theme-los-simpson .btn-premium.btn-primary { background: rgba(255, 215, 0, 0.2) !important; border-color: rgba(255, 215, 0, 0.6) !important; color: #ffd700 !important; box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4) !important; }
-  .theme-los-simpson #theme-gradient { background: linear-gradient(135deg, rgba(74,63,10,0.4) 0%, rgba(26,42,74,0.3) 50%, rgba(10,26,58,0.6) 100%) !important; }
+  /* Los Simpson - Amarillo cartoon */
+  .theme-los-simpson .detail-back-btn {
+    border: 1px solid rgba(255, 215, 0, 0.5) !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3) !important;
+    background: rgba(255, 215, 0, 0.1) !important;
+  }
+  .theme-los-simpson .detail-brand-tag {
+    color: #ffd700 !important;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  }
+  .theme-los-simpson .btn-premium.btn-primary {
+    background: rgba(255, 215, 0, 0.2) !important;
+    border-color: rgba(255, 215, 0, 0.6) !important;
+    color: #ffd700 !important;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4) !important;
+  }
+  .theme-los-simpson #theme-gradient {
+    background: linear-gradient(135deg, rgba(74,63,10,0.4) 0%, rgba(26,42,74,0.3) 50%, rgba(10,26,58,0.6) 100%) !important;
+  }
 
-  .theme-breaking-bad .detail-back-btn { border: 1px solid rgba(0, 177, 64, 0.5) !important; box-shadow: 0 0 20px rgba(0, 177, 64, 0.3) !important; background: rgba(0, 177, 64, 0.1) !important; }
-  .theme-breaking-bad .detail-brand-tag { color: #00b140 !important; text-shadow: 0 0 15px rgba(0, 177, 64, 0.6); }
-  .theme-breaking-bad .btn-premium.btn-primary { background: rgba(0, 177, 64, 0.2) !important; border-color: rgba(0, 177, 64, 0.6) !important; color: #00b140 !important; box-shadow: 0 4px 20px rgba(0, 177, 64, 0.4) !important; }
-  .theme-breaking-bad #theme-gradient { background: linear-gradient(135deg, rgba(26,42,26,0.4) 0%, rgba(51,51,51,0.3) 50%, rgba(0,0,0,0.6) 100%) !important; }
+  /* Breaking Bad - Verde químico */
+  .theme-breaking-bad .detail-back-btn {
+    border: 1px solid rgba(0, 177, 64, 0.5) !important;
+    box-shadow: 0 0 20px rgba(0, 177, 64, 0.3) !important;
+    background: rgba(0, 177, 64, 0.1) !important;
+  }
+  .theme-breaking-bad .detail-brand-tag {
+    color: #00b140 !important;
+    text-shadow: 0 0 15px rgba(0, 177, 64, 0.6);
+  }
+  .theme-breaking-bad .btn-premium.btn-primary {
+    background: rgba(0, 177, 64, 0.2) !important;
+    border-color: rgba(0, 177, 64, 0.6) !important;
+    color: #00b140 !important;
+    box-shadow: 0 4px 20px rgba(0, 177, 64, 0.4) !important;
+  }
+  .theme-breaking-bad #theme-gradient {
+    background: linear-gradient(135deg, rgba(26,42,26,0.4) 0%, rgba(51,51,51,0.3) 50%, rgba(0,0,0,0.6) 100%) !important;
+  }
 
-  .theme-stranger-things .detail-back-btn { border: 1px solid rgba(255, 45, 45, 0.5) !important; box-shadow: 0 0 20px rgba(255, 45, 45, 0.3) !important; background: rgba(255, 45, 45, 0.1) !important; }
-  .theme-stranger-things .detail-brand-tag { color: #ff2d2d !important; text-shadow: 0 0 15px rgba(255, 45, 45, 0.6); }
-  .theme-stranger-things .btn-premium.btn-primary { background: rgba(255, 45, 45, 0.2) !important; border-color: rgba(255, 45, 45, 0.6) !important; color: #ff2d2d !important; box-shadow: 0 4px 20px rgba(255, 45, 45, 0.4) !important; }
-  .theme-stranger-things #theme-gradient { background: linear-gradient(135deg, rgba(61,10,10,0.4) 0%, rgba(26,10,10,0.3) 50%, rgba(0,0,0,0.6) 100%) !important; }
+  /* Stranger Things - Rojo neón retro */
+  .theme-stranger-things .detail-back-btn {
+    border: 1px solid rgba(255, 45, 45, 0.5) !important;
+    box-shadow: 0 0 20px rgba(255, 45, 45, 0.3) !important;
+    background: rgba(255, 45, 45, 0.1) !important;
+  }
+  .theme-stranger-things .detail-brand-tag {
+    color: #ff2d2d !important;
+    text-shadow: 0 0 15px rgba(255, 45, 45, 0.6);
+  }
+  .theme-stranger-things .btn-premium.btn-primary {
+    background: rgba(255, 45, 45, 0.2) !important;
+    border-color: rgba(255, 45, 45, 0.6) !important;
+    color: #ff2d2d !important;
+    box-shadow: 0 4px 20px rgba(255, 45, 45, 0.4) !important;
+  }
+  .theme-stranger-things #theme-gradient {
+    background: linear-gradient(135deg, rgba(61,10,10,0.4) 0%, rgba(26,10,10,0.3) 50%, rgba(0,0,0,0.6) 100%) !important;
+  }
 
-  .theme-shrek .detail-back-btn { border: 1px solid rgba(123, 198, 126, 0.5) !important; box-shadow: 0 0 20px rgba(123, 198, 126, 0.3) !important; background: rgba(123, 198, 126, 0.1) !important; }
-  .theme-shrek .detail-brand-tag { color: #7bc67e !important; text-shadow: 0 0 15px rgba(123, 198, 126, 0.6); }
-  .theme-shrek .btn-premium.btn-primary { background: rgba(123, 198, 126, 0.2) !important; border-color: rgba(123, 198, 126, 0.6) !important; color: #7bc67e !important; box-shadow: 0 4px 20px rgba(123, 198, 126, 0.4) !important; }
-  .theme-shrek #theme-gradient { background: linear-gradient(135deg, rgba(42,58,26,0.4) 0%, rgba(58,42,26,0.3) 50%, rgba(26,26,10,0.6) 100%) !important; }
+  /* Shrek - Verde pantano */
+  .theme-shrek .detail-back-btn {
+    border: 1px solid rgba(123, 198, 126, 0.5) !important;
+    box-shadow: 0 0 20px rgba(123, 198, 126, 0.3) !important;
+    background: rgba(123, 198, 126, 0.1) !important;
+  }
+  .theme-shrek .detail-brand-tag {
+    color: #7bc67e !important;
+    text-shadow: 0 0 15px rgba(123, 198, 126, 0.6);
+  }
+  .theme-shrek .btn-premium.btn-primary {
+    background: rgba(123, 198, 126, 0.2) !important;
+    border-color: rgba(123, 198, 126, 0.6) !important;
+    color: #7bc67e !important;
+    box-shadow: 0 4px 20px rgba(123, 198, 126, 0.4) !important;
+  }
+  .theme-shrek #theme-gradient {
+    background: linear-gradient(135deg, rgba(42,58,26,0.4) 0%, rgba(58,42,26,0.3) 50%, rgba(26,26,10,0.6) 100%) !important;
+  }
 
-  .theme-euphoria .detail-back-btn { border: 1px solid rgba(191, 95, 255, 0.5) !important; box-shadow: 0 0 20px rgba(191, 95, 255, 0.3) !important; background: rgba(191, 95, 255, 0.1) !important; }
-  .theme-euphoria .detail-brand-tag { color: #bf5fff !important; text-shadow: 0 0 15px rgba(191, 95, 255, 0.6); }
-  .theme-euphoria .btn-premium.btn-primary { background: rgba(191, 95, 255, 0.2) !important; border-color: rgba(191, 95, 255, 0.6) !important; color: #bf5fff !important; box-shadow: 0 4px 20px rgba(191, 95, 255, 0.4) !important; }
-  .theme-euphoria #theme-gradient { background: linear-gradient(135deg, rgba(42,10,58,0.4) 0%, rgba(58,26,58,0.3) 50%, rgba(26,10,10,0.6) 100%) !important; }
+  /* Euphoria - Púrpura neón */
+  .theme-euphoria .detail-back-btn {
+    border: 1px solid rgba(191, 95, 255, 0.5) !important;
+    box-shadow: 0 0 20px rgba(191, 95, 255, 0.3) !important;
+    background: rgba(191, 95, 255, 0.1) !important;
+  }
+  .theme-euphoria .detail-brand-tag {
+    color: #bf5fff !important;
+    text-shadow: 0 0 15px rgba(191, 95, 255, 0.6);
+  }
+  .theme-euphoria .btn-premium.btn-primary {
+    background: rgba(191, 95, 255, 0.2) !important;
+    border-color: rgba(191, 95, 255, 0.6) !important;
+    color: #bf5fff !important;
+    box-shadow: 0 4px 20px rgba(191, 95, 255, 0.4) !important;
+  }
+  .theme-euphoria #theme-gradient {
+    background: linear-gradient(135deg, rgba(42,10,58,0.4) 0%, rgba(58,26,58,0.3) 50%, rgba(26,10,10,0.6) 100%) !important;
+  }
 
-  .theme-from .detail-back-btn { border: 1px solid rgba(204, 78, 0, 0.5) !important; box-shadow: 0 0 20px rgba(204, 78, 0, 0.3) !important; background: rgba(204, 78, 0, 0.1) !important; }
-  .theme-from .detail-brand-tag { color: #cc4e00 !important; text-shadow: 0 0 15px rgba(204, 78, 0, 0.6); }
-  .theme-from .btn-premium.btn-primary { background: rgba(204, 78, 0, 0.2) !important; border-color: rgba(204, 78, 0, 0.6) !important; color: #cc4e00 !important; box-shadow: 0 4px 20px rgba(204, 78, 0, 0.4) !important; }
-  .theme-from #theme-gradient { background: linear-gradient(135deg, rgba(58,26,10,0.4) 0%, rgba(42,10,10,0.3) 50%, rgba(0,0,0,0.6) 100%) !important; }
+  /* From - Naranja óxido horror */
+  .theme-from .detail-back-btn {
+    border: 1px solid rgba(204, 78, 0, 0.5) !important;
+    box-shadow: 0 0 20px rgba(204, 78, 0, 0.3) !important;
+    background: rgba(204, 78, 0, 0.1) !important;
+  }
+  .theme-from .detail-brand-tag {
+    color: #cc4e00 !important;
+    text-shadow: 0 0 15px rgba(204, 78, 0, 0.6);
+  }
+  .theme-from .btn-premium.btn-primary {
+    background: rgba(204, 78, 0, 0.2) !important;
+    border-color: rgba(204, 78, 0, 0.6) !important;
+    color: #cc4e00 !important;
+    box-shadow: 0 4px 20px rgba(204, 78, 0, 0.4) !important;
+  }
+  .theme-from #theme-gradient {
+    background: linear-gradient(135deg, rgba(58,26,10,0.4) 0%, rgba(42,10,10,0.3) 50%, rgba(0,0,0,0.6) 100%) !important;
+  }
 
-  .theme-resident-evil .detail-back-btn { border: 1px solid rgba(139, 0, 0, 0.5) !important; box-shadow: 0 0 20px rgba(139, 0, 0, 0.3) !important; background: rgba(139, 0, 0, 0.1) !important; }
-  .theme-resident-evil .detail-brand-tag { color: #8b0000 !important; text-shadow: 0 0 15px rgba(139, 0, 0, 0.6); }
-  .theme-resident-evil .btn-premium.btn-primary { background: rgba(139, 0, 0, 0.3) !important; border-color: rgba(139, 0, 0, 0.8) !important; color: #ff4444 !important; box-shadow: 0 4px 20px rgba(139, 0, 0, 0.5) !important; }
-  .theme-resident-evil #theme-gradient { background: linear-gradient(135deg, rgba(58,0,0,0.5) 0%, rgba(26,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%) !important; }
+  /* Resident Evil - Rojo sangre */
+  .theme-resident-evil .detail-back-btn {
+    border: 1px solid rgba(139, 0, 0, 0.5) !important;
+    box-shadow: 0 0 20px rgba(139, 0, 0, 0.3) !important;
+    background: rgba(139, 0, 0, 0.1) !important;
+  }
+  .theme-resident-evil .detail-brand-tag {
+    color: #8b0000 !important;
+    text-shadow: 0 0 15px rgba(139, 0, 0, 0.6);
+  }
+  .theme-resident-evil .btn-premium.btn-primary {
+    background: rgba(139, 0, 0, 0.3) !important;
+    border-color: rgba(139, 0, 0, 0.8) !important;
+    color: #ff4444 !important;
+    box-shadow: 0 4px 20px rgba(139, 0, 0, 0.5) !important;
+  }
+  .theme-resident-evil #theme-gradient {
+    background: linear-gradient(135deg, rgba(58,0,0,0.5) 0%, rgba(26,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%) !important;
+  }
 
   @media (min-width: 768px) {
-    .cinema-header { padding: 16px 32px; }
-    .hero-banner { height: 50vh; max-height: 500px; }
-    .hero-title { font-size: 40px; }
-    .movie-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 0 32px 24px; }
-    .movie-carousel { gap: 20px; padding: 4px 32px 12px; }
-    .movie-card { flex: 0 0 160px; }
-    .section-header { padding: 0 32px; }
-    .tabs { max-width: 500px; padding: 0 32px; }
-    .detail-body-content { padding: 24px 32px; }
-    .ep-media-box { width: 200px; }
-    .bottom-nav { max-width: 1600px; margin: 0 auto; }
-  }
-
-  @media (min-width: 1024px) {
-    .hero-title { font-size: 48px; }
-    .movie-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; padding: 0 40px 32px; }
-    .movie-carousel { gap: 24px; padding: 4px 40px 12px; }
-    .movie-card { flex: 0 0 200px; }
-    .section-header { padding: 0 40px; }
-    .tabs { padding: 0 40px; }
-    .detail-body-content { padding: 24px 40px; }
-    .ep-media-box { width: 240px; }
-  }
-
-  @media (min-width: 1440px) {
-    .movie-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 28px; padding: 0 48px 36px; }
-    .movie-carousel { gap: 28px; padding: 4px 48px 12px; }
-    .movie-card { flex: 0 0 220px; }
-    .section-header { padding: 0 48px; }
-    .tabs { padding: 0 48px; }
-  }
-
-  #home-continue-watching-grid .movie-card {
-    flex: 0 0 140px;
-    min-width: 140px;
-  }
-  @media (min-width: 768px) {
-    #home-continue-watching-grid .movie-card { flex: 0 0 160px; min-width: 160px; }
-  }
-  @media (min-width: 1024px) {
-    #home-continue-watching-grid .movie-card { flex: 0 0 200px; min-width: 200px; }
-  }
-  @media (min-width: 1440px) {
-    #home-continue-watching-grid .movie-card { flex: 0 0 220px; min-width: 220px; }
-  }
-
-  /* ═══ MEJORAS DETALLE EN PC ═══ */
-  @media (min-width: 768px) {
-    .detail-overlay { padding: 0 5%; }
-    .detail-media-container { max-width: 900px; margin: 0 auto; border-radius: 8px; overflow: hidden; }
-    .detail-body-content { max-width: 900px; padding: 32px 40px; }
-    .detail-title { font-size: 36px; }
-    .detail-inline-meta { font-size: 16px; gap: 24px; }
-    .detail-desc { font-size: 16px; line-height: 1.6; }
-    .detail-credits { font-size: 14px; }
-    .detail-action-buttons { gap: 16px; }
-    .detail-action-buttons .btn-premium { padding: 14px 24px; font-size: 16px; }
-    .ep-list-netflix { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
-    .ep-media-box { width: 100%; max-width: 280px; }
-    .season-dropdown-wrapper { padding: 0 40px; }
-    #detail-similares-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 16px; }
-  }
-
-  @media (min-width: 1024px) {
+    body { max-width: 1400px; margin: 0 auto; }
+    .movie-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; padding: 0 24px 24px; }
+    .movie-card { flex: 0 0 150px; }
+    .movie-carousel { gap: 14px; }
+    .hero-banner { height: 420px; }
+    .hero-title { font-size: 36px; }
+    .bottom-nav { max-width: 1400px; margin: 0 auto; left: 0; right: 0; }
     .detail-overlay { padding: 0 10%; }
-    .detail-media-container { max-width: 1000px; }
-    .detail-body-content { max-width: 1000px; padding: 40px 48px; }
-    .detail-title { font-size: 42px; }
-    .ep-list-netflix { grid-template-columns: repeat(3, 1fr); gap: 32px; }
-    #detail-similares-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 20px; }
+    .detail-body-content { max-width: 900px; }
+    .ep-media-box { width: 200px; min-width: 200px; }
+    .section-title { font-size: 16px; }
+    .tabs { max-width: 400px; }
   }
 
-  @media (min-width: 1440px) {
+  @media (min-width: 1024px) {
+    .movie-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 0 32px 32px; }
+    .movie-card { flex: 0 0 180px; }
+    .hero-banner { height: 500px; }
+    .hero-title { font-size: 44px; }
     .detail-overlay { padding: 0 15%; }
-    .detail-media-container { max-width: 1200px; }
-    .detail-body-content { max-width: 1200px; }
-    .ep-list-netflix { grid-template-columns: repeat(4, 1fr); }
-    #detail-similares-grid { grid-template-columns: repeat(6, 1fr) !important; }
-  }
-
-
-  @media (min-width: 768px) {
-    .detail-media-container {
-      max-height: 55vh;
-      overflow: hidden;
-    }
+    .ep-media-box { width: 240px; min-width: 240px; }
+    .movie-carousel { padding: 0 32px; }
+    .section-header { padding: 0 32px; }
+    .main-header { padding: 0 32px; }
+    #home-continue-watching-grid .movie-card { flex: 0 0 180px; min-width: 180px; }
   }
 </style>
 </head>
@@ -785,7 +846,7 @@ function renderCards(items, gridId, append = false) {
       ? `<div class="progress-container"><div class="progress-bar" style="width:${finished ? 100 : percent}%;background:${finished ? '#4caf50' : 'var(--accent)'};"></div></div>`
       : '';
     card.innerHTML = `<div class="movie-badge">${item.tipo === 'serie' ? 'SERIE' : '4K'}</div>
-      <img class="movie-poster" src="${item.portada || ''}" loading="lazy">
+      <img class="movie-poster" src="${item.portada || 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Crect fill='%23181818' width='200' height='300'/%3E%3Ctext x='100' y='155' text-anchor='middle' fill='%23666666' font-size='60'%3E🎬%3C/text%3E%3C/svg%3E'}" loading="lazy">
       <div class="card-meta"><div class="movie-title">${item.titulo}</div></div>
       ${progressBar}`;
     card.onclick = () => openDetail(item);
@@ -893,30 +954,26 @@ function applyDetailTheme(titulo) {
   console.log('🎨 Tema aplicado en pantalla completa:', themeClass, '| Acento:', theme.accent, '| Efecto:', theme.effect);
 }
 
-// CONTROL DE DETALLES
+// Cargar metadatos reales desde /detalle
 function cargarMetadatos(item) {
   fetch(`${getServer()}/detalle?url=${encodeURIComponent(item.url)}`)
     .then(r => r.json())
     .then(d => {
       if (d.error) return;
-      // Sinopsis (películas y series)
       if (d.sinopsis) {
         const descEl = document.getElementById('detail-desc');
         if (descEl) descEl.textContent = d.sinopsis;
       }
-      // Año / fecha
       if (d.fecha) {
         const yearEl = document.getElementById('detail-year');
         if (yearEl) yearEl.textContent = d.fecha;
       }
-      // Calidad y género (reemplaza el texto genérico en películas y series)
       if (d.calidad || d.genero) {
         const durEl = document.getElementById('detail-duration-lbl');
         if (durEl) {
           durEl.textContent = [d.calidad, d.genero].filter(Boolean).join(' · ');
         }
       }
-      // Director/creador y elenco
       const credEl = document.querySelector('.detail-credits');
       if (credEl) {
         let html = '';
@@ -927,6 +984,8 @@ function cargarMetadatos(item) {
     })
     .catch(() => {});
 }
+
+// CONTROL DE DETALLES
 function openDetail(item, fromPopstate) {
   state.currentItem = item;
   if (!fromPopstate) history.pushState({view: 'detail', item: item}, '', '');
@@ -945,19 +1004,22 @@ function openDetail(item, fromPopstate) {
   const btnPlay = document.getElementById('btn-play-main');
   const epsSection = document.getElementById('detail-episodes-section');
 
+  const btnDownload = document.getElementById('btn-download-main');
   if (isSerie) {
     btnPlay.style.display = 'none';
+    if (btnDownload) btnDownload.style.display = 'none';
     epsSection.style.display = 'block';
     loadEpisodes(item.url);
   } else {
+    if (btnDownload) btnDownload.style.display = 'inline-flex';
     btnPlay.style.display = 'block';
     epsSection.style.display = 'none';
     document.getElementById('detail-desc').textContent = "Sinopsis oficial no disponible en este momento. Explora las temporadas o reproduce directamente el flujo de streaming sincronizado.";
   }
 
-    cargarMetadatos(item);
   document.getElementById('detail-overlay').style.display = 'flex';
   const tcShow = document.getElementById('themeCanvas'); if(tcShow) tcShow.style.display = 'block';
+  cargarMetadatos(item);
   updateMiListaBtn();
   
   document.getElementById('detail-similares-section').style.display = item.tipo === 'pelicula' ? 'block' : 'none';
@@ -1031,7 +1093,6 @@ async function playEpisodeData(url, idx) {
 }
 
 async function resolveAndEmbed(url, trackingUrl) {
-  console.log('resolveAndEmbed: ' + url);
   document.getElementById('detail-backdrop').style.display = 'none';
   document.getElementById('embedded-player-container').style.display = 'block';
   const tc = document.getElementById('themeCanvas'); if(tc) tc.style.zIndex = '-2';
@@ -1039,28 +1100,29 @@ async function resolveAndEmbed(url, trackingUrl) {
   if (vloader) { vloader.style.display = 'flex'; }
   
   state.trackingUrl = trackingUrl;
-  const title = state.currentItem ? (state.currentItem.titulo || '') : '';
   initPlyr();
 
-  const btnPlayMain = document.getElementById('btn-play-main'); if (btnPlayMain) btnPlayMain.style.display = 'none';
-  const btnRotateScreen = document.getElementById('btn-rotate-screen'); if (btnRotateScreen) btnRotateScreen.style.display = 'inline-flex';
+  document.getElementById('btn-play-main').style.display = 'none';
 
   try {
     const res = await fetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
     const data = await res.json();
-    console.log('Resolver data: ' + JSON.stringify(data).substring(0,200));
     if (data.error) {
       alert("No se pudo resolver el video: " + data.error);
       closePlayerMechanics();
       return;
     }
-    // NUEVA ESTRATEGIA: priorizar webview para cualquier embed
+    const title = state.currentItem ? (state.currentItem.titulo || '') : '';
+    // C8 WebView: app intercepta m3u8 desde embed
     if (data.webview && data.embed) {
-      console.log('Usando embed via webview');
-      loadEmbedIframe(data.embed);
+      if (window.CineStranger) {
+        window.CineStranger.playVideo('webview://' + data.embed, title);
+      } else {
+        loadEmbedIframe(data.embed);
+      }
       return;
     }
-    // Fallback: si hay m3u8 directo (filemoon/vidhide)
+    // C8 m3u8 directo (filemoon/vidhide)
     if (data.m3u8 && !data.url) {
       if (window.CineStranger) {
         window.CineStranger.playVideo('webview://' + data.m3u8, title);
@@ -1078,10 +1140,11 @@ async function resolveAndEmbed(url, trackingUrl) {
     if (window.CineStranger) {
       const isVimeosAndroid = data.original && (data.original.includes('vimeos.zip') || data.original.includes('vimeos.net'));
       if (isVimeosAndroid && data.embed) {
+        // WebView captura m3u8 directo; fallback al m3u8 via onPlayerError en DetalleActivity
         window.CineStranger.playVideo('webview://' + data.embed, title);
       } else {
         const ref = data.referer || data.embed || '';
-        window.CineStranger.showVideoOptions(data.original || data.url, title, ref);
+        window.CineStranger.playVideo('webview://' + (data.original || data.url), title);
       }
       closePlayerMechanics();
       return;
@@ -1106,6 +1169,7 @@ async function resolveAndEmbed(url, trackingUrl) {
     closePlayerMechanics();
   }
 }
+
 function loadEmbedIframe(embedUrl) {
   const container = document.getElementById('embedded-player-container');
   const video = document.getElementById('video-player');
@@ -1123,61 +1187,41 @@ function loadEmbedIframe(embedUrl) {
   iframe.allowFullscreen = true;
   iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;background:#000;';
   container.appendChild(iframe);
-  document.getElementById('btn-stream-options').style.display = 'inline-flex';
 }
 
 function startHlsStream(src) {
-  console.log('startHlsStream: ' + src.substring(0,100));
-  // Si estamos en la app Android, usar ExoPlayer nativo
+  // Si estamos en la app Android, abrir como embed WebView
   if (window.CineStranger) {
     const title = state.currentItem ? (state.currentItem.titulo || '') : '';
-    window.CineStranger.playVideo(src, title);
+    window.CineStranger.playVideo('webview://' + src, title);
     return;
   }
   const video = document.getElementById('video-player');
   if (state.hls) { state.hls.destroy(); state.hls = null; }
 
   if (Hls.isSupported()) {
-    console.log('HLS soportado, cargando...');
-    const hls = new Hls({ 
-      enableWorker: false,
-      fragLoadingTimeOut: 60000,
-      manifestLoadingTimeOut: 30000,
-      levelLoadingTimeOut: 60000
-    });
+    const hls = new Hls({ enableWorker: false });
     hls.loadSource(src);
-    hls.on(Hls.Events.ERROR, function(event, data) {
-      console.log('ERROR HLS: ' + data.type + ' - ' + (data.details || ''));
-    });
     hls.attachMedia(video);
     state.hls = hls;
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      console.log('MANIFEST PARSED, iniciando reproducción');
       const tracks = hls.audioTracks;
       if (tracks && tracks.length > 1) {
         const esIdx = tracks.findIndex(t => t.lang === 'es' || (t.name||'').toLowerCase().includes('espa'));
         if (esIdx >= 0) hls.audioTrack = esIdx;
         const label = tracks[hls.audioTrack]?.lang || 'ES';
-        const btn = document.getElementById('btn-rotate-screen');
-        btn.textContent = '🌐 ' + label.toUpperCase().slice(0,2);
-        btn.style.display = 'inline-flex';
       } else {
-        document.getElementById('btn-rotate-screen').style.display = 'none';
-  document.getElementById('btn-stream-options').style.display = 'none';
       }
       syncSavedProgress(video);
       state.plyrInstance.play();
-      document.getElementById('btn-stream-options').style.display = 'inline-flex';
       const vl = document.getElementById('video-loader');
       if (vl) vl.style.display = 'none';
     });
   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-    console.log('Usando reproducción nativa HLS');
     video.src = src;
     video.addEventListener('loadedmetadata', () => {
       syncSavedProgress(video);
       state.plyrInstance.play();
-      document.getElementById('btn-stream-options').style.display = 'inline-flex';
       const vl = document.getElementById('video-loader');
       if (vl) vl.style.display = 'none';
     });
@@ -1217,19 +1261,13 @@ function closePlayerMechanics() {
   if (embedIframe) embedIframe.remove();
   const videoEl = document.getElementById('video-player');
   if (videoEl) videoEl.style.display = 'block';
-
-  const backdrop = document.getElementById('detail-backdrop');
-  if (backdrop) backdrop.style.display = 'block';
-  const container = document.getElementById('embedded-player-container');
-  if (container) container.style.display = 'none';
+  
+  document.getElementById('detail-backdrop').style.display = 'block';
+  document.getElementById('embedded-player-container').style.display = 'none';
+  if (window.CineStranger) window.CineStranger.hidePlayer();
   const tc2 = document.getElementById('themeCanvas'); if(tc2) tc2.style.zIndex = '0';
-  const btnRotate = document.getElementById('btn-rotate-screen');
-  if (btnRotate) btnRotate.style.display = 'none';
-  const btnStream = document.getElementById('btn-stream-options');
-  if (btnStream) btnStream.style.display = 'none';
   if(state.currentItem && state.currentItem.tipo !== 'serie') {
-    const btnPlay = document.getElementById('btn-play-main');
-    if (btnPlay) btnPlay.style.display = 'block';
+    document.getElementById('btn-play-main').style.display = 'block';
   }
 }
 
@@ -1562,14 +1600,5 @@ document.getElementById('search-input').addEventListener('input', function() {
 </script>
 
 
-
-<div id="stream-options-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeStreamOptions()">
-  <div class="modal" style="max-width:500px;">
-    <h2>⚙️ Opciones de stream</h2>
-    <div id="stream-options-content" style="color:#ccc;font-size:13px;">Cargando variantes...</div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeStreamOptions()">Cerrar</button>
-    </div>
-  </div>
 </body>
 </html>
