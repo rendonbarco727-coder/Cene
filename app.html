@@ -846,7 +846,7 @@ function renderCards(items, gridId, append = false) {
       ? `<div class="progress-container"><div class="progress-bar" style="width:${finished ? 100 : percent}%;background:${finished ? '#4caf50' : 'var(--accent)'};"></div></div>`
       : '';
     card.innerHTML = `<div class="movie-badge">${item.tipo === 'serie' ? 'SERIE' : '4K'}</div>
-      <img class="movie-poster" src="${item.portada || 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Crect fill='%23181818' width='200' height='300'/%3E%3Ctext x='100' y='155' text-anchor='middle' fill='%23666666' font-size='60'%3E🎬%3C/text%3E%3C/svg%3E'}" loading="lazy">
+      <img class="movie-poster" src="${item.portada || ''}" loading="lazy">
       <div class="card-meta"><div class="movie-title">${item.titulo}</div></div>
       ${progressBar}`;
     card.onclick = () => openDetail(item);
@@ -954,37 +954,6 @@ function applyDetailTheme(titulo) {
   console.log('🎨 Tema aplicado en pantalla completa:', themeClass, '| Acento:', theme.accent, '| Efecto:', theme.effect);
 }
 
-// Cargar metadatos reales desde /detalle
-function cargarMetadatos(item) {
-  fetch(`${getServer()}/detalle?url=${encodeURIComponent(item.url)}`)
-    .then(r => r.json())
-    .then(d => {
-      if (d.error) return;
-      if (d.sinopsis) {
-        const descEl = document.getElementById('detail-desc');
-        if (descEl) descEl.textContent = d.sinopsis;
-      }
-      if (d.fecha) {
-        const yearEl = document.getElementById('detail-year');
-        if (yearEl) yearEl.textContent = d.fecha;
-      }
-      if (d.calidad || d.genero) {
-        const durEl = document.getElementById('detail-duration-lbl');
-        if (durEl) {
-          durEl.textContent = [d.calidad, d.genero].filter(Boolean).join(' · ');
-        }
-      }
-      const credEl = document.querySelector('.detail-credits');
-      if (credEl) {
-        let html = '';
-        if (d.director) html += 'Director: <span>' + d.director + '</span><br>';
-        if (d.elenco) html += 'Elenco: <span>' + d.elenco + '</span>';
-        if (html) credEl.innerHTML = html;
-      }
-    })
-    .catch(() => {});
-}
-
 // CONTROL DE DETALLES
 function openDetail(item, fromPopstate) {
   state.currentItem = item;
@@ -1019,7 +988,6 @@ function openDetail(item, fromPopstate) {
 
   document.getElementById('detail-overlay').style.display = 'flex';
   const tcShow = document.getElementById('themeCanvas'); if(tcShow) tcShow.style.display = 'block';
-  cargarMetadatos(item);
   updateMiListaBtn();
   
   document.getElementById('detail-similares-section').style.display = item.tipo === 'pelicula' ? 'block' : 'none';
@@ -1116,6 +1084,8 @@ async function resolveAndEmbed(url, trackingUrl) {
     // C8 WebView: app intercepta m3u8 desde embed
     if (data.webview && data.embed) {
       if (window.CineStranger) {
+        const vloader1 = document.getElementById('video-loader');
+        if (vloader1) vloader1.style.display = 'none';
         window.CineStranger.playVideo('webview://' + data.embed, title);
       } else {
         loadEmbedIframe(data.embed);
@@ -1125,6 +1095,8 @@ async function resolveAndEmbed(url, trackingUrl) {
     // C8 m3u8 directo (filemoon/vidhide)
     if (data.m3u8 && !data.url) {
       if (window.CineStranger) {
+        const vloader2 = document.getElementById('video-loader');
+        if (vloader2) vloader2.style.display = 'none';
         window.CineStranger.playVideo('webview://' + data.m3u8, title);
       } else {
         startHlsStream(data.m3u8);
@@ -1138,15 +1110,14 @@ async function resolveAndEmbed(url, trackingUrl) {
     }
     // App Android: siempre usar ExoPlayer con la URL directa
     if (window.CineStranger) {
-      const isVimeosAndroid = data.original && (data.original.includes('vimeos.zip') || data.original.includes('vimeos.net'));
-      if (isVimeosAndroid && data.embed) {
-        // WebView captura m3u8 directo; fallback al m3u8 via onPlayerError en DetalleActivity
+      const vloader3 = document.getElementById('video-loader');
+      if (vloader3) vloader3.style.display = 'none';
+      // Sin ExoPlayer: cualquier fuente con embed (pagina HTML real) va por WebView
+      if (data.embed && /^https?:\/\//i.test(data.embed)) {
         window.CineStranger.playVideo('webview://' + data.embed, title);
       } else {
-        const ref = data.referer || data.embed || '';
         window.CineStranger.playVideo('webview://' + (data.original || data.url), title);
       }
-      closePlayerMechanics();
       return;
     }
     // Si hay embed y no hay m3u8 útil, usar iframe
@@ -1193,6 +1164,11 @@ function startHlsStream(src) {
   // Si estamos en la app Android, abrir como embed WebView
   if (window.CineStranger) {
     const title = state.currentItem ? (state.currentItem.titulo || '') : '';
+    // Ocultar el spinner de "Cargando stream...": en este camino el WebView nativo
+    // Android se encarga de renderizar el embed, asi que el loader HTML no tiene
+    // mas razon de estar visible (a diferencia de los caminos Hls.js / iframe).
+    const vloader = document.getElementById('video-loader');
+    if (vloader) vloader.style.display = 'none';
     window.CineStranger.playVideo('webview://' + src, title);
     return;
   }
