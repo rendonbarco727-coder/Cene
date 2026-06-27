@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Cinema Stranger — Premium Streaming Platform</title>
-<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Syne:wght@700;800&display=swap');
 
@@ -20,9 +19,6 @@
     --border-color: #282828;
     --shadow-premium: 0 8px 24px rgba(0,0,0,0.5);
     
-    --plyr-color-main: #E50914;
-    --plyr-video-background: #000000;
-    --plyr-video-control-color: #FFFFFF;
   }
 
   * { 
@@ -597,7 +593,6 @@
           <div style="width:48px;height:48px;border:4px solid #333;border-top-color:#E50914;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
           <div style="color:#aaa;font-size:13px;letter-spacing:1px;">Cargando stream...</div>
         </div>
-        <video id="video-player" playsinline crossorigin></video>
       </div>
     </div>
     
@@ -680,8 +675,6 @@
     </button>
   </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.7/hls.min.js"></script>
-<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script>
 const DEFAULT_SERVER = 'https://ruben-inspiron-5558.tail5c4d3b.ts.net';
 
@@ -696,27 +689,12 @@ const state = {
   currentItem: null,
   currentTemporadas: null,
   currentTab: 'T1',
-  hls: null,
-  plyrInstance: null,
   trackingUrl: null,
   progressSaverInterval: null,
   isRotated: false,
   currentEpIdx: null
 };
 
-function initPlyr() {
-  if (!state.plyrInstance) {
-    state.plyrInstance = new Plyr('#video-player', {
-      controls: ['rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'fullscreen'],
-      tooltips: { controls: false, seek: false },
-      clickToPlay: true,
-      rewind: 10,
-      seekTime: 10,
-      invertTime: false,
-      toggleInvert: false,
-      displayDuration: true
-    });
-  }
 }
 
 function openSearch() {
@@ -1205,7 +1183,6 @@ function loadEmbedIframe(embedUrl) {
   const container = document.getElementById('embedded-player-container');
   const video = document.getElementById('video-player');
   const vloader = document.getElementById('video-loader');
-  if (state.hls) { state.hls.destroy(); state.hls = null; }
   video.style.display = 'none';
   if (vloader) vloader.style.display = 'none';
   // Eliminar iframe previo si existe
@@ -1220,70 +1197,7 @@ function loadEmbedIframe(embedUrl) {
   container.appendChild(iframe);
 }
 
-function startHlsStream(src) {
-  // Si estamos en la app Android, abrir como embed WebView
-  if (window.CineStranger) {
-    const title = state.currentItem ? (state.currentItem.titulo || '') : '';
-    // Ocultar el spinner de "Cargando stream...": en este camino el WebView nativo
-    // Android se encarga de renderizar el embed, asi que el loader HTML no tiene
-    // mas razon de estar visible (a diferencia de los caminos Hls.js / iframe).
-    const vloader = document.getElementById('video-loader');
-    if (vloader) vloader.style.display = 'none';
-    window.CineStranger.playVideo('webview://' + src, title);
-    return;
-  }
-  const video = document.getElementById('video-player');
-  if (state.hls) { state.hls.destroy(); state.hls = null; }
 
-  if (Hls.isSupported()) {
-    const hls = new Hls({ enableWorker: false });
-    hls.loadSource(src);
-    hls.attachMedia(video);
-    state.hls = hls;
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      const tracks = hls.audioTracks;
-      if (tracks && tracks.length > 1) {
-        const esIdx = tracks.findIndex(t => t.lang === 'es' || (t.name||'').toLowerCase().includes('espa'));
-        if (esIdx >= 0) hls.audioTrack = esIdx;
-        const label = tracks[hls.audioTrack]?.lang || 'ES';
-      } else {
-      }
-      syncSavedProgress(video);
-      state.plyrInstance.play();
-      const vl = document.getElementById('video-loader');
-      if (vl) vl.style.display = 'none';
-    });
-  } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-    video.src = src;
-    video.addEventListener('loadedmetadata', () => {
-      syncSavedProgress(video);
-      state.plyrInstance.play();
-      const vl = document.getElementById('video-loader');
-      if (vl) vl.style.display = 'none';
-    });
-  }
-
-  clearInterval(state.progressSaverInterval);
-  state.progressSaverInterval = setInterval(() => {
-    if (state.plyrInstance && state.plyrInstance.playing && video.currentTime > 5) {
-      const saved = JSON.parse(localStorage.getItem('cs_progress') || '{}');
-      saved[state.trackingUrl] = {
-        time: video.currentTime,
-        duration: video.duration || 0,
-        titulo: state.currentItem.titulo,
-        portada: state.currentItem.portada,
-        tipo: state.currentItem.tipo,
-        itemRaw: state.currentItem
-      };
-      localStorage.setItem('cs_progress', JSON.stringify(saved));
-    }
-  }, 4000);
-}
-
-function syncSavedProgress(video) {
-  const saved = JSON.parse(localStorage.getItem('cs_progress') || '{}');
-  if (saved[state.trackingUrl]) video.currentTime = saved[state.trackingUrl].time;
-}
 
 
 
@@ -1291,12 +1205,8 @@ function closePlayerMechanics() {
   state.currentEpIdx = null;
   highlightActiveEp(null);
   clearInterval(state.progressSaverInterval);
-  if (state.plyrInstance) state.plyrInstance.stop();
-  if (state.hls) { state.hls.destroy(); state.hls = null; }
   const embedIframe = document.getElementById('embed-iframe');
   if (embedIframe) embedIframe.remove();
-  const videoEl = document.getElementById('video-player');
-  if (videoEl) videoEl.style.display = 'block';
   
   document.getElementById('detail-backdrop').style.display = 'block';
   document.getElementById('embedded-player-container').style.display = 'none';
