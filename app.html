@@ -614,9 +614,7 @@
         
         <div class="detail-action-buttons">
           <button class="btn-premium btn-primary" id="btn-play-main" onclick="playMain()">▶ Ver</button>
-          
-          
-          
+          <button class="btn-premium btn-secondary" id="btn-download-main" onclick="downloadMain()" style="display:none;">⬇ Descargar</button>
           
         </div>
         
@@ -823,7 +821,21 @@ async function loadCatalog(tipo) {
   } catch (e) {
     const msg2 = e && e.message ? e.message : String(e);
     if (window.CineStranger) window.CineStranger.logError('CATALOG_ERROR: ' + msg2);
-    document.getElementById(`${tipo}-state`).innerHTML = `<div class="state-msg">⚠️ Servidor desconectado.</div>`;
+    let retryCount = parseInt(document.getElementById(`${tipo}-state`).dataset.retry || '0');
+    retryCount++;
+    const maxRetry = 4;
+    const delay = Math.min(retryCount * 5, 20);
+    if (retryCount <= maxRetry) {
+      document.getElementById(`${tipo}-state`).dataset.retry = retryCount;
+      document.getElementById(`${tipo}-state`).innerHTML = `<div class="state-msg">⚠️ Sin conexión con el servidor. Reintentando en ${delay}s... (${retryCount}/${maxRetry})<br><button onclick="resetCatalog('${tipo}');loadCatalog('${tipo}')" style="margin-top:12px;background:var(--accent);border:none;color:#fff;padding:8px 20px;border-radius:4px;font-size:13px;cursor:pointer;">Reintentar ahora</button></div>`;
+      setTimeout(() => {
+        s.loading = false;
+        s.done = false;
+        loadCatalog(tipo);
+      }, delay * 1000);
+    } else {
+      document.getElementById(`${tipo}-state`).innerHTML = `<div class="state-msg">❌ Servidor no disponible.<br><button onclick="document.getElementById('${tipo}-state').dataset.retry='0';resetCatalog('${tipo}');loadCatalog('${tipo}')" style="margin-top:12px;background:var(--accent);border:none;color:#fff;padding:8px 20px;border-radius:4px;font-size:13px;cursor:pointer;">Reintentar</button></div>`;
+    }
   } finally { s.loading = false; }
 }
 
@@ -1535,6 +1547,18 @@ function _animateTheme() {
 loadCatalog('peliculas');
 renderContinueWatching();
 history.replaceState({view: 'catalog'}, '', '');
+
+// Pausar canvas cuando la pestaña no es visible
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) {
+    if (_themeAnimId) { cancelAnimationFrame(_themeAnimId); _themeAnimId = null; }
+  } else {
+    // Reanudar solo si el detalle está abierto y hay efectos activos
+    if (document.getElementById('detail-overlay').style.display === 'flex' && _themeEffectType !== 'none' && _themeEffects.length > 0) {
+      _animateTheme();
+    }
+  }
+});
 window.addEventListener('popstate', function(e) {
   const s = e.state;
   if (!s) return;
