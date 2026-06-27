@@ -848,7 +848,13 @@ function renderCards(items, gridId, append = false) {
     const progressBar = percent > 2
       ? `<div class="progress-container"><div class="progress-bar" style="width:${finished ? 100 : percent}%;background:${finished ? '#4caf50' : 'var(--accent)'};"></div></div>`
       : '';
-    card.innerHTML = `<div class="movie-badge">${item.tipo === 'serie' ? 'SERIE' : '4K'}</div>
+    const fuenteColores = {'ck':'#e50914','c8':'#1a73e8','c3':'#00b894','mf':'#f39c12'};
+    const fuenteLabel = {'ck':'CK','c8':'C8','c3':'C3','mf':'MF'};
+    const fuente = item.fuente || 'ck';
+    const badgeColor = fuenteColores[fuente] || '#555';
+    const badgeText = fuenteLabel[fuente] || fuente.toUpperCase();
+    const tipoBadge = item.tipo === 'serie' ? '<div class="movie-badge" style="left:6px;right:auto;background:rgba(0,0,0,0.75);">SERIE</div>' : '';
+    card.innerHTML = `${tipoBadge}<div class="movie-badge" style="background:${badgeColor};">${badgeText}</div>
       <img class="movie-poster" src="${item.portada || ''}" loading="lazy">
       <div class="card-meta"><div class="movie-title">${item.titulo}</div></div>
       ${progressBar}`;
