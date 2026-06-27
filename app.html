@@ -1137,9 +1137,7 @@ async function resolveAndEmbed(url, trackingUrl) {
 
 function loadEmbedIframe(embedUrl) {
   const container = document.getElementById('embedded-player-container');
-  const video = document.getElementById('video-player');
   const vloader = document.getElementById('video-loader');
-  video.style.display = 'none';
   if (vloader) vloader.style.display = 'none';
   // Eliminar iframe previo si existe
   const old = document.getElementById('embed-iframe');
