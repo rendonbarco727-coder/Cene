@@ -1117,12 +1117,12 @@ async function playEpisodeData(url, idx) {
 
 // Llamado desde Java cuando el video realmente empieza a reproducirse
 function videoStarted() {
-  // Esperar 1.5s extra para que el buffer arranque antes de quitar el loader
-  setTimeout(function() {
-    const vloader = document.getElementById('video-loader');
-    if (vloader) vloader.style.display = 'none';
-    if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
-  }, 1500);
+  // No hacer nada aqui, el loader se quita desde Java cuando currentTime > 1
+}
+function videoPlaying() {
+  const vloader = document.getElementById('video-loader');
+  if (vloader) vloader.style.display = 'none';
+  if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
 }
 
 async function resolveAndEmbed(url, trackingUrl) {
