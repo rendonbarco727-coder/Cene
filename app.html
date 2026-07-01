@@ -593,7 +593,7 @@
       <div class="backdrop-gradient-theme" id="theme-gradient"></div>
       
       <div class="embedded-player-wrap" id="embedded-player-container">
-        <div id="video-loader" style="display:none; position:fixed; inset:0; z-index:9999; background:#000; align-items:center; justify-content:center; flex-direction:column; gap:16px;">
+        <div id="video-loader" style="display:none; position:absolute; inset:0; z-index:50; background:#000; align-items:center; justify-content:center; flex-direction:column; gap:16px;">
           <!-- Anillo animado -->
           <div style="position:relative;width:80px;height:80px;">
             <div style="position:absolute;inset:0;border:4px solid #1a1a1a;border-radius:50%;"></div>
@@ -1117,9 +1117,12 @@ async function playEpisodeData(url, idx) {
 
 // Llamado desde Java cuando el video realmente empieza a reproducirse
 function videoStarted() {
-  const vloader = document.getElementById('video-loader');
-  if (vloader) vloader.style.display = 'none';
-  if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
+  // Esperar 1.5s extra para que el buffer arranque antes de quitar el loader
+  setTimeout(function() {
+    const vloader = document.getElementById('video-loader');
+    if (vloader) vloader.style.display = 'none';
+    if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
+  }, 1500);
 }
 
 async function resolveAndEmbed(url, trackingUrl) {
