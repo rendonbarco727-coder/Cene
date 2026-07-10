@@ -1033,8 +1033,13 @@ async function resolveAndEmbed(url, trackingUrl) {
       return;
     }
     // Si es vimeos y hay embed, usar iframe (más confiable)
-    if (data.embed && (data.embed.includes('vimeos.net') || data.embed.includes('vimeos.zip'))) {
-      console.log('Usando embed iframe para vimeos');
+    // El servidor ya indica explicitamente cuando el embed necesita
+    // cargarse via iframe (webview: true) -- antes esto se detectaba
+    // mirando si el string de embed contenia vimeos.net/vimeos.zip,
+    // lo cual dejaba afuera a cualquier otra fuente que tambien devuelva
+    // webview:true (como c3/cuevana), causando "sin URL" para esas series.
+    if (data.embed && data.webview) {
+      console.log('Usando embed iframe (webview=true, servidor=' + data.servidor + ')');
       loadEmbedIframe(data.embed);
       return;
     }
