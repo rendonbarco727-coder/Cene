@@ -1078,6 +1078,16 @@ function loadEmbedIframe(embedUrl) {
   iframe.src = embedUrl;
   iframe.allow = 'autoplay; fullscreen';
   iframe.allowFullscreen = true;
+  // Sandbox: permite que el reproductor funcione (scripts, su propio origen
+  // para cookies/localStorage, y forms si el player los usa) pero bloquea
+  // que el contenido del iframe navegue/redirija la ventana PRINCIPAL o
+  // abra popups nuevos. Sin esto, embeds con ads maliciosos (confirmado con
+  // C3: redirige a traves de attirecideryeah.com -> g2288.com ->
+  // aliexpress.com, secuestrando toda la app) sacan al usuario de FilmLite
+  // por completo. allow-top-navigation-by-user-activation permite que un
+  // click REAL del usuario dentro del iframe SI pueda navegar (por si el
+  // player legitimo necesita eso), pero bloquea la navegacion automatica/JS.
+  iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-top-navigation-by-user-activation';
   iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;background:#000;';
   container.appendChild(iframe);
   document.getElementById('btn-stream-options').style.display = 'inline-flex';
