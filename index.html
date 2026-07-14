@@ -1255,7 +1255,26 @@ function startHlsStream(src) {
     });
     hls.loadSource(src);
     hls.on(Hls.Events.ERROR, function(event, data) {
-      console.log('ERROR HLS: ' + data.type + ' - ' + (data.details || ''));
+      console.log('ERROR HLS: ' + data.type + ' - ' + (data.details || '') + ' fatal=' + data.fatal);
+      if (!data.fatal) return;
+      switch (data.type) {
+        case Hls.ErrorTypes.NETWORK_ERROR:
+          console.log('Fatal network error, reintentando loadSource...');
+          hls.startLoad();
+          break;
+        case Hls.ErrorTypes.MEDIA_ERROR:
+          console.log('Fatal media error, intentando recoverMediaError...');
+          hls.recoverMediaError();
+          break;
+        default:
+          console.log('Error fatal no recuperable, destruyendo HLS.');
+          hls.destroy();
+          state.hls = null;
+          const vloader2 = document.getElementById('video-loader');
+          if (vloader2) vloader2.style.display = 'none';
+          alert('No se pudo reproducir este canal. Probá con otro.');
+          break;
+      }
     });
     hls.attachMedia(video);
     state.hls = hls;
