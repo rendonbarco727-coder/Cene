@@ -1282,6 +1282,11 @@ function startHlsStream(src) {
     hls.attachMedia(video);
     state.hls = hls;
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      console.log('DEBUG video: paused=' + video.paused + ' w=' + video.videoWidth + ' h=' + video.videoHeight + ' readyState=' + video.readyState + ' display=' + video.style.display + ' offsetW=' + video.offsetWidth + ' offsetH=' + video.offsetHeight);
+      video.play().then(() => console.log('DEBUG play() OK')).catch(e => console.log('DEBUG play() ERROR: ' + e.message));
+      setTimeout(() => {
+        console.log('DEBUG +3s video: paused=' + video.paused + ' w=' + video.videoWidth + ' h=' + video.videoHeight + ' readyState=' + video.readyState + ' currentTime=' + video.currentTime);
+      }, 3000);
       console.log('MANIFEST PARSED, iniciando reproducción');
       const tracks = hls.audioTracks;
       if (tracks && tracks.length > 1) {
