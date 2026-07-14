@@ -847,11 +847,13 @@ function playCanalTV(canal) {
   if (!canal.m3u8) { alert('Canal no disponible en este momento'); return; }
 
   state.currentItem = { titulo: canal.t, url: canal.u };
+  state.trackingUrl = canal.u;
   document.getElementById('detail-backdrop').style.display = 'none';
   document.getElementById('embedded-player-container').style.display = 'block';
   const tc = document.getElementById('themeCanvas'); if (tc) tc.style.zIndex = '-2';
   const vloader = document.getElementById('video-loader');
   if (vloader) vloader.style.display = 'flex';
+  initPlyr();
   document.getElementById('btn-play-main').style.display = 'none';
 
   startHlsStream(canal.m3u8);
