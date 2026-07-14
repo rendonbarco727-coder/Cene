@@ -1209,6 +1209,17 @@ function mostrarSelectorIdioma(idiomas) {
   });
 
   container.appendChild(box);
+
+  // DEBUG TEMPORAL: medir dimensiones reales para diagnosticar por que
+  // los botones de servidor aparecen cortados/apretados.
+  const r = box.getBoundingClientRect();
+  const rc = container.getBoundingClientRect();
+  const dmc = document.querySelector('.detail-media-container');
+  const rdmc = dmc ? dmc.getBoundingClientRect() : null;
+  console.log('DEBUG selector box rect: ' + JSON.stringify(r));
+  console.log('DEBUG selector container rect: ' + JSON.stringify(rc));
+  console.log('DEBUG selector detail-media-container rect: ' + JSON.stringify(rdmc));
+  console.log('DEBUG selector box scrollHeight: ' + box.scrollHeight + ' clientHeight: ' + box.clientHeight);
 }
 
 function loadEmbedIframe(embedUrl) {
