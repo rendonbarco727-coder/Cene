@@ -844,7 +844,7 @@ function renderTVCards(canales) {
 }
 
 function playCanalTV(canal) {
-  if (!canal.m3u8) { alert('Canal no disponible en este momento'); return; }
+  if (!canal.u) { alert('Canal no disponible en este momento'); return; }
 
   state.currentItem = { titulo: canal.t, url: canal.u };
   state.trackingUrl = canal.u;
@@ -854,17 +854,16 @@ function playCanalTV(canal) {
   const tc = document.getElementById('themeCanvas'); if (tc) tc.style.zIndex = '-2';
   const vloader = document.getElementById('video-loader');
   if (vloader) vloader.style.display = 'flex';
-  initPlyr();
   document.getElementById('btn-play-main').style.display = 'none';
 
-  // El atributo crossorigin del <video> base hace que el navegador exija
-  // headers CORS en cada fragmento .ts y descarte silenciosamente los que
-  // no los traen (readyState nunca avanza, aunque el manifest cargue bien).
-  // Para TV en vivo lo sacamos antes de reproducir.
-  const video = document.getElementById('video-player');
-  video.removeAttribute('crossorigin');
-
-  startHlsStream(canal.m3u8);
+  // TV en vivo: usar el embed original en iframe en vez del m3u8 directo.
+  // El m3u8 resuelto suele fallar por CORS (el CDN de origen no manda
+  // Access-Control-Allow-Origin para requests desde github.io) y ademas
+  // el <video> propio quedaba sin CSS de layout (tamano intrinseco del
+  // navegador, invisible). loadEmbedIframe ya oculta el <video> propio
+  // y mete un iframe con position:absolute;inset:0, corriendo con el
+  // Origin correcto porque es la pagina real de cxtvenvivo.com.
+  loadEmbedIframe(canal.u);
 }
 
 function renderCards(items, gridId, append = false) {
