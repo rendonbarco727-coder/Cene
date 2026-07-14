@@ -554,6 +554,23 @@
     </section>
   </div>
 
+  <div class="app-screen" id="view-tv" style="display: none; padding-top: 75px;">
+    <div class="tabs" style="padding:0 16px;">
+      <select id="tv-categoria-select" onchange="loadTV(this.value)" style="width:100%;padding:10px;border-radius:6px;background:var(--bg-card);color:#fff;border:1px solid #333;font-size:14px;">
+        <option value="">Todas las categorías</option>
+      </select>
+    </div>
+    <section id="tv-section">
+      <div class="section-header">
+        <div class="section-title">TV en Vivo</div>
+      </div>
+      <div class="carousel-container" style="flex-wrap:wrap;display:flex;">
+        <div class="movie-carousel" id="tv-grid" style="flex-wrap:wrap;display:flex;"></div>
+      </div>
+      <div id="tv-state"></div>
+    </section>
+  </div>
+
   <div class="app-screen" id="view-search" style="display: none; padding-top: 20px;">
     <div class="search-bar-wrap">
       <div class="search-icon">🔍</div>
@@ -691,6 +708,9 @@
     <button class="nav-item" id="nav-mylist-btn" onclick="switchMainView('mylist', this)">
       <span>Mi Lista</span>
     </button>
+    <button class="nav-item" id="nav-tv-btn" onclick="switchMainView('tv', this)">
+      <span>TV en Vivo</span>
+    </button>
     <button class="nav-item" onclick="switchMainView('profile', this)">
       <span>Perfil</span>
     </button>
@@ -784,8 +804,14 @@ function switchMainView(target, btn, fromPopstate) {
   document.getElementById('view-search').style.display  = target === 'search'  ? 'flex' : 'none';
   document.getElementById('view-mylist').style.display  = target === 'mylist'  ? 'flex' : 'none';
   document.getElementById('view-profile').style.display = target === 'profile' ? 'flex' : 'none';
+  document.getElementById('view-tv').style.display = target === 'tv' ? 'flex' : 'none';
   document.getElementById('main-header').style.display = (target === 'search') ? 'none' : 'flex';
   if(target === 'profile' || target === 'catalog') renderContinueWatching();
+  if (target === 'tv' && !state.tvLoaded) {
+    state.tvLoaded = true;
+    loadTVCategorias();
+    loadTV();
+  }
   if (!fromPopstate) history.pushState({view: target}, '', '');
 }
 
@@ -840,6 +866,79 @@ function setupHeroBanner(item) {
   if(item.portada) document.getElementById('hero-display').style.backgroundImage = `url('${item.portada}')`;
   document.getElementById('hero-title').textContent = item.titulo;
   document.getElementById('hero-play-btn').onclick = () => openDetail(item);
+}
+
+// == TV EN VIVO ==
+async function loadTVCategorias() {
+  try {
+    const res = await fetch(`${getServer()}/tv/categorias`);
+    const cats = await res.json();
+    const sel = document.getElementById('tv-categoria-select');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Todas las categorias</option>' +
+      cats.map(c => `<option value="${c}">${c.replace(/-/g, ' ')}</option>`).join('');
+  } catch (e) {
+    console.error('Error cargando categorias TV:', e);
+  }
+}
+
+async function loadTV(categoria = '') {
+  const stateEl = document.getElementById('tv-state');
+  if (stateEl) stateEl.innerHTML = '<div class="state-msg">Cargando canales...</div>';
+  try {
+    const qs = categoria ? `?categoria=${encodeURIComponent(categoria)}` : '';
+    const res = await fetch(`${getServer()}/tv${qs}`);
+    const canales = await res.json();
+    renderTVCards(canales);
+    if (stateEl) stateEl.innerHTML = '';
+  } catch (e) {
+    if (stateEl) stateEl.innerHTML = `<div class="state-msg">Sin conexion con el servidor.<br><button onclick="loadTV('${categoria}')" style="margin-top:12px;background:var(--accent);border:none;color:#fff;padding:8px 20px;border-radius:4px;font-size:13px;cursor:pointer;">Reintentar</button></div>`;
+  }
+}
+
+function renderTVCards(canales) {
+  const grid = document.getElementById('tv-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  canales.forEach((canal) => {
+    const card = document.createElement('div');
+    card.className = 'movie-card';
+    card.innerHTML = `
+      <div class="movie-badge" style="background:#c0392b;">${canal.pais || ''}</div>
+      <img class="movie-poster" src="${canal.logo || ''}" loading="lazy" style="object-fit:contain;background:#111;">
+      <div class="card-meta"><div class="movie-title">${canal.t}</div></div>`;
+    card.onclick = () => playCanalTV(canal);
+    grid.appendChild(card);
+  });
+}
+
+function playCanalTV(canal) {
+  if (!canal.m3u8) { alert('Canal no disponible en este momento'); return; }
+
+  document.getElementById('detail-backdrop').style.display = 'none';
+  document.getElementById('embedded-player-container').style.display = 'block';
+  const tc = document.getElementById('themeCanvas'); if (tc) tc.style.zIndex = '-2';
+  const vloader = document.getElementById('video-loader');
+  if (vloader) vloader.style.display = 'flex';
+
+  state.trackingUrl = canal.u;
+  document.getElementById('btn-play-main').style.display = 'none';
+
+  if (window._tapHintTimer) clearTimeout(window._tapHintTimer);
+  window._tapHintTimer = setTimeout(function () {
+    const hint = document.getElementById('tap-to-play-hint');
+    const dots = document.getElementById('loader-dots');
+    if (hint && vloader && vloader.style.display !== 'none') {
+      hint.style.display = 'block';
+      if (dots) dots.style.display = 'none';
+    }
+  }, 6000);
+
+  if (window.CineStranger) {
+    window.CineStranger.playVideo(canal.m3u8, canal.t);
+  } else {
+    loadEmbedIframe(canal.m3u8);
+  }
 }
 
 function renderCards(items, gridId, append = false) {
