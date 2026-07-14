@@ -844,20 +844,26 @@ function renderTVCards(canales) {
 }
 
 function playCanalTV(canal) {
-  if (!canal.u) { alert('Canal no disponible en este momento'); return; }
+  if (!canal.m3u8) { alert('Canal no disponible en este momento'); return; }
 
   state.currentItem = { titulo: canal.t, url: canal.u };
   state.trackingUrl = canal.u;
   document.getElementById('detail-backdrop').style.display = 'none';
   document.getElementById('embedded-player-container').style.display = 'block';
   const tc = document.getElementById('themeCanvas'); if (tc) tc.style.zIndex = '-2';
+  const vloader = document.getElementById('video-loader');
+  if (vloader) vloader.style.display = 'flex';
+  initPlyr();
   document.getElementById('btn-play-main').style.display = 'none';
 
-  // TV en vivo: usamos la pagina completa del canal en iframe (no el m3u8
-  // aislado) porque el CDN de origen (CloudFront, Ottera, etc.) exige
-  // Referer/Origin de cxtvenvivo.com para servir los fragmentos. Cargando
-  // la pagina real en el iframe, su propio JS corre con el Origin correcto.
-  loadEmbedIframe(canal.u);
+  // El atributo crossorigin del <video> base hace que el navegador exija
+  // headers CORS en cada fragmento .ts y descarte silenciosamente los que
+  // no los traen (readyState nunca avanza, aunque el manifest cargue bien).
+  // Para TV en vivo lo sacamos antes de reproducir.
+  const video = document.getElementById('video-player');
+  video.removeAttribute('crossorigin');
+
+  startHlsStream(canal.m3u8);
 }
 
 function renderCards(items, gridId, append = false) {
