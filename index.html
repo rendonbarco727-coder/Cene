@@ -848,6 +848,7 @@ function playCanalTV(canal) {
 
   state.currentItem = { titulo: canal.t, url: canal.u };
   state.trackingUrl = canal.u;
+  document.getElementById('detail-overlay').style.display = 'flex';
   document.getElementById('detail-backdrop').style.display = 'none';
   document.getElementById('embedded-player-container').style.display = 'block';
   const tc = document.getElementById('themeCanvas'); if (tc) tc.style.zIndex = '-2';
