@@ -1257,8 +1257,14 @@ function startHlsStream(src) {
       levelLoadingTimeOut: 60000
     });
     hls.loadSource(src);
+    hls.on(Hls.Events.FRAG_LOADING, function(event, data) {
+      console.log('DEBUG frag loading: ' + (data.frag ? data.frag.url : '?'));
+    });
+    hls.on(Hls.Events.FRAG_LOADED, function(event, data) {
+      console.log('DEBUG frag LOADED ok, bytes=' + (data.payload ? data.payload.byteLength : '?'));
+    });
     hls.on(Hls.Events.ERROR, function(event, data) {
-      console.log('ERROR HLS: ' + data.type + ' - ' + (data.details || '') + ' fatal=' + data.fatal);
+      console.log('ERROR HLS: ' + data.type + ' - ' + (data.details || '') + ' fatal=' + data.fatal + ' url=' + (data.frag ? data.frag.url : data.url || '?') + ' response=' + JSON.stringify(data.response || {}));
       if (!data.fatal) return;
       switch (data.type) {
         case Hls.ErrorTypes.NETWORK_ERROR:
