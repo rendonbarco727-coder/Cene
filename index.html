@@ -207,6 +207,14 @@
     top: 0; left: 0;
     z-index: 10;
   }
+  .embedded-player-wrap video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+    background: #000;
+  }
 
   .detail-back-btn {
     position: absolute; top: 16px; left: 16px; z-index: 220;
@@ -893,15 +901,25 @@ function playCanalTV(canal) {
     return;
   }
 
-  // Resto de los canales: usar el embed original en iframe en vez del
-  // m3u8 directo. El m3u8 resuelto suele fallar por CORS (el CDN de
-  // origen no manda Access-Control-Allow-Origin para requests desde
-  // github.io) y ademas el <video> propio quedaba sin CSS de layout
-  // (tamano intrinseco del navegador, invisible). loadEmbedIframe ya
-  // oculta el <video> propio y mete un iframe con
-  // position:absolute;inset:0, corriendo con el Origin correcto porque
-  // es la pagina real de cxtvenvivo.com.
-  console.log('DEBUG playCanalTV: sin youtube_id, usando canal.u -> ' + canal.u);
+  // Canales con m3u8 propio: usar el proxy del backend en vez del m3u8
+  // directo. El CDN de origen (otteravision.com y similares) no manda
+  // Access-Control-Allow-Origin, asi que el navegador bloquea el fetch()
+  // del manifest hecho desde JS en github.io -- confirmado con
+  // manifestLoadError/CORS en consola. El proxy hace el fetch del lado
+  // del servidor (sin restriccion CORS) y reenvia el manifest reescrito
+  // + los segmentos .ts, sirviendo todo con el header CORS que ya agrega
+  // el @app.after_request global del backend. Esto deja usar el <video>
+  // propio via startHlsStream en vez de cargar la pagina completa de
+  // cxtvenvivo.com en un iframe (que tapaba el player real con el resto
+  // del sitio -- confirmado con "Cinco TV").
+  if (canal.m3u8) {
+    const proxyUrl = `${getServer()}/tv/proxy_m3u8?url=${encodeURIComponent(canal.m3u8)}`;
+    console.log('DEBUG playCanalTV: usando proxy m3u8 -> ' + proxyUrl);
+    startHlsStream(proxyUrl);
+    return;
+  }
+
+  console.log('DEBUG playCanalTV: sin m3u8 ni youtube_id, usando canal.u -> ' + canal.u);
   loadEmbedIframe(canal.u);
 }
 
