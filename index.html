@@ -876,13 +876,32 @@ function playCanalTV(canal) {
   if (vloader) vloader.style.display = 'flex';
   document.getElementById('btn-play-main').style.display = 'none';
 
-  // TV en vivo: usar el embed original en iframe en vez del m3u8 directo.
-  // El m3u8 resuelto suele fallar por CORS (el CDN de origen no manda
-  // Access-Control-Allow-Origin para requests desde github.io) y ademas
-  // el <video> propio quedaba sin CSS de layout (tamano intrinseco del
-  // navegador, invisible). loadEmbedIframe ya oculta el <video> propio
-  // y mete un iframe con position:absolute;inset:0, corriendo con el
-  // Origin correcto porque es la pagina real de cxtvenvivo.com.
+  console.log('DEBUG playCanalTV: canal.t=' + canal.t + ' canal.youtube_id=' + canal.youtube_id + ' canal.u=' + canal.u);
+
+  // Algunos canales del catalogo no tienen m3u8 propio -- en realidad
+  // retransmiten YouTube Live (confirmado con "Canal 5 (El 5)": el HTML
+  // de cxtvenvivo.com no trae data-stream-url, pero si un
+  // <iframe src="youtube.com/embed/<id>"> con el stream real). Para esos
+  // se arma el embed de YouTube directo, sin pasar por la pagina de
+  // cxtvenvivo.com -- cargar esa pagina completa en el iframe traia su
+  // propio header/sidebar/ads y dejaba el player real fuera de vista,
+  // scrolleado mas abajo, en vez de mostrar solo el video.
+  if (canal.youtube_id) {
+    const embedUrl = `https://www.youtube.com/embed/${canal.youtube_id}?autoplay=1`;
+    console.log('DEBUG playCanalTV: usando YouTube embed -> ' + embedUrl);
+    loadEmbedIframe(embedUrl);
+    return;
+  }
+
+  // Resto de los canales: usar el embed original en iframe en vez del
+  // m3u8 directo. El m3u8 resuelto suele fallar por CORS (el CDN de
+  // origen no manda Access-Control-Allow-Origin para requests desde
+  // github.io) y ademas el <video> propio quedaba sin CSS de layout
+  // (tamano intrinseco del navegador, invisible). loadEmbedIframe ya
+  // oculta el <video> propio y mete un iframe con
+  // position:absolute;inset:0, corriendo con el Origin correcto porque
+  // es la pagina real de cxtvenvivo.com.
+  console.log('DEBUG playCanalTV: sin youtube_id, usando canal.u -> ' + canal.u);
   loadEmbedIframe(canal.u);
 }
 
