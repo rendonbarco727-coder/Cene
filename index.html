@@ -494,9 +494,12 @@
   </div>
 
   <div class="app-screen" id="view-tv" style="display: none; padding-top: 75px;">
-    <div class="tabs" style="padding:0 16px;">
-      <select id="tv-categoria-select" onchange="loadTV(this.value)" style="width:100%;padding:10px;border-radius:6px;background:var(--bg-card);color:#fff;border:1px solid #333;font-size:14px;">
+    <div class="tabs" style="padding:0 16px;display:flex;gap:8px;">
+      <select id="tv-categoria-select" onchange="loadTV(this.value, document.getElementById('tv-pais-select').value)" style="flex:1;padding:10px;border-radius:6px;background:var(--bg-card);color:#fff;border:1px solid #333;font-size:14px;">
         <option value="">Todas las categorias</option>
+      </select>
+      <select id="tv-pais-select" onchange="loadTV(document.getElementById('tv-categoria-select').value, this.value)" style="flex:1;padding:10px;border-radius:6px;background:var(--bg-card);color:#fff;border:1px solid #333;font-size:14px;">
+        <option value="">Todos los paises</option>
       </select>
     </div>
     <section id="tv-section">
@@ -755,6 +758,7 @@ function switchMainView(target, btn, fromPopstate) {
   if (target === 'tv' && !state.tvLoaded) {
     state.tvLoaded = true;
     loadTVCategorias();
+    loadTVPaises();
     loadTV();
   }
   if (!fromPopstate) history.pushState({view: target}, '', '');
@@ -813,17 +817,33 @@ async function loadTVCategorias() {
   }
 }
 
-async function loadTV(categoria = '') {
+async function loadTVPaises() {
+  try {
+    const res = await fetch(`${getServer()}/tv/paises`);
+    const paises = await res.json();
+    const sel = document.getElementById('tv-pais-select');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Todos los paises</option>' +
+      paises.map(p => `<option value="${p}">${p}</option>`).join('');
+  } catch (e) {
+    console.error('Error cargando paises TV:', e);
+  }
+}
+
+async function loadTV(categoria = '', pais = '') {
   const stateEl = document.getElementById('tv-state');
   if (stateEl) stateEl.innerHTML = '<div class="state-msg">Cargando canales...</div>';
   try {
-    const qs = categoria ? `?categoria=${encodeURIComponent(categoria)}` : '';
+    const params = new URLSearchParams();
+    if (categoria) params.set('categoria', categoria);
+    if (pais) params.set('pais', pais);
+    const qs = params.toString() ? `?${params.toString()}` : '';
     const res = await fetch(`${getServer()}/tv${qs}`);
     const canales = await res.json();
     renderTVCards(canales);
     if (stateEl) stateEl.innerHTML = '';
   } catch (e) {
-    if (stateEl) stateEl.innerHTML = `<div class="state-msg">Sin conexion con el servidor.<br><button onclick="loadTV('${categoria}')" style="margin-top:12px;background:var(--accent);border:none;color:#fff;padding:8px 20px;border-radius:4px;font-size:13px;cursor:pointer;">Reintentar</button></div>`;
+    if (stateEl) stateEl.innerHTML = `<div class="state-msg">Sin conexion con el servidor.<br><button onclick="loadTV('${categoria}', '${pais}')" style="margin-top:12px;background:var(--accent);border:none;color:#fff;padding:8px 20px;border-radius:4px;font-size:13px;cursor:pointer;">Reintentar</button></div>`;
   }
 }
 
