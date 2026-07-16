@@ -769,6 +769,10 @@ function switchMainView(target, btn, fromPopstate) {
     loadTVPaises();
     loadTV();
   }
+  if (!state.infiniteScrollInit) {
+    state.infiniteScrollInit = true;
+    initInfiniteScrollCarousels();
+  }
   if (!fromPopstate) history.pushState({view: target}, '', '');
 }
 
@@ -810,11 +814,31 @@ async function loadCatalog(tipo) {
       items = data.items || data || [];
     }
     if (s.page === 1 && items.length > 0 && tipo === 'peliculas') setupHeroBanner(items[0]);
-    renderCards(items, `${tipo}-grid`, true);
+    if (items.length === 0) {
+      s.done = true;
+    } else {
+      renderCards(items, `${tipo}-grid`, true);
+    }
   } catch (e) {
     console.log('ERROR en resolveAndEmbed: ' + e.message);
     document.getElementById(`${tipo}-state`).innerHTML = `<div class="state-msg">⚠️ Servidor desconectado.</div>`;
   } finally { s.loading = false; }
+}
+
+function initInfiniteScrollCarousels() {
+  ['peliculas', 'series'].forEach((tipo) => {
+    const carousel = document.getElementById(`${tipo}-grid`);
+    if (!carousel) return;
+    carousel.addEventListener('scroll', () => {
+      const s = state[tipo];
+      if (s.loading || s.done) return;
+      const distanciaAlFinal = carousel.scrollWidth - carousel.scrollLeft - carousel.clientWidth;
+      if (distanciaAlFinal < 400) {
+        s.page += 1;
+        loadCatalog(tipo);
+      }
+    });
+  });
 }
 
 function setupHeroBanner(item) {
