@@ -786,17 +786,29 @@ function resetCatalog(tipo) {
   document.getElementById(`${tipo}-grid`).innerHTML = '';
 }
 
+let _popularesMxCache = null;
+
 async function loadCatalog(tipo) {
   const s = state[tipo];
   if (s.loading || s.done) return;
   if (document.getElementById('detail-overlay').style.display === 'flex') return;
   s.loading = true;
   try {
-    const endpoint = tipo === 'peliculas' ? 'peliculas' : 'series';
-    const res = await fetch(`${getServer()}/cinecalidad/${endpoint}?pagina=${s.page}&limite=50`);
-    const data = await res.json();
-    console.log('Resolver data: ' + JSON.stringify(data).substring(0,200));
-    const items = data.items || data || [];
+    let items;
+    if (s.page === 1) {
+      if (!_popularesMxCache) {
+        const resPop = await fetch(`${getServer()}/populares_mx`);
+        _popularesMxCache = await resPop.json();
+      }
+      const tipoFiltro = tipo === 'peliculas' ? 'pelicula' : 'serie';
+      items = _popularesMxCache.filter(i => i.tipo === tipoFiltro);
+    } else {
+      const endpoint = tipo === 'peliculas' ? 'peliculas' : 'series';
+      const res = await fetch(`${getServer()}/cinecalidad/${endpoint}?pagina=${s.page}&limite=50`);
+      const data = await res.json();
+      console.log('Resolver data: ' + JSON.stringify(data).substring(0,200));
+      items = data.items || data || [];
+    }
     if (s.page === 1 && items.length > 0 && tipo === 'peliculas') setupHeroBanner(items[0]);
     renderCards(items, `${tipo}-grid`, true);
   } catch (e) {
