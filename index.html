@@ -125,8 +125,8 @@
   .tab { flex: 1; text-align: center; padding: 12px 0; border-radius: 6px; font-size: 14px; color: var(--text-muted); background: var(--bg-surface); border: 1px solid transparent; cursor: pointer; }
   .tab.active { background: rgba(229, 9, 20, 0.1); border-color: var(--accent); color: var(--text-color); font-weight: 700; }
 
-  .platform-pills-wrap { padding: 12px 0 4px; margin-bottom: 8px; }
-  .platform-pills { display: flex; gap: 10px; overflow-x: auto; padding: 4px 24px 12px; scrollbar-width: none; }
+  .platform-pills-wrap { padding: 12px 0 4px; margin-bottom: 8px; min-height: 56px; flex-shrink: 0; }
+  .platform-pills { display: flex; gap: 10px; overflow-x: auto; padding: 4px 24px 12px; scrollbar-width: none; min-height: 44px; }
   .platform-pills::-webkit-scrollbar { display: none; }
   .platform-pill { flex: 0 0 auto; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 700; color: var(--text-muted); background: var(--bg-surface); border: 1px solid transparent; cursor: pointer; white-space: nowrap; }
   .platform-pill.active { background: rgba(229, 9, 20, 0.1); border-color: var(--accent); color: var(--text-color); }
@@ -1743,7 +1743,6 @@ function _animateTheme() {
   _themeAnimId = requestAnimationFrame(_animateTheme);
 }
 // ══ FIN TEMAS ══
-console.log('CHECKPOINT llegue hasta aca antes de PLATAFORMAS');
 
 const PLATAFORMAS = [
   { label: 'Netflix', valores: ['Netflix', 'Netflix Standard with Ads'] },
@@ -1756,7 +1755,6 @@ let platformActiveLabel = null;
 
 function renderPlatformPills() {
   const wrap = document.getElementById('platform-pills');
-  console.log('CHECKPOINT2 wrap encontrado:', wrap);
   wrap.innerHTML = '';
   PLATAFORMAS.forEach(p => {
     const btn = document.createElement('button');
@@ -1765,7 +1763,6 @@ function renderPlatformPills() {
     btn.onclick = () => togglePlatform(p);
     wrap.appendChild(btn);
   });
-  console.log('CHECKPOINT3 hijos de wrap despues del forEach:', wrap.children.length);
 }
 
 async function togglePlatform(p) {
