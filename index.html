@@ -1765,6 +1765,7 @@ function renderPlatformPills() {
     btn.onclick = () => togglePlatform(p);
     wrap.appendChild(btn);
   });
+  console.log('CHECKPOINT3 hijos de wrap despues del forEach:', wrap.children.length);
 }
 
 async function togglePlatform(p) {
