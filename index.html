@@ -125,6 +125,12 @@
   .tab { flex: 1; text-align: center; padding: 12px 0; border-radius: 6px; font-size: 14px; color: var(--text-muted); background: var(--bg-surface); border: 1px solid transparent; cursor: pointer; }
   .tab.active { background: rgba(229, 9, 20, 0.1); border-color: var(--accent); color: var(--text-color); font-weight: 700; }
 
+  .platform-pills-wrap { padding: 12px 0 4px; margin-bottom: 8px; }
+  .platform-pills { display: flex; gap: 10px; overflow-x: auto; padding: 4px 24px 12px; scrollbar-width: none; }
+  .platform-pills::-webkit-scrollbar { display: none; }
+  .platform-pill { flex: 0 0 auto; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 700; color: var(--text-muted); background: var(--bg-surface); border: 1px solid transparent; cursor: pointer; white-space: nowrap; }
+  .platform-pill.active { background: rgba(229, 9, 20, 0.1); border-color: var(--accent); color: var(--text-color); }
+
   .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 24px; }
   .section-title { font-family: 'Syne', sans-serif; font-size: 16px; color: #ffffff; font-weight: 700; text-transform: uppercase; border-left: 3px solid var(--accent); padding-left: 10px; }
   
@@ -454,6 +460,16 @@
   <div id="header-search-results" style="display:none;position:fixed;top:60px;left:0;right:0;max-height:70vh;overflow-y:auto;background:transparent;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:160;padding:12px;"></div>
 
   <div class="app-screen" id="view-catalog">
+    <div class="platform-pills-wrap">
+      <div class="platform-pills" id="platform-pills"></div>
+    </div>
+    <div id="platform-results-section" style="display:none;">
+      <div class="section-header">
+        <div class="section-title" id="platform-results-title">Resultados</div>
+      </div>
+      <div class="movie-grid" id="platform-results-grid"></div>
+      <div id="platform-results-state"></div>
+    </div>
     <div class="hero-banner" id="hero-display" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&q=80');">
       <div class="hero-content">
         <div class="hero-title" id="hero-title">Cargando Destacado...</div>
@@ -1727,6 +1743,74 @@ function _animateTheme() {
   _themeAnimId = requestAnimationFrame(_animateTheme);
 }
 // ══ FIN TEMAS ══
+
+const PLATAFORMAS = [
+  { label: 'Netflix', valores: ['Netflix', 'Netflix Standard with Ads'] },
+  { label: 'Prime Video', valores: ['Amazon Prime Video', 'Amazon Prime Video with Ads'] },
+  { label: 'HBO Max', valores: ['HBO Max'] },
+  { label: 'Disney+', valores: ['Disney Plus'] },
+  { label: 'Paramount+', valores: ['Paramount Plus', 'Paramount Plus Premium'] }
+];
+let platformActiveLabel = null;
+
+function renderPlatformPills() {
+  const wrap = document.getElementById('platform-pills');
+  wrap.innerHTML = '';
+  PLATAFORMAS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'platform-pill';
+    btn.textContent = p.label;
+    btn.onclick = () => togglePlatform(p);
+    wrap.appendChild(btn);
+  });
+}
+
+async function togglePlatform(p) {
+  const section = document.getElementById('platform-results-section');
+  const grid = document.getElementById('platform-results-grid');
+  const stateEl = document.getElementById('platform-results-state');
+  const title = document.getElementById('platform-results-title');
+
+  document.querySelectorAll('.platform-pill').forEach(b => b.classList.remove('active'));
+
+  if (platformActiveLabel === p.label) {
+    platformActiveLabel = null;
+    section.style.display = 'none';
+    return;
+  }
+
+  platformActiveLabel = p.label;
+  [...document.querySelectorAll('.platform-pill')].find(b => b.textContent === p.label)?.classList.add('active');
+
+  section.style.display = 'block';
+  title.textContent = p.label;
+  grid.innerHTML = '';
+  stateEl.innerHTML = '<div class="state-msg">Cargando...</div>';
+
+  try {
+    const resultadosPorValor = await Promise.all(
+      p.valores.map(v => fetch(`${getServer()}/por_plataforma?nombre=${encodeURIComponent(v)}`).then(r => r.json()))
+    );
+    const vistos = new Set();
+    const items = [];
+    resultadosPorValor.flat().forEach(item => {
+      if (!vistos.has(item.url)) {
+        vistos.add(item.url);
+        items.push(item);
+      }
+    });
+    if (!items.length) {
+      stateEl.innerHTML = '<div class="state-msg">Sin resultados para esta plataforma.</div>';
+    } else {
+      stateEl.innerHTML = '';
+      renderCards(items, 'platform-results-grid', false);
+    }
+  } catch (e) {
+    stateEl.innerHTML = '<div class="state-msg">Error al cargar. Intentá de nuevo.</div>';
+  }
+}
+
+renderPlatformPills();
 
 loadCatalog('peliculas');
 renderContinueWatching();
