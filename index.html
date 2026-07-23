@@ -988,6 +988,15 @@
   </button>
 </div>
 
+<div id="fl-error-box" style="display:none;position:fixed;inset:0;z-index:999999;background:#1a0000;color:#fff;padding:20px;font-family:monospace;font-size:13px;overflow-y:auto;white-space:pre-wrap;"></div>
+<script>
+window.addEventListener('error', function(e) {
+  var box = document.getElementById('fl-error-box');
+  if (!box) return;
+  box.style.display = 'block';
+  box.textContent += 'ERROR: ' + e.message + '\n  en ' + (e.filename || '?') + ':' + (e.lineno || '?') + ':' + (e.colno || '?') + '\n\n';
+});
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.7/hls.min.js"></script>
 <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script>
