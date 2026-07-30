@@ -1113,7 +1113,7 @@ function openDetail(item, fromPopstate) {
 
   const grid = document.getElementById('detail-similares-grid');
   grid.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">Cargando...</div>';
-  fetch(`${getServer()}/similares?titulo=${encodeURIComponent(item.titulo)}&tipo=${item.tipo}&limite=9`)
+  fetch(`${getServer()}/similares?url=${encodeURIComponent(item.url)}&tipo=${item.tipo}&limite=9`)
     .then(r => r.json())
     .then(items => {
       grid.innerHTML = '';
