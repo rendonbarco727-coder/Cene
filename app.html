@@ -205,6 +205,48 @@
     z-index: 10;
   }
 
+  .embed-switcher {
+    display: none;
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 60;
+    padding: 28px 10px 8px;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0) 100%);
+  }
+  .embed-switcher::-webkit-scrollbar { display: none; }
+  .embed-btn {
+    flex: 0 0 auto;
+    padding: 7px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(20,20,20,0.85);
+    color: rgba(255,255,255,0.75);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .embed-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .embed-retry-btn {
+    padding: 8px 18px;
+    border-radius: 6px;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
   .detail-back-btn {
     position: absolute; top: 16px; left: 16px; z-index: 220;
     background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff;
@@ -631,6 +673,8 @@
             <div style="color:#aaa;font-size:11px;margin-top:4px;">El video está listo</div>
           </div>
         </div>
+        <div id="embed-error" style="display:none;position:absolute;inset:0;z-index:55;background:#000;align-items:center;justify-content:center;flex-direction:column;gap:8px;text-align:center;padding:24px;color:#fff;"></div>
+        <div class="embed-switcher" id="embed-switcher"></div>
       </div>
     </div>
     
@@ -1352,28 +1396,13 @@ async function resolveAndEmbed(url, trackingUrl) {
     }
     await csEnsureToken();
     const title = state.currentItem ? (state.currentItem.titulo || '') : '';
-    const embedUrl = data.embed || data.original || data.url || '';
-    if (!embedUrl) {
-      alert("No se pudo resolver el video: sin URL");
-      closePlayerMechanics();
+    const embeds = _embedsDesdeRespuesta(data);
+    if (!embeds.length) {
+      _mostrarEmbedError('No se encontraron fuentes para reproducir el video.');
       return;
     }
-    // El loader se oculta cuando Java confirma que el video arrancó (videoStarted)
-    // Mientras tanto mostramos hint de tap si el autoplay falla tras 6s
-    if (window._tapHintTimer) clearTimeout(window._tapHintTimer);
-    window._tapHintTimer = setTimeout(function() {
-      const hint = document.getElementById('tap-to-play-hint');
-      const dots = document.getElementById('loader-dots');
-      if (hint && vloader && vloader.style.display !== 'none') {
-        hint.style.display = 'block';
-        if (dots) dots.style.display = 'none';
-      }
-    }, 6000);
-    if (window.CineStranger) {
-      window.CineStranger.playVideo('webview://' + embedUrl, title);
-    } else {
-      loadEmbedIframe(embedUrl);
-    }
+    // EMBEDS: cadena de fallback con botones de cambio (web + WebView Android).
+    await loadEmbeds(embeds);
   } catch (e) {
     const msg = e && e.message ? e.message : String(e);
     if (window.CineStranger) window.CineStranger.logError('RESOLVE_ERROR: ' + msg);
@@ -1382,17 +1411,244 @@ async function resolveAndEmbed(url, trackingUrl) {
   }
 }
 
-async function loadEmbedIframe(embedUrl) {
-  const container = document.getElementById('embedded-player-container');
+// ═══════════════════════════════════════════════════════════════════
+// EMBEDS: carga con cadena de fallback (WebView / iframe / video HLS)
+// Cada episodio llega como {T1: [{num, embeds: [{url, proveedor}]}]}.
+// ═══════════════════════════════════════════════════════════════════
+const EMBED_WATCHDOG_MS = 12000;
+let _embedsActuales = [];
+let _embedActivoIdx = 0;
+let _embedReloj = null;          // watchdog del embed en curso
+let _hlsjsPromise = null;
+
+function _proveedorDesdeUrl(u) {
+  u = String(u || '').toLowerCase();
+  if (/\.m3u8(\?|$)/.test(u)) return 'm3u8';
+  const m = u.match(/^https?:\/\/([^/]+)/);
+  const host = (m ? m[1] : '').replace(/^www\./, '');
+  const kws = {
+    'filemoon': 'filemoon', 'bysejikuar': 'filemoon',
+    'vidhide': 'vidhide', 'vidply': 'vidhide',
+    'streamwish': 'streamwish', 'swish': 'streamwish', 'awish': 'streamwish',
+    'voe': 'voe', 'doodstream': 'doodstream', 'dood': 'doodstream',
+    'goodstream': 'goodstream', 'hlswish': 'hlswish', 'vimeos': 'vimeos',
+    'minochinos': 'minochinos', 'hanerix': 'hanerix',
+    'morencius': 'morencius', 'tiktokshopping': 'morencius'
+  };
+  for (const kw of Object.keys(kws)) {
+    if (host.includes(kw)) return kws[kw];
+  }
+  return host || 'desconocido';
+}
+
+function _dedupEmbeds(list) {
+  const seen = new Set(), out = [];
+  for (const e of list || []) {
+    if (!e) continue;
+    const url = (e.url || '').trim();
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+    out.push({ url: url, proveedor: (e.proveedor || _proveedorDesdeUrl(url) || 'desconocido') });
+  }
+  return out;
+}
+
+// Normaliza la respuesta de /resolver o /episodios a [{url, proveedor}].
+function _embedsDesdeRespuesta(data) {
+  if (!data || typeof data !== 'object') return [];
+  const out = [];
+  if (Array.isArray(data.embeds)) out.push(...data.embeds);
+  for (const k of Object.keys(data)) {
+    if (k === 'embeds' || k === 'titulo' || k === 'portada' || k === 'error') continue;
+    const v = data[k];
+    if (!Array.isArray(v)) continue;
+    for (const ep of v) {
+      if (ep && Array.isArray(ep.embeds)) out.push(...ep.embeds);
+    }
+  }
+  if (out.length) return _dedupEmbeds(out);
+  const legacy = data.embed || data.original || data.url || data.m3u8 || '';
+  if (legacy) return _dedupEmbeds([{ url: legacy, proveedor: data.proveedor || data.servidor || '' }]);
+  return [];
+}
+
+function _esEmbedM3u8(embed) {
+  const u = ((embed && embed.url) || '').toLowerCase();
+  const p = ((embed && embed.proveedor) || '').toLowerCase();
+  return p === 'm3u8' || /\.m3u8(\?|$)/.test(u);
+}
+
+function _cargarHlsJs() {
+  if (window.Hls) return Promise.resolve();
+  if (_hlsjsPromise) return _hlsjsPromise;
+  _hlsjsPromise = new Promise(r => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js';
+    s.onload = () => r();
+    s.onerror = () => r();
+    document.head.appendChild(s);
+  });
+  return _hlsjsPromise;
+}
+
+function _limpiarContenedorEmbed() {
+  const iframe = document.getElementById('embed-iframe'); if (iframe) iframe.remove();
+  const wrap = document.getElementById('embed-video-container'); if (wrap) wrap.remove();
+  if (_embedReloj) { clearTimeout(_embedReloj); _embedReloj = null; }
+  if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
+}
+
+function _ocultarLoaderEmbed() {
   const vloader = document.getElementById('video-loader');
   if (vloader) vloader.style.display = 'none';
-  // Garantiza que el token esté disponible para construir /proxy_embed.
+  if (_embedReloj) { clearTimeout(_embedReloj); _embedReloj = null; }
+  if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
+}
+
+function _mostrarEmbedError(mensaje, motivo) {
+  const vloader = document.getElementById('video-loader');
+  if (vloader) vloader.style.display = 'none';
+  const err = document.getElementById('embed-error');
+  if (!err) return;
+  err.innerHTML =
+    '<div style="font-size:15px;font-weight:700;">⚠️ ' + esc(mensaje) + '</div>' +
+    (motivo ? '<div style="color:var(--text-muted);font-size:12px;margin-top:4px;">' + esc(motivo) + '</div>' : '') +
+    '<div style="margin-top:14px;"><button class="embed-retry-btn" onclick="_reintentarEmbed()">↻ Reintentar</button></div>';
+  err.style.display = 'flex';
+}
+
+function _ocultarEmbedError() {
+  const err = document.getElementById('embed-error');
+  if (err) err.style.display = 'none';
+}
+
+// Inserta el <iframe> del proveedor encima del backdrop del detalle.
+function _cargarEmbedIframe(url) {
+  _limpiarContenedorEmbed();
+  const container = document.getElementById('embedded-player-container');
+  const iframe = document.createElement('iframe');
+  iframe.id = 'embed-iframe';
+  iframe.allow = 'autoplay; fullscreen; encrypted-media; picture-in-picture';
+  iframe.allowFullscreen = true;
+  iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;background:#000;z-index:5;';
+  iframe.addEventListener('load', () => _ocultarLoaderEmbed());
+  iframe.src = url;
+  container.appendChild(iframe);
+  clearTimeout(_embedReloj);
+  _embedReloj = setTimeout(() => _avanzarEmbedAuto('El proveedor no respondió'), EMBED_WATCHDOG_MS);
+}
+
+// <video> para embeds m3u8 (última opción cuando el HTML no tenía iframes).
+async function _cargarEmbedVideo(url) {
+  _limpiarContenedorEmbed();
+  const container = document.getElementById('embedded-player-container');
+  const wrap = document.createElement('div');
+  wrap.id = 'embed-video-container';
+  wrap.style.cssText = 'position:absolute;inset:0;z-index:5;background:#000;display:flex;align-items:center;justify-content:center;';
+  const video = document.createElement('video');
+  video.id = 'embed-video';
+  video.src = url;
+  video.controls = true;
+  video.autoplay = true;
+  video.playsInline = true;
+  video.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+  video.addEventListener('playing', _ocultarLoaderEmbed);
+  video.addEventListener('canplay', _ocultarLoaderEmbed);
+  video.addEventListener('error', () => _avanzarEmbedAuto('El video no pudo reproducirse'));
+  wrap.appendChild(video);
+  container.appendChild(wrap);
+  await _cargarHlsJs();
+  if (window.Hls && window.Hls.isSupported()) {
+    const hls = new window.Hls({ maxBufferLength: 30, manifestLoadingMaxRetry: 6, fragLoadingMaxRetry: 8 });
+    hls.loadSource(url);
+    hls.attachMedia(video);
+  }
+  video.play().catch(() => {});
+  clearTimeout(_embedReloj);
+  _embedReloj = setTimeout(() => _avanzarEmbedAuto('El stream no arrancó'), EMBED_WATCHDOG_MS);
+}
+
+// Botones de embeds alternativos (fallback manual).
+function renderEmbedButtons() {
+  const bar = document.getElementById('embed-switcher');
+  if (!bar) return;
+  bar.innerHTML = '';
+  if (_embedsActuales.length <= 1) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  _embedsActuales.forEach((e, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'embed-btn' + (i === _embedActivoIdx ? ' active' : '');
+    btn.textContent = (e.proveedor || 'Embed') + (i === _embedActivoIdx ? ' ▶' : '');
+    btn.onclick = () => _cambiarEmbed(i);
+    bar.appendChild(btn);
+  });
+}
+
+function _cambiarEmbed(i) { _cargarEmbedEnPosicion(i); }
+function _reintentarEmbed() { _cargarEmbedEnPosicion(_embedActivoIdx); }
+
+// Carga un embed de la lista y vigila su arranque.
+async function _cargarEmbedEnPosicion(idx) {
+  const embed = _embedsActuales[idx];
+  if (!embed) {
+    _mostrarEmbedError('No hay más fuentes disponibles.');
+    renderEmbedButtons();
+    return;
+  }
+  _embedActivoIdx = idx;
+  renderEmbedButtons();
+  const vloader = document.getElementById('video-loader');
+  if (vloader) vloader.style.display = 'flex';
+  _ocultarEmbedError();
+  if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
+  window._tapHintTimer = setTimeout(function() {
+    const hint = document.getElementById('tap-to-play-hint');
+    const dots = document.getElementById('loader-dots');
+    if (hint && vloader && vloader.style.display !== 'none') {
+      hint.style.display = 'block';
+      if (dots) dots.style.display = 'none';
+    }
+  }, 6000);
+
+  if (_esEmbedM3u8(embed)) {
+    await _cargarEmbedVideo(embed.url);
+  } else {
+    await csEnsureToken();
+    const url = isExternalEmbed(embed.url) ? proxyEmbedUrl(embed.url) : embed.url;
+    _cargarEmbedIframe(url);
+  }
+}
+
+// Fallback automático: si el embed actual no arrancó, intenta el siguiente.
+function _avanzarEmbedAuto(motivo) {
+  if (_embedReloj) { clearTimeout(_embedReloj); _embedReloj = null; }
+  const vloader = document.getElementById('video-loader');
+  if (vloader && vloader.style.display === 'none') return;
+  const next = _embedActivoIdx + 1;
+  if (next < _embedsActuales.length) {
+    _cargarEmbedEnPosicion(next);
+  } else {
+    _mostrarEmbedError('El embed no está disponible en este momento.', motivo);
+  }
+}
+
+// Punto de entrada: recibe la lista [{url, proveedor}] y monta la cadena.
+async function loadEmbeds(embedsArray) {
+  _embedsActuales = _dedupEmbeds(embedsArray || []);
+  _embedActivoIdx = 0;
+  _ocultarEmbedError();
+  renderEmbedButtons();
+  await _cargarEmbedEnPosicion(0);
+}
+
+// Legacy: carga un solo iframe (usado por TV en vivo y fallbacks simples).
+async function loadEmbedIframe(embedUrl) {
+  const vloader = document.getElementById('video-loader');
+  if (vloader) vloader.style.display = 'none';
   await csEnsureToken();
-  // Eliminar iframe previo si existe
-  const old = document.getElementById('embed-iframe');
-  if (old) old.remove();
-  // Los embeds externos pasan por /proxy_embed ABSOLUTO con token (SSRF server-side).
+  _limpiarContenedorEmbed();
   if (isExternalEmbed(embedUrl)) embedUrl = proxyEmbedUrl(embedUrl);
+  const container = document.getElementById('embedded-player-container');
   const iframe = document.createElement('iframe');
   iframe.id = 'embed-iframe';
   iframe.src = embedUrl;
@@ -1410,9 +1666,16 @@ function closePlayerMechanics() {
   state.currentEpIdx = null;
   highlightActiveEp(null);
   clearInterval(state.progressSaverInterval);
+  _embedsActuales = [];
+  _embedActivoIdx = 0;
+  _limpiarContenedorEmbed();
+  if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
   const embedIframe = document.getElementById('embed-iframe');
   if (embedIframe) embedIframe.remove();
-  
+  const ew = document.getElementById('embed-video-container'); if (ew) ew.remove();
+  const err = document.getElementById('embed-error'); if (err) err.style.display = 'none';
+  const bar = document.getElementById('embed-switcher'); if (bar) bar.style.display = 'none';
+
   document.getElementById('detail-backdrop').style.display = 'block';
   document.getElementById('embedded-player-container').style.display = 'none';
   if (window.CineStranger) window.CineStranger.hidePlayer();
