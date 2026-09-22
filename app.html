@@ -1361,8 +1361,12 @@ async function downloadMain() {
 async function playEpisodeData(url, idx) {
   state.currentEpIdx = idx;
   highlightActiveEp(idx);
-  await resolveAndEmbed(url, url);
-  const eps = state.currentTemporadas[state.currentTab] || [];
+  const eps = (state.currentTemporadas && state.currentTemporadas[state.currentTab]) || [];
+  const ep = eps[idx] || null;
+  const id = url || (ep && ep.url) || '';
+  let embeds = _embedsDesdeEpisodio(ep);
+  if (!embeds.length) embeds = null;
+  await resolveAndEmbed(id, id, embeds);
   // prefetch episodios siguiente desactivado
 }
 
@@ -1376,7 +1380,7 @@ function videoPlaying() {
   if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
 }
 
-async function resolveAndEmbed(url, trackingUrl) {
+async function resolveAndEmbed(url, trackingUrl, embedsDirectos) {
   document.getElementById('detail-backdrop').style.display = 'none';
   document.getElementById('embedded-player-container').style.display = 'block';
   const tc = document.getElementById('themeCanvas'); if(tc) tc.style.zIndex = '-2';
@@ -1386,7 +1390,26 @@ async function resolveAndEmbed(url, trackingUrl) {
   state.trackingUrl = trackingUrl;
   document.getElementById('btn-play-main').style.display = 'none';
 
+  const item = state.currentItem;
+  const isSerie = !!(item && item.tipo === 'serie');
+
   try {
+    await csEnsureToken();
+
+    // ── SERIE: los episodios llegan con sus propios embeds ──────────
+    if (isSerie) {
+      const embeds = _dedupEmbeds(embedsDirectos || []);
+      if (embeds.length) {
+        // El episodio ya trae embeds → reproducción directa del primero.
+        await loadEmbedDirecto(embeds[0], embeds, 0);
+      } else {
+        // Sin embeds precargados → mostrar episodios con sus embeds.
+        await mostrarEpisodiosConEmbeds(url);
+      }
+      return;
+    }
+
+    // ── PELÍCULA: /resolver → embeds → iframe directo ───────────────
     const res = await apiFetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
     const data = await res.json();
     if (data.error) {
@@ -1394,15 +1417,13 @@ async function resolveAndEmbed(url, trackingUrl) {
       closePlayerMechanics();
       return;
     }
-    await csEnsureToken();
-    const title = state.currentItem ? (state.currentItem.titulo || '') : '';
     const embeds = _embedsDesdeRespuesta(data);
     if (!embeds.length) {
       _mostrarEmbedError('No se encontraron fuentes para reproducir el video.');
       return;
     }
-    // EMBEDS: cadena de fallback con botones de cambio (web + WebView Android).
-    await loadEmbeds(embeds);
+    // EMBEDS: cadena de fallback automático con botones de cambio.
+    await loadEmbedDirecto(embeds[0], embeds, 0);
   } catch (e) {
     const msg = e && e.message ? e.message : String(e);
     if (window.CineStranger) window.CineStranger.logError('RESOLVE_ERROR: ' + msg);
@@ -1411,14 +1432,47 @@ async function resolveAndEmbed(url, trackingUrl) {
   }
 }
 
+// Serie: carga y muestra los episodios del título junto con sus embeds.
+async function mostrarEpisodiosConEmbeds(url) {
+  try {
+    const endpoint = url.includes('cuevana.you') ? 'episodios_c3' : 'episodios';
+    const res = await apiFetch(`${getServer()}/${endpoint}?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+    state.currentTemporadas = data;
+    const temps = Object.keys(data || {}).filter(t => data[t] && data[t].length > 0).sort((a,b) => parseInt(a.replace("T","")) - parseInt(b.replace("T","")));
+    if (!temps.length) {
+      _mostrarEmbedError('Este título no tiene episodios con embeds disponibles.');
+      return;
+    }
+    state.currentTab = temps[0];
+    document.getElementById('detail-duration-lbl').textContent = temps.length + (temps.length === 1 ? ' temporada' : ' temporadas');
+    document.getElementById('season-dropdown-label').textContent = 'Temporada ' + temps[0].replace('T','');
+    document.getElementById('detail-episodes-section').style.display = 'block';
+    renderEpisodes(temps[0]);
+    // Si se llamó desde un episodio concreto, intentar reproducirlo.
+    const currentEp = state.currentEpIdx;
+    if (currentEp != null) {
+      const eps = state.currentTemporadas[state.currentTab] || [];
+      const ep = eps[currentEp] || eps[0];
+      const eb = ep ? _embedsDesdeEpisodio(ep) : [];
+      if (eb.length) await loadEmbedDirecto(eb[0], eb, 0);
+    }
+  } catch (e) {
+    const msg = e && e.message ? e.message : String(e);
+    _mostrarEmbedError('No se pudieron cargar los episodios.', msg);
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════
-// EMBEDS: carga con cadena de fallback (WebView / iframe / video HLS)
-// Cada episodio llega como {T1: [{num, embeds: [{url, proveedor}]}]}.
+// EMBEDS: carga DIRECTO en <iframe> (filemoon y otros proveedores).
+// El servidor devuelve {titulo, T1: [{embeds: [{url, proveedor}]}]};
+// cada embed se inserta en un <iframe> con watchdog de 12s y fallback.
 // ═══════════════════════════════════════════════════════════════════
 const EMBED_WATCHDOG_MS = 12000;
 let _embedsActuales = [];
 let _embedActivoIdx = 0;
-let _embedReloj = null;          // watchdog del embed en curso
+let _embedReloj = null;          // watchdog del embed en curso (m3u8 legacy)
+let _embedDirectoTimer = null;   // watchdog del iframe directo
 let _hlsjsPromise = null;
 
 function _proveedorDesdeUrl(u) {
@@ -1472,6 +1526,14 @@ function _embedsDesdeRespuesta(data) {
   return [];
 }
 
+// Embeds YA incluidos en un episodio (formato {T1: [{embeds: [...]}]}).
+function _embedsDesdeEpisodio(ep) {
+  if (!ep) return [];
+  const raw = Array.isArray(ep.embeds) ? ep.embeds
+    : (ep.embed ? (typeof ep.embed === 'string' ? [{ url: ep.embed }] : [ep.embed]) : []);
+  return _dedupEmbeds(raw);
+}
+
 function _esEmbedM3u8(embed) {
   const u = ((embed && embed.url) || '').toLowerCase();
   const p = ((embed && embed.proveedor) || '').toLowerCase();
@@ -1495,6 +1557,7 @@ function _limpiarContenedorEmbed() {
   const iframe = document.getElementById('embed-iframe'); if (iframe) iframe.remove();
   const wrap = document.getElementById('embed-video-container'); if (wrap) wrap.remove();
   if (_embedReloj) { clearTimeout(_embedReloj); _embedReloj = null; }
+  if (_embedDirectoTimer) { clearTimeout(_embedDirectoTimer); _embedDirectoTimer = null; }
   if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
 }
 
@@ -1502,6 +1565,7 @@ function _ocultarLoaderEmbed() {
   const vloader = document.getElementById('video-loader');
   if (vloader) vloader.style.display = 'none';
   if (_embedReloj) { clearTimeout(_embedReloj); _embedReloj = null; }
+  if (_embedDirectoTimer) { clearTimeout(_embedDirectoTimer); _embedDirectoTimer = null; }
   if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
 }
 
@@ -1520,6 +1584,66 @@ function _mostrarEmbedError(mensaje, motivo) {
 function _ocultarEmbedError() {
   const err = document.getElementById('embed-error');
   if (err) err.style.display = 'none';
+}
+
+// Carga un embed DIRECTO en <iframe> (filemoon y otros proveedores).
+// Cadena de fallback: si no arranca en 12s prueba el siguiente embed.
+// Si todos fallan: muestra error + botón "Reintentar".
+async function loadEmbedDirecto(embed, embedsArray, idx) {
+  if (_embedDirectoTimer) { clearTimeout(_embedDirectoTimer); _embedDirectoTimer = null; }
+  if (embedsArray) _embedsActuales = _dedupEmbeds(embedsArray);
+  if (idx != null) _embedActivoIdx = idx;
+
+  const e = embed || _embedsActuales[_embedActivoIdx];
+  if (!e) {
+    _mostrarEmbedError('El embed no está disponible en este momento.', 'Se agotaron las fuentes');
+    renderEmbedButtons();
+    return;
+  }
+
+  renderEmbedButtons();
+  _ocultarEmbedError();
+  const vloader = document.getElementById('video-loader');
+  if (vloader) vloader.style.display = 'flex';
+  if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
+  window._tapHintTimer = setTimeout(function () {
+    const hint = document.getElementById('tap-to-play-hint');
+    const dots = document.getElementById('loader-dots');
+    if (hint && vloader && vloader.style.display !== 'none') {
+      hint.style.display = 'block';
+      if (dots) dots.style.display = 'none';
+    }
+  }, 6000);
+
+  // <iframe> directo con el embed del proveedor (filemoon, etc).
+  _limpiarContenedorEmbed();
+  await csEnsureToken();
+  const url = isExternalEmbed(e.url) ? proxyEmbedUrl(e.url) : e.url;
+  const container = document.getElementById('embedded-player-container');
+  const iframe = document.createElement('iframe');
+  iframe.id = 'embed-iframe';
+  iframe.allow = 'autoplay; fullscreen; encrypted-media; picture-in-picture';
+  iframe.allowFullscreen = true;
+  iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;background:#000;z-index:5;';
+  iframe.addEventListener('load', () => _ocultarLoaderEmbed());
+  iframe.src = url;
+  container.appendChild(iframe);
+
+  // Watchdog: el proveedor tiene 12s para arrancar antes de probar otro.
+  _embedDirectoTimer = setTimeout(() => _avanzarEmbedDirecto(e.proveedor || 'El proveedor no respondió'), EMBED_WATCHDOG_MS);
+}
+
+// Fallback automático: si el iframe no arrancó en 12s → siguiente embed.
+function _avanzarEmbedDirecto(motivo) {
+  if (_embedDirectoTimer) { clearTimeout(_embedDirectoTimer); _embedDirectoTimer = null; }
+  const vloader = document.getElementById('video-loader');
+  if (vloader && vloader.style.display === 'none') return; // ya arrancó
+  const next = _embedActivoIdx + 1;
+  if (next < _embedsActuales.length) {
+    loadEmbedDirecto(_embedsActuales[next], _embedsActuales, next);
+  } else {
+    _mostrarEmbedError('El embed no está disponible en este momento.', motivo);
+  }
 }
 
 // Inserta el <iframe> del proveedor encima del backdrop del detalle.
@@ -1596,26 +1720,12 @@ async function _cargarEmbedEnPosicion(idx) {
     return;
   }
   _embedActivoIdx = idx;
-  renderEmbedButtons();
-  const vloader = document.getElementById('video-loader');
-  if (vloader) vloader.style.display = 'flex';
-  _ocultarEmbedError();
-  if (window._tapHintTimer) { clearTimeout(window._tapHintTimer); window._tapHintTimer = null; }
-  window._tapHintTimer = setTimeout(function() {
-    const hint = document.getElementById('tap-to-play-hint');
-    const dots = document.getElementById('loader-dots');
-    if (hint && vloader && vloader.style.display !== 'none') {
-      hint.style.display = 'block';
-      if (dots) dots.style.display = 'none';
-    }
-  }, 6000);
-
   if (_esEmbedM3u8(embed)) {
     await _cargarEmbedVideo(embed.url);
   } else {
+    // Todos los embeds van directo al <iframe> (filemoon, etc).
     await csEnsureToken();
-    const url = isExternalEmbed(embed.url) ? proxyEmbedUrl(embed.url) : embed.url;
-    _cargarEmbedIframe(url);
+    await loadEmbedDirecto(embed, _embedsActuales, idx);
   }
 }
 
@@ -1740,18 +1850,22 @@ function renderEpisodes(t) {
       ? `<div style="position:absolute;bottom:0;left:0;width:100%;height:3px;background:rgba(255,255,255,0.2)"><div style="width:${percent}%;height:100%;background:${barColor};"></div></div>`
       : '';
     const thePortada = safeImgUrl(ep.portada || state.currentItem?.portada || '');
+    const provEmbeds = _embedsDesdeEpisodio(ep);
+    const provLabel = provEmbeds.length
+      ? provEmbeds.map(x => x.proveedor || _proveedorDesdeUrl(x.url)).filter(Boolean).join(' · ')
+      : '';
     const node = document.createElement('div');
     node.className = 'ep-node';
     node.innerHTML = `
       <div class="ep-row-top">
-        <div class="ep-media-box" onclick="playEpisodeData('${escJs(ep.url)}', ${i})" style="position:relative;">
+        <div class="ep-media-box" onclick="playEpisodeData('${escJs(ep.url || '')}', ${i})" style="position:relative;">
           <img src="${esc(thePortada)}" onerror="this.onerror=null;this.src='${escJs(thePortada)}'">
           <div class="ep-play-overlay"><div class="ep-play-ring">&#9654;</div></div>
           ${progressBar}
         </div>
         <div class="ep-meta-info">
           <div class="ep-headline">${i + 1}. ${esc(ep.titulo || 'Episodio ' + (i+1))}</div>
-          <div class="ep-runtime">${finished ? '&#10003; Visto' : percent > 2 ? Math.round(percent) + '% visto' : '45m'}</div>
+          <div class="ep-runtime">${finished ? '&#10003; Visto' : percent > 2 ? Math.round(percent) + '% visto' : '45m'}${provLabel ? ' · ' + esc(provLabel) : ''}</div>
         </div>
       </div>`;
     list.appendChild(node);
