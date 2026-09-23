@@ -1454,9 +1454,16 @@ async function reproducirDesdeResolver(url) {
 
     // 1) response.embed → <iframe> directo (WebView) con m3u8 de respaldo.
     if (data.embed) {
-      const cadena = [{ url: data.embed, proveedor: data.proveedor || _proveedorDesdeUrl(data.embed) }];
+      let cadena = [];
+      if (Array.isArray(data.embeds) && data.embeds.length) {
+        cadena = data.embeds
+          .filter(x => x && x.url)
+          .map(x => ({ url: x.url, proveedor: x.proveedor || _proveedorDesdeUrl(x.url) }));
+      } else {
+        cadena = [{ url: data.embed, proveedor: data.proveedor || _proveedorDesdeUrl(data.embed) }];
+      }
       const m3u8b = data.url || data.m3u8;
-      if (m3u8b) cadena.push({ url: m3u8b, proveedor: 'm3u8' });
+      if (m3u8b && !cadena.some(c => c.url === m3u8b)) cadena.push({ url: m3u8b, proveedor: 'm3u8' });
       const embeds = _dedupEmbeds(cadena);
       await loadEmbedDirecto(embeds[0], embeds, 0);
       return;
