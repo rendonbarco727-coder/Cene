@@ -1242,6 +1242,9 @@ function openDetail(item, fromPopstate) {
   const epsSection = document.getElementById('detail-episodes-section');
 
   const btnDownload = document.getElementById('btn-download-main');
+  document.getElementById('detail-desc').textContent = "Cargando sinopsis...";
+  // Cargar metadatos reales del servidor (serie y película)
+  cargarDetalle(item.url, isSerie);
   if (isSerie) {
     btnPlay.style.display = 'none';
     if (btnDownload) btnDownload.style.display = 'none';
@@ -1251,9 +1254,6 @@ function openDetail(item, fromPopstate) {
     if (btnDownload) btnDownload.style.display = 'inline-flex';
     btnPlay.style.display = 'block';
     epsSection.style.display = 'none';
-    document.getElementById('detail-desc').textContent = "Cargando sinopsis...";
-    // Cargar metadatos reales del servidor
-    cargarDetalle(item.url, isSerie);
   }
 
   document.getElementById('detail-overlay').style.display = 'flex';
@@ -1395,16 +1395,17 @@ async function resolveAndEmbed(url, trackingUrl, embedsDirectos) {
   try {
     await csEnsureToken();
 
-    // ── SERIE: los episodios llegan con sus propios embeds ──────────
+    // ── SERIE: episodios con embeds pre-cargados → reprod. directa; ──
+    // ── si no, resolver el episodio (embeds WebView del servidor). ──
     if (isSerie) {
       const embeds = _dedupEmbeds(embedsDirectos || []);
       if (embeds.length) {
         // El episodio ya trae embeds → reproducción directa del primero.
         await loadEmbedDirecto(embeds[0], embeds, 0);
-      } else {
-        // Sin embeds precargados → mostrar episodios con sus embeds.
-        await mostrarEpisodiosConEmbeds(url);
+        return;
       }
+      // Sin embeds precargados → /resolver responde embed WebView + m3u8.
+      await reproducirDesdeResolver(url);
       return;
     }
 
@@ -1431,6 +1432,98 @@ async function resolveAndEmbed(url, trackingUrl, embedsDirectos) {
     alert("Error cargando el flujo de streaming: " + msg);
     closePlayerMechanics();
   }
+}
+
+// Resuelve una URL (episodio o película) y reproduce el resultado:
+// embed WebView directo, m3u8 vía /stream/HLS, o selector de idioma.
+async function reproducirDesdeResolver(url) {
+  try {
+    const res = await apiFetch(`${getServer()}/resolver?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+    if (data.error) {
+      alert("No se pudo resolver el video: " + data.error);
+      closePlayerMechanics();
+      return;
+    }
+
+    // 0) Sin Latino disponible → el servidor manda la lista de idiomas.
+    if (data.necesita_idioma && Array.isArray(data.idiomas)) {
+      _mostrarSelectorIdioma(data.idiomas);
+      return;
+    }
+
+    // 1) response.embed → <iframe> directo (WebView) con m3u8 de respaldo.
+    if (data.embed) {
+      const cadena = [{ url: data.embed, proveedor: data.proveedor || _proveedorDesdeUrl(data.embed) }];
+      const m3u8b = data.url || data.m3u8;
+      if (m3u8b) cadena.push({ url: m3u8b, proveedor: 'm3u8' });
+      const embeds = _dedupEmbeds(cadena);
+      await loadEmbedDirecto(embeds[0], embeds, 0);
+      return;
+    }
+
+    // 2) response.url (m3u8) → usar en <video>
+    const videoUrl = data.url || data.m3u8;
+    if (videoUrl) {
+      _embedsActuales = _dedupEmbeds([{ url: videoUrl, proveedor: 'm3u8' }]);
+      _embedActivoIdx = 0;
+      await _cargarEmbedVideo(videoUrl);
+      return;
+    }
+
+    // 3) fallback: cadena de embeds existente
+    const embeds = _embedsDesdeRespuesta(data);
+    if (!embeds.length) {
+      _mostrarEmbedError('No se encontraron fuentes para reproducir el video.');
+      return;
+    }
+    await loadEmbedDirecto(embeds[0], embeds, 0);
+  } catch (e) {
+    const msg = e && e.message ? e.message : String(e);
+    if (window.CineStranger) window.CineStranger.logError('RESOLVE_ERROR: ' + msg);
+    alert("Error cargando el flujo de streaming: " + msg);
+    closePlayerMechanics();
+  }
+}
+
+// Selector de idiomas/servidores (C3 sin Latino): botón por idioma →
+// servidor, reproduce el embed elegido.
+function _mostrarSelectorIdioma(idiomas) {
+  const existing = document.getElementById('idioma-picker');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'idioma-picker';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#141414;border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:20px;min-width:240px;max-width:90vw;max-height:80vh;overflow-y:auto;';
+  const title = document.createElement('h3');
+  title.textContent = 'Elige idioma';
+  title.style.cssText = 'color:#fff;margin:0 0 12px;font-size:16px;text-align:center;';
+  box.appendChild(title);
+  idiomas.forEach(grupo => {
+    const label = document.createElement('div');
+    label.textContent = grupo.idioma;
+    label.style.cssText = 'color:#e50914;font-weight:bold;font-size:13px;margin:10px 0 6px;text-transform:uppercase;';
+    box.appendChild(label);
+    (grupo.servidores || []).forEach(s => {
+      const btn = document.createElement('button');
+      btn.textContent = s.nombre || 'Servidor';
+      btn.style.cssText = 'display:block;width:100%;margin:4px 0;padding:10px;background:#222;border:1px solid #333;border-radius:6px;color:#fff;font-size:14px;cursor:pointer;';
+      btn.onclick = () => {
+        overlay.remove();
+        const embeds = _dedupEmbeds([{ url: s.url, proveedor: (s.nombre || '') + '·' + grupo.idioma }]);
+        loadEmbedDirecto(embeds[0], embeds, 0);
+      };
+      box.appendChild(btn);
+    });
+  });
+  const cancel = document.createElement('button');
+  cancel.textContent = '✕ Cerrar';
+  cancel.style.cssText = 'display:block;width:100%;margin-top:14px;padding:8px;background:transparent;border:1px solid #444;border-radius:6px;color:#999;cursor:pointer;';
+  cancel.onclick = () => overlay.remove();
+  box.appendChild(cancel);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
 }
 
 // Serie: carga y muestra los episodios del título junto con sus embeds.
@@ -1599,6 +1692,12 @@ async function loadEmbedDirecto(embed, embedsArray, idx) {
   if (!e) {
     _mostrarEmbedError('El embed no está disponible en este momento.', 'Se agotaron las fuentes');
     renderEmbedButtons();
+    return;
+  }
+
+  // El proveedor m3u8 NO va en iframe: va a un <video> con HLS.js.
+  if (e.proveedor === 'm3u8' || /\.m3u8(\?|$)/i.test(e.url || '')) {
+    await _cargarEmbedVideo(e.url);
     return;
   }
 
